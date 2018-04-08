@@ -1,6 +1,7 @@
 package com.aizone.blockchain.core;
 
-import com.aizone.blockchain.encrypt.SHAUtils;
+import com.aizone.blockchain.encrypt.HashUtils;
+import com.google.common.base.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,12 +39,15 @@ public class Chain {
 		unPackedTransactions = new ArrayList<>();
 		//创建创世区块
 		Block block = new Block();
-		block.setIndex(1);
-		block.setNonce(100);
-		block.setPreviousHash("1");
-		block.setDifficulty(BLOCK_DIFFICULT);
-		block.setTimestamp(new Date());
-		block.setTransactions(new ArrayList<>());
+		BlockHeader header = new BlockHeader();
+		header.setIndex(blocks.size()+1);
+		header.setNonce(100);
+		header.setPreviousHash("1");
+		header.setDifficulty(BLOCK_DIFFICULT);
+		header.setTimestamp(new Date());
+		block.setHeader(header);
+		block.setHash(HashUtils.sha256(header.toString()));
+		block.setBody(new BlockBody());
 		blocks.add(block);
 	}
 
@@ -78,17 +82,21 @@ public class Chain {
 	 * 开始挖矿
 	 * @return
 	 */
-	public Block Mining() {
+	public Block mining() {
 		Integer nonce = miner.proofOfWork(blocks.get(blocks.size()-1));
-		Block prevBlock = blocks.get(blocks.size() - 1);
+		Block lastBlock = getLastBlock();
 		Block block = new Block();
-		block.setIndex(blocks.size());
-		block.setNonce(nonce);
-		block.setTransactions(getUnPackedTransactions());
-		block.setDifficulty(BLOCK_DIFFICULT);
-		block.setPreviousHash(prevBlock.getHash());
-		block.setTimestamp(new Date());
-		block.setHash(SHAUtils.sha256(block.toString()));
+		//创建区块头
+		BlockHeader header = new BlockHeader();
+		header.setIndex(blocks.size()+1);
+		header.setNonce(nonce);
+		header.setDifficulty(BLOCK_DIFFICULT);
+		header.setPreviousHash(lastBlock.getHash());
+		header.setTimestamp(new Date());
+		block.setHash(HashUtils.sha256(header.toString()));
+		block.setHeader(header);
+		//打包交易
+		block.setBody(new BlockBody(getUnPackedTransactions()));
 		blocks.add(block);
 		return block;
 	}
@@ -98,9 +106,17 @@ public class Chain {
 	 * @param transaction
 	 */
 	public Transaction sendTransaction(Transaction transaction) {
-		String txjHash = SHAUtils.sha256(transaction.toString());
-		transaction.setTxHash(txjHash);
+		String txjHash = HashUtils.sha256(transaction.toString());
+		transaction.setTxHash(Optional.of(txjHash));
 		unPackedTransactions.add(transaction);
 		return transaction;
+	}
+
+	/**
+	 * 获取最后一个区块
+	 * @return
+	 */
+	public Block getLastBlock() {
+		return blocks.get(blocks.size() - 1);
 	}
 }

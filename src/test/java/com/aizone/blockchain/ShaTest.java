@@ -1,6 +1,6 @@
 package com.aizone.blockchain;
 
-import com.aizone.blockchain.encrypt.SHAUtils;
+import com.aizone.blockchain.encrypt.HashUtils;
 import org.junit.Test;
 
 /**
@@ -11,7 +11,8 @@ public class ShaTest {
 
 	@Test
 	public void sha256Test() {
-		String key = SHAUtils.sha256("aizone");
+		String key = HashUtils.sha256("aizone");
 		System.out.println(key.length());
 	}
+
 }

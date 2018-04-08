@@ -1,5 +1,7 @@
 package com.aizone.blockchain.core;
 
+import com.google.common.base.Optional;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -30,7 +32,7 @@ public class Transaction {
 	/**
 	 * 交易金额
 	 */
-	private BigDecimal amout;
+	private BigDecimal amount;
 	/**
 	 * 交易时间戳
 	 */
@@ -45,60 +47,60 @@ public class Transaction {
 	 */
 	private Serializable data;
 
-	public String getSender() {
-		return sender;
+	public Optional<String> getSender() {
+		return Optional.of(sender);
 	}
 
-	public void setSender(String sender) {
-		this.sender = sender;
+	public void setSender(Optional<String> sender) {
+		this.sender = sender.get();
 	}
 
 	public String getSign() {
 		return sign;
 	}
 
-	public void setSign(String sign) {
-		this.sign = sign;
+	public void setSign(Optional<String> sign) {
+		this.sign = sign.get();
 	}
 
 	public String getRecipient() {
 		return recipient;
 	}
 
-	public void setRecipient(String recipient) {
-		this.recipient = recipient;
+	public void setRecipient(Optional<String> recipient) {
+		this.recipient = recipient.get();
 	}
 
 	public String getPublicKey() {
 		return publicKey;
 	}
 
-	public void setPublicKey(String publicKey) {
-		this.publicKey = publicKey;
+	public void setPublicKey(Optional<String> publicKey) {
+		this.publicKey = publicKey.get();
 	}
 
-	public BigDecimal getAmout() {
-		return amout;
+	public BigDecimal getAmount() {
+		return amount;
 	}
 
-	public void setAmout(BigDecimal amout) {
-		this.amout = amout;
+	public void setAmount(Optional<BigDecimal> amount) {
+		this.amount = amount.get();
 	}
 
 	public Date getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
+	public void setTimestamp(Optional<Date> timestamp) {
+		this.timestamp = timestamp.get();
 	}
 
 	public String getTxHash() {
 		return txHash;
 	}
 
-	public void setTxHash(String txHash) {
-		this.txHash = txHash;
+	public void setTxHash(Optional<String> txHash) {
+		this.txHash = txHash.get();
 	}
 
 	public Serializable getData() {
@@ -115,7 +117,7 @@ public class Transaction {
 				"sender='" + sender + '\'' +
 				", recipient='" + recipient + '\'' +
 				", publicKey='" + publicKey + '\'' +
-				", amout=" + amout +
+				", amount=" + amount +
 				", timestamp=" + timestamp +
 				", txHash='" + txHash + '\'' +
 				", data=" + data +

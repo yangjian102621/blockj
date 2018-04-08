@@ -1,6 +1,6 @@
 package com.aizone.blockchain.core;
 
-import com.aizone.blockchain.encrypt.SHAUtils;
+import com.aizone.blockchain.encrypt.HashUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,7 +19,7 @@ public class Miner {
 	 */
 	public Integer proofOfWork(Block lastBlock) {
 		Integer nonce = 1;
-		while (!validProof(lastBlock.getNonce(), nonce)) {
+		while (!validProof(lastBlock.getHeader().getNonce(), nonce)) {
 			nonce++;
 		}
 		return nonce;
@@ -33,7 +33,7 @@ public class Miner {
 	 */
 	public boolean validProof(Integer lastNonce, Integer nonce) {
 
-		String guess = SHAUtils.sha256(lastNonce.toString()+nonce.toString());
+		String guess = HashUtils.sha256(lastNonce.toString()+nonce.toString());
 		return guess.startsWith("00000");
 	}
 

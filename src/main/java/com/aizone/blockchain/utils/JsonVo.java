@@ -7,6 +7,9 @@ package com.aizone.blockchain.utils;
  */
 public class JsonVo {
 
+	public static final int CODE_SUCCESS = 200;
+	public static final int CODE_FAIL = 400;
+
 	/**
 	 * 返回状态码
 	 */
@@ -22,18 +25,28 @@ public class JsonVo {
 
 	public JsonVo() {}
 
-	public JsonVo(int code, String message, Class<?> item) {
+	public JsonVo(int code, String message, Object item) {
 		this.code = code;
 		this.message = message;
 		this.item = item;
 	}
 
+	public JsonVo(int code, String message) {
+		this.code = code;
+		this.message = message;
+	}
+
+	public JsonVo(int code, Object item) {
+		this.code = code;
+		this.item = item;
+	}
+
 	public static JsonVo success() {
-		return new JsonVo(200, "SUCCESS", null);
+		return new JsonVo(CODE_SUCCESS, "SUCCESS", null);
 	}
 
 	public static JsonVo fail() {
-		return new JsonVo(400, "FAIL", null);
+		return new JsonVo(CODE_FAIL, "FAIL", null);
 	}
 
 	public int getCode() {

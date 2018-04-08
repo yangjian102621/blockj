@@ -26,6 +26,13 @@ public class Account {
 	 */
 	private BigDecimal balance;
 
+	public Account(String privateKey, String publicKey, String address, BigDecimal balance) {
+		this.privateKey = privateKey;
+		this.publicKey = publicKey;
+		this.address = address;
+		this.balance = balance;
+	}
+
 	public String getPrivateKey() {
 		return privateKey;
 	}

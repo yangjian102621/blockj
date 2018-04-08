@@ -1,10 +1,12 @@
 package com.aizone.blockchain.controller;
 
+import com.aizone.blockchain.core.Block;
+import com.aizone.blockchain.core.Chain;
+import com.aizone.blockchain.core.Transaction;
 import com.aizone.blockchain.utils.JsonVo;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.google.common.base.Preconditions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,8 +15,19 @@ import javax.servlet.http.HttpServletRequest;
  * @since 2018-04-07 上午10:50.
  */
 @RestController
-@RequestMapping("/block")
+@RequestMapping("/chain")
 public class BlockController {
+	/**
+	 * 收款人私钥，测试数据
+	 */
+	private static final String SENDER_PRIVATE_KEY = "";
+	/**
+	 * 收款人公钥，测试数据
+	 */
+	private static final String SENDER_PUBLIC_KEY = "";
+
+	@Autowired
+	private Chain chain;
 
 	@GetMapping({"", "/", "index"})
 	public JsonVo index(HttpServletRequest request) {
@@ -28,7 +41,13 @@ public class BlockController {
 	 */
 	@GetMapping("/mine")
 	public JsonVo mine(HttpServletRequest request) {
-		return JsonVo.success();
+
+		Block block = chain.mining();
+		JsonVo vo = new JsonVo();
+		vo.setCode(JsonVo.CODE_SUCCESS);
+		vo.setMessage("Create a new block");
+		vo.setItem(block);
+		return vo;
 	}
 
 	/**
@@ -36,18 +55,25 @@ public class BlockController {
 	 * @param request
 	 * @return
 	 */
-	@GetMapping("/chain")
-	public JsonVo chain(HttpServletRequest request) {
-		return JsonVo.success();
+	@GetMapping("/block/view")
+	public JsonVo viewChain(HttpServletRequest request) {
+		JsonVo success = JsonVo.success();
+		success.setItem(chain);
+		return success;
+
 	}
 
 	/**
 	 * 发送交易
-	 * @param request
+	 * @param transaction
 	 * @return
 	 */
 	@PostMapping("/transactions/new")
-	public JsonVo sendTransaction(HttpServletRequest request) {
+	public JsonVo sendTransaction(@RequestBody Transaction transaction) {
+		Preconditions.checkNotNull(transaction.getSender(), "sender is needed.");
+		Preconditions.checkNotNull(transaction.getRecipient(), "recipient is needed.");
+		Preconditions.checkNotNull(transaction.getAmount(), "Amount is needed.");
+		//transaction.setPublicKey();
 		return JsonVo.success();
 	}
 
@@ -70,4 +96,5 @@ public class BlockController {
 	public JsonVo sync(HttpServletRequest request) {
 		return JsonVo.success();
 	}
+
 }
