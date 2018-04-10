@@ -1,5 +1,9 @@
 package com.aizone.blockchain.wallet;
 
+import com.aizone.blockchain.encrypt.WalletUtils;
+
+import java.security.KeyPair;
+
 /**
  * 账户控制工具类, 锁定，解锁等操作
  * @author yangjian
@@ -12,10 +16,9 @@ public class Personal {
 	 * @return
 	 */
 	public static Account newAccount() throws Exception {
-//		String privateKey = ECDSAAlgorithm.generatePrivateKey();
-//		String publicKey = ECDSAAlgorithm.generatePublicKey(privateKey);
-//		String address = ECDSAAlgorithm.getAddress(publicKey);
-//		return new Account(privateKey, publicKey, address, BigDecimal.ZERO);
-		return null;
+		KeyPair keyPair = WalletUtils.generateKeyPair();
+		Account account = new Account(keyPair.getPublic().getEncoded());
+
+		return account;
 	}
 }

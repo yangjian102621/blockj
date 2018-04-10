@@ -33,7 +33,7 @@ public class Miner {
 	 */
 	public boolean validProof(Integer lastNonce, Integer nonce) {
 
-		String guess = HashUtils.sha256(lastNonce.toString()+nonce.toString());
+		String guess = HashUtils.sha256Hex(lastNonce.toString()+nonce.toString());
 		return guess.startsWith("00000");
 	}
 

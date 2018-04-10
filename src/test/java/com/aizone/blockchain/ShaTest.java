@@ -11,7 +11,7 @@ public class ShaTest {
 
 	@Test
 	public void sha256Test() {
-		String key = HashUtils.sha256("aizone");
+		String key = HashUtils.sha256Hex("aizone");
 		System.out.println(key.length());
 	}
 

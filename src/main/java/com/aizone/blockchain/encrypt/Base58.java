@@ -12,40 +12,15 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 /**
- * Base58 编码算法，用来生成比特币地址
- * alphanumeric strings.
- * <p>
- * Note that this is not the same base58 as used by Flickr, which you may find
- * referenced around the Internet.
- * <p>
- * instead, which adds support for testing the prefix and suffix bytes commonly
- * found in addresses.
- * <p>
- * Satoshi explains: why base-58 instead of standard base-64 encoding?
- * <ul>
- * <li>Don't want 0OIl characters that look the same in some fonts and could be
- * used to create visually identical looking account numbers.</li>
- * <li>A string with non-alphanumeric characters is not as easily accepted as an
- * account number.</li>
- * <li>E-mail usually won't line-break if there's no punctuation to break at.</li>
- * <li>Doubleclicking selects the whole number as one word if it's all
- * alphanumeric.</li>
- * </ul>
- * <p>
- * However, note that the encoding/decoding runs in O(n&sup2;) time, so it is
- * not useful for large data.
- * <p>
- * The basic idea of the encoding is to treat the data bytes as a large number
- * represented using base-256 digits, convert the number to be represented using
- * base-58 digits, preserve the exact number of leading zeros (which are
- * otherwise lost during the mathematical operations on the numbers), and
- * finally represent the resulting base-58 digits as alphanumeric ASCII
- * characters.
+ * Base58 编码算法实现
+ * @author yangjian
  */
-public class Base58Utils {
+public class Base58 {
+
 	public static final char[] ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".toCharArray();
 	private static final char ENCODED_ZERO = ALPHABET[0];
 	private static final int[] INDEXES = new int[128];
+
 	static {
 		Arrays.fill(INDEXES, -1);
 		for (int i = 0; i < ALPHABET.length; i++) {
@@ -55,9 +30,7 @@ public class Base58Utils {
 
 	/**
 	 * Encodes the given bytes as a base58 string (no checksum is appended).
-	 *
-	 * @param input
-	 *            the bytes to encode
+	 * @param input the bytes to encode
 	 * @return the base58-encoded string
 	 */
 	public static String encode(byte[] input) {
@@ -71,14 +44,15 @@ public class Base58Utils {
 		}
 		// Convert base-256 digits to base-58 digits (plus conversion to ASCII
 		// characters)
-		input = Arrays.copyOf(input, input.length); // since we modify it
-													// in-place
-		char[] encoded = new char[input.length * 2]; // upper bound
+		input = Arrays.copyOf(input, input.length);
+		// in-place
+		char[] encoded = new char[input.length * 2];
 		int outputStart = encoded.length;
 		for (int inputStart = zeros; inputStart < input.length;) {
 			encoded[--outputStart] = ALPHABET[divmod(input, inputStart, 256, 58)];
 			if (input[inputStart] == 0) {
-				++inputStart; // optimization - skip leading zeros
+				// optimization - skip leading zeros
+				++inputStart;
 			}
 		}
 		// Preserve exactly as many leading encoded zeros in output as there
@@ -99,6 +73,7 @@ public class Base58Utils {
 	 * @param input
 	 *            the base58-encoded string to decode
 	 * @return the decoded data bytes
+	 * @throws RuntimeException
 	 *             if the given string is not a valid base58 string
 	 */
 	public static byte[] decode(String input) throws RuntimeException {
@@ -127,7 +102,8 @@ public class Base58Utils {
 		for (int inputStart = zeros; inputStart < input58.length;) {
 			decoded[--outputStart] = divmod(input58, inputStart, 58, 256);
 			if (input58[inputStart] == 0) {
-				++inputStart; // optimization - skip leading zeros
+				// optimization - skip leading zeros
+				++inputStart;
 			}
 		}
 		// Ignore extra leading zeroes that were added during the calculation.
@@ -153,7 +129,7 @@ public class Base58Utils {
 	 * @throws AddressFormatException
 	 *             if the input is not base 58 or the checksum does not
 	 *             validate.
-	 * 
+	 *
 	 *             public static byte[] decodeChecked(String input) throws
 	 *             AddressFormatException { byte[] decoded = decode(input); if
 	 *             (decoded.length < 4) throw new
@@ -197,5 +173,4 @@ public class Base58Utils {
 		}
 		return (byte) remainder;
 	}
-
 }

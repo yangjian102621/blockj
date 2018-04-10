@@ -1,5 +1,6 @@
 package com.aizone.blockchain.core;
 
+import com.aizone.blockchain.encrypt.WalletUtils;
 import com.google.common.base.Optional;
 
 import java.io.Serializable;
@@ -28,7 +29,7 @@ public class Transaction {
 	/**
 	 * 收款人公钥
 	 */
-	private String publicKey;
+	private byte[] publicKey;
 	/**
 	 * 交易金额
 	 */
@@ -71,11 +72,11 @@ public class Transaction {
 		this.recipient = recipient.get();
 	}
 
-	public String getPublicKey() {
+	public byte[] getPublicKey() {
 		return publicKey;
 	}
 
-	public void setPublicKey(Optional<String> publicKey) {
+	public void setPublicKey(Optional<byte[]> publicKey) {
 		this.publicKey = publicKey.get();
 	}
 
@@ -116,7 +117,7 @@ public class Transaction {
 		return "Transaction{" +
 				"sender='" + sender + '\'' +
 				", recipient='" + recipient + '\'' +
-				", publicKey='" + publicKey + '\'' +
+				", publicKey='" + WalletUtils.publicKeyEncode(publicKey) + '\'' +
 				", amount=" + amount +
 				", timestamp=" + timestamp +
 				", txHash='" + txHash + '\'' +

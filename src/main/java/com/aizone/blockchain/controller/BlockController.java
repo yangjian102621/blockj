@@ -73,7 +73,6 @@ public class BlockController {
 		Preconditions.checkNotNull(transaction.getSender(), "sender is needed.");
 		Preconditions.checkNotNull(transaction.getRecipient(), "recipient is needed.");
 		Preconditions.checkNotNull(transaction.getAmount(), "Amount is needed.");
-		//transaction.setPublicKey();
 		return JsonVo.success();
 	}
 

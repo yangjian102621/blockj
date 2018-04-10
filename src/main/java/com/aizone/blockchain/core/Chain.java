@@ -46,7 +46,7 @@ public class Chain {
 		header.setDifficulty(BLOCK_DIFFICULT);
 		header.setTimestamp(new Date());
 		block.setHeader(header);
-		block.setHash(HashUtils.sha256(header.toString()));
+		block.setHash(HashUtils.sha256Hex(header.toString()));
 		block.setBody(new BlockBody());
 		blocks.add(block);
 	}
@@ -93,7 +93,7 @@ public class Chain {
 		header.setDifficulty(BLOCK_DIFFICULT);
 		header.setPreviousHash(lastBlock.getHash());
 		header.setTimestamp(new Date());
-		block.setHash(HashUtils.sha256(header.toString()));
+		block.setHash(HashUtils.sha256Hex(header.toString()));
 		block.setHeader(header);
 		//打包交易
 		block.setBody(new BlockBody(getUnPackedTransactions()));
@@ -106,7 +106,7 @@ public class Chain {
 	 * @param transaction
 	 */
 	public Transaction sendTransaction(Transaction transaction) {
-		String txjHash = HashUtils.sha256(transaction.toString());
+		String txjHash = HashUtils.sha256Hex(transaction.toString());
 		transaction.setTxHash(Optional.of(txjHash));
 		unPackedTransactions.add(transaction);
 		return transaction;
