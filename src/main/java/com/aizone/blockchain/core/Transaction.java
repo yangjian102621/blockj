@@ -1,11 +1,11 @@
 package com.aizone.blockchain.core;
 
+import com.aizone.blockchain.encrypt.HashUtils;
 import com.aizone.blockchain.encrypt.WalletUtils;
-import com.google.common.base.Optional;
+import com.aizone.blockchain.utils.SerializeUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 交易对象
@@ -37,7 +37,7 @@ public class Transaction {
 	/**
 	 * 交易时间戳
 	 */
-	private Date timestamp;
+	private long timestamp;
 
 	/**
 	 * 交易 Hash 值
@@ -48,60 +48,69 @@ public class Transaction {
 	 */
 	private Serializable data;
 
-	public Optional<String> getSender() {
-		return Optional.of(sender);
+	public Transaction(String sender, String recipient, BigDecimal amount) {
+		this.sender = sender;
+		this.recipient = recipient;
+		this.amount = amount;
 	}
 
-	public void setSender(Optional<String> sender) {
-		this.sender = sender.get();
+	public Transaction() {
+	}
+
+	public String getSender() {
+		return sender;
+	}
+
+	public void setSender(String sender) {
+		this.sender = sender;
 	}
 
 	public String getSign() {
 		return sign;
 	}
 
-	public void setSign(Optional<String> sign) {
-		this.sign = sign.get();
+	public void setSign(String sign) {
+		this.sign = sign;
 	}
 
 	public String getRecipient() {
 		return recipient;
 	}
 
-	public void setRecipient(Optional<String> recipient) {
-		this.recipient = recipient.get();
+	public void setRecipient(String recipient) {
+		this.recipient = recipient;
 	}
 
 	public byte[] getPublicKey() {
 		return publicKey;
 	}
 
-	public void setPublicKey(Optional<byte[]> publicKey) {
-		this.publicKey = publicKey.get();
+	public void setPublicKey(byte[] publicKey) {
+		this.publicKey = publicKey;
 	}
 
 	public BigDecimal getAmount() {
 		return amount;
 	}
 
-	public void setAmount(Optional<BigDecimal> amount) {
-		this.amount = amount.get();
+	public void setAmount(BigDecimal amount) {
+		this.amount = amount;
 	}
 
-	public Date getTimestamp() {
+	public Long getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(Optional<Date> timestamp) {
-		this.timestamp = timestamp.get();
+	public void setTimestamp(Long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	public String getTxHash() {
 		return txHash;
 	}
 
-	public void setTxHash(Optional<String> txHash) {
-		this.txHash = txHash.get();
+	public void setTxHash(String txHash) {
+		this.txHash = txHash;
 	}
 
 	public Serializable getData() {
@@ -110,6 +119,17 @@ public class Transaction {
 
 	public void setData(Serializable data) {
 		this.data = data;
+	}
+
+	/**
+	 * 计算交易信息的Hash值
+	 * @return
+	 */
+	public byte[] hash() {
+		// 使用序列化的方式对Transaction对象进行深度复制
+		byte[] serializeBytes = SerializeUtils.serialize(this);
+		Transaction copyTx = (Transaction) SerializeUtils.unSerialize(serializeBytes);
+		return HashUtils.sha256(SerializeUtils.serialize(copyTx));
 	}
 
 	@Override

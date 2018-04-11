@@ -1,4 +1,4 @@
-package com.aizone.blockchain;
+package com.aizone.blockchain.utils;
 
 import com.aizone.blockchain.encrypt.SignUtils;
 import com.aizone.blockchain.encrypt.WalletUtils;
@@ -11,7 +11,7 @@ import java.security.KeyPair;
  * @author yangjian
  * @since 18-4-9
  */
-public class SignTest {
+public class SignUtilsTest {
 
 	@Test
 	public void sign() throws Exception {

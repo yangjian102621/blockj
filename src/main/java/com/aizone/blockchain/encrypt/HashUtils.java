@@ -1,6 +1,6 @@
 package com.aizone.blockchain.encrypt;
 
-import cn.hutool.crypto.digest.DigestUtil;
+import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  * hash 工具类
@@ -15,7 +15,7 @@ public class HashUtils {
 	 * @return
 	 */
 	public static String sha256Hex(String input) {
-		return DigestUtil.sha256Hex(input);
+		return DigestUtils.sha256Hex(input);
 	}
 
 	/**
@@ -24,34 +24,14 @@ public class HashUtils {
 	 * @return
 	 */
 	public static String sha256Hex(byte[] input) {
-		return DigestUtil.sha256Hex(input);
+		return DigestUtils.sha256Hex(input);
 	}
 
 	public static byte[] sha256(String input) {
-		return DigestUtil.sha256(input);
+		return DigestUtils.sha256(input);
 	}
 
 	public static byte[] sha256(byte[] input) {
-		return DigestUtil.sha256(input);
-	}
-
-	/**
-	 * 数组转换成十六进制字符串
-	 *
-	 * @param bArray
-	 * @return HexString
-	 */
-	public static String toHexString(byte[] bArray) {
-
-		StringBuilder sb = new StringBuilder(bArray.length);
-		String sTemp;
-		for (int i = 0; i < bArray.length; i++) {
-			sTemp = Integer.toHexString(0xFF & bArray[i]);
-			if (sTemp.length() < 2) {
-				sb.append(0);
-			}
-			sb.append(sTemp.toUpperCase());
-		}
-		return sb.toString();
+		return DigestUtils.sha256(input);
 	}
 }

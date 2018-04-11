@@ -1,7 +1,7 @@
 package com.aizone.blockchain.controller;
 
 import com.aizone.blockchain.core.Block;
-import com.aizone.blockchain.core.Chain;
+import com.aizone.blockchain.core.BlockChain;
 import com.aizone.blockchain.core.Transaction;
 import com.aizone.blockchain.utils.JsonVo;
 import com.google.common.base.Preconditions;
@@ -27,7 +27,7 @@ public class BlockController {
 	private static final String SENDER_PUBLIC_KEY = "";
 
 	@Autowired
-	private Chain chain;
+	private BlockChain blockChain;
 
 	@GetMapping({"", "/", "index"})
 	public JsonVo index(HttpServletRequest request) {
@@ -42,7 +42,7 @@ public class BlockController {
 	@GetMapping("/mine")
 	public JsonVo mine(HttpServletRequest request) {
 
-		Block block = chain.mining();
+		Block block = blockChain.mining();
 		JsonVo vo = new JsonVo();
 		vo.setCode(JsonVo.CODE_SUCCESS);
 		vo.setMessage("Create a new block");
@@ -58,7 +58,7 @@ public class BlockController {
 	@GetMapping("/block/view")
 	public JsonVo viewChain(HttpServletRequest request) {
 		JsonVo success = JsonVo.success();
-		success.setItem(chain);
+		success.setItem(blockChain);
 		return success;
 
 	}

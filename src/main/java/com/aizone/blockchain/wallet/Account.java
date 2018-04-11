@@ -29,6 +29,10 @@ public class Account implements Serializable {
 	 * 账户余额
 	 */
 	private BigDecimal balance;
+	/**
+	 * 账户锁定状态
+	 */
+	private boolean locked = false;
 
 	public Account() {
 	}
@@ -83,6 +87,14 @@ public class Account implements Serializable {
 
 	public void setBalance(BigDecimal balance) {
 		this.balance = balance;
+	}
+
+	public boolean isLocked() {
+		return locked;
+	}
+
+	public void setLocked(boolean locked) {
+		this.locked = locked;
 	}
 
 	@Override

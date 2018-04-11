@@ -17,15 +17,10 @@ public class Block implements Serializable {
 	 * 区块 Body
 	 */
 	private BlockBody body;
-	/**
-	 * 区块 Hash
-	 */
-	private String hash;
 
-	public Block(BlockHeader header, BlockBody body, String hash) {
+	public Block(BlockHeader header, BlockBody body) {
 		this.header = header;
 		this.body = body;
-		this.hash = hash;
 	}
 
 	public Block() {
@@ -45,13 +40,5 @@ public class Block implements Serializable {
 
 	public void setBody(BlockBody body) {
 		this.body = body;
-	}
-
-	public String getHash() {
-		return hash;
-	}
-
-	public void setHash(String hash) {
-		this.hash = hash;
 	}
 }

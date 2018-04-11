@@ -25,6 +25,7 @@ public class AccountController {
 	@PostMapping("/new")
 	public JsonVo newAccount(HttpServletRequest request) throws Exception {
 
+		String password = request.getParameter("password");
 		Account account = Personal.newAccount();
 		return new JsonVo(JsonVo.CODE_SUCCESS, "New account created, please remember your Address and Private Key.",
 				account);

@@ -1,7 +1,7 @@
-package com.aizone.blockchain.wallet;
+package com.aizone.blockchain.utils;
 
 import com.aizone.blockchain.core.Block;
-import com.aizone.blockchain.utils.SerializeUtils;
+import com.aizone.blockchain.wallet.Account;
 import com.google.common.base.Optional;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
@@ -28,6 +28,10 @@ public class RocksDBUtils {
 	 * 钱包数据存储 hash 桶前缀
 	 */
 	public static final String WALLETS_BUCKET_PREFIX = "wallets_";
+	/**
+	 * 挖矿账户
+	 */
+	public static final String COIN_BASE_ACCOUNT = "coinbase_wallet";
 
 	/**
 	 * 最后一个区块的 hash 在 DB 中的存储 key
@@ -68,7 +72,7 @@ public class RocksDBUtils {
 	 * 更新最新一个区块的Hash值
 	 * @param lastBlockHash
 	 */
-	public void updateLastBlockHash(String lastBlockHash) throws RocksDBException {
+	public void putLastBlockHash(String lastBlockHash) throws RocksDBException {
 		rocksDB.put(SerializeUtils.serialize(LAST_BLOCK_HASH_KEY), SerializeUtils.serialize(lastBlockHash));
 	}
 
@@ -90,7 +94,7 @@ public class RocksDBUtils {
 	 * @param block
 	 */
 	public void putBlock(Block block) throws RocksDBException {
-		byte[] key = SerializeUtils.serialize(BLOCKS_BUCKET_PREFIX + block.getHash());
+		byte[] key = SerializeUtils.serialize(BLOCKS_BUCKET_PREFIX + block.getHeader().getHash());
 		rocksDB.put(key, SerializeUtils.serialize(block));
 	}
 
@@ -122,6 +126,32 @@ public class RocksDBUtils {
 	public Account getAccount(String address) throws RocksDBException {
 		byte[] key = SerializeUtils.serialize(WALLETS_BUCKET_PREFIX + address);
 		return (Account) SerializeUtils.unSerialize(rocksDB.get(key));
+	}
+
+	/**
+	 * 设置挖矿账户
+	 * @param account
+	 * @throws RocksDBException
+	 */
+	public void putCoinbaseAccount(Optional<Account> account) throws RocksDBException {
+		if (account.isPresent()) {
+			byte[] key = SerializeUtils.serialize(COIN_BASE_ACCOUNT);
+			rocksDB.put(key, SerializeUtils.serialize(account.get()));
+		}
+	}
+
+	/**
+	 * 获取挖矿账户
+	 * @return
+	 * @throws RocksDBException
+	 */
+	public Optional<Account> getCoinbaseAccount() {
+		try {
+			Account account = (Account) SerializeUtils.unSerialize(rocksDB.get(SerializeUtils.serialize(COIN_BASE_ACCOUNT)));
+			return Optional.of(account);
+		} catch (Exception e) {
+			return Optional.absent();
+		}
 	}
 
 	/**

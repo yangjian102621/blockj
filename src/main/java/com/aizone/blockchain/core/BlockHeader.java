@@ -2,7 +2,6 @@ package com.aizone.blockchain.core;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.Date;
 
 /**
  * 区块头
@@ -22,15 +21,25 @@ public class BlockHeader implements Serializable {
 	/**
 	 * PoW 问题的答案
 	 */
-	private Integer nonce;
+	private Long nonce;
 	/**
 	 * 时间戳
 	 */
-	private Date timestamp;
+	private Long timestamp;
+	/**
+	 * 区块 Hash
+	 */
+	private String hash;
 	/**
 	 * 上一个区块的 hash 地址
 	 */
 	private String previousHash;
+
+	public BlockHeader(Integer index, String previousHash) {
+		this.index = index;
+		this.timestamp = System.currentTimeMillis();
+		this.previousHash = previousHash;
+	}
 
 	public Integer getIndex() {
 		return index;
@@ -48,19 +57,19 @@ public class BlockHeader implements Serializable {
 		this.difficulty = difficulty;
 	}
 
-	public Integer getNonce() {
+	public Long getNonce() {
 		return nonce;
 	}
 
-	public void setNonce(Integer nonce) {
+	public void setNonce(Long nonce) {
 		this.nonce = nonce;
 	}
 
-	public Date getTimestamp() {
+	public Long getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(Date timestamp) {
+	public void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
 	}
 
@@ -72,6 +81,14 @@ public class BlockHeader implements Serializable {
 		this.previousHash = previousHash;
 	}
 
+	public String getHash() {
+		return hash;
+	}
+
+	public void setHash(String hash) {
+		this.hash = hash;
+	}
+
 	@Override
 	public String toString() {
 		return "BlockHeader{" +
@@ -79,6 +96,7 @@ public class BlockHeader implements Serializable {
 				", difficulty=" + difficulty +
 				", nonce=" + nonce +
 				", timestamp=" + timestamp +
+				", hash='" + hash + '\'' +
 				", previousHash='" + previousHash + '\'' +
 				'}';
 	}
