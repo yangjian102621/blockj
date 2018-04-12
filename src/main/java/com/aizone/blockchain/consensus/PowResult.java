@@ -1,5 +1,7 @@
 package com.aizone.blockchain.consensus;
 
+import java.math.BigInteger;
+
 /**
  * <p> 工作量计算结果 </p>
  *
@@ -19,9 +21,9 @@ public class PowResult {
     /**
      * 目标难度值
      */
-    private Integer target;
+    private BigInteger target;
 
-    public PowResult(long nonce, String hash, Integer target) {
+    public PowResult(long nonce, String hash, BigInteger target) {
         this.nonce = nonce;
         this.hash = hash;
         this.target = target;
@@ -43,11 +45,11 @@ public class PowResult {
         this.hash = hash;
     }
 
-    public Integer getTarget() {
+    public BigInteger getTarget() {
         return target;
     }
 
-    public void setTarget(Integer target) {
+    public void setTarget(BigInteger target) {
         this.target = target;
     }
 

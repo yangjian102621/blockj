@@ -19,7 +19,7 @@ public class ProofOfWork {
     /**
      * 难度目标位
      */
-    public static final int TARGET_BITS = 60;
+    public static final int TARGET_BITS = 15;
 
     /**
      * 区块
@@ -45,6 +45,8 @@ public class ProofOfWork {
     }
 
     public ProofOfWork(Block block, BigInteger target) {
+        //00000000000000000048d520ecb353e161114576304d901e15a01f521269e6ea
+        //351106055289972
         this.block = block;
         this.target = target;
     }
@@ -69,7 +71,8 @@ public class ProofOfWork {
                 nonce++;
             }
         }
-        return new PowResult(nonce, shaHex, this.target.intValue());
+        System.out.println(this.target.doubleValue());
+        return new PowResult(nonce, shaHex, this.target);
     }
 
     /**

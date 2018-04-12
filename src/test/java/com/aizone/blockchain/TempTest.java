@@ -2,6 +2,8 @@ package com.aizone.blockchain;
 
 import org.junit.Test;
 
+import java.math.BigInteger;
+
 /**
  * 临时测试文件，测试各种其他测试代码
  * @author yangjian
@@ -11,7 +13,10 @@ public class TempTest {
 
 	@Test
 	public void run() {
-
+		BigInteger targetValue = BigInteger.valueOf(1).shiftLeft((256 - 15));
+		BigInteger bigInteger = BigInteger.valueOf(1).shiftLeft((224));
+		System.out.println(targetValue.divide(bigInteger));
+		System.out.println(BigInteger.ONE);
 
 	}
 
