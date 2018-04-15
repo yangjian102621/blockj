@@ -1,16 +1,18 @@
 package com.aizone.blockchain.pow;
 
-import com.aizone.blockchain.consensus.PowResult;
-import com.aizone.blockchain.consensus.ProofOfWork;
 import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.core.BlockBody;
 import com.aizone.blockchain.core.BlockHeader;
 import com.aizone.blockchain.core.Transaction;
 import com.aizone.blockchain.encrypt.HashUtils;
 import com.aizone.blockchain.encrypt.SignUtils;
+import com.aizone.blockchain.mine.pow.PowResult;
+import com.aizone.blockchain.mine.pow.ProofOfWork;
 import com.aizone.blockchain.wallet.Account;
 import com.aizone.blockchain.wallet.Personal;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 
@@ -20,6 +22,8 @@ import java.math.BigDecimal;
  * @since 18-4-11
  */
 public class PowTest {
+
+	static Logger logger = LoggerFactory.getLogger(PowTest.class);
 
 	@Test
 	public void main() throws Exception {

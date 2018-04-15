@@ -41,6 +41,10 @@ public class BlockHeader implements Serializable {
 		this.previousHash = previousHash;
 	}
 
+	public BlockHeader() {
+		this.timestamp = System.currentTimeMillis();
+	}
+
 	public Integer getIndex() {
 		return index;
 	}

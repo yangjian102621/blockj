@@ -52,9 +52,11 @@ public class Transaction {
 		this.sender = sender;
 		this.recipient = recipient;
 		this.amount = amount;
+		this.timestamp = System.currentTimeMillis();
 	}
 
 	public Transaction() {
+		this.timestamp = System.currentTimeMillis();
 	}
 
 	public String getSender() {
@@ -125,11 +127,11 @@ public class Transaction {
 	 * 计算交易信息的Hash值
 	 * @return
 	 */
-	public byte[] hash() {
+	public String hash() {
 		// 使用序列化的方式对Transaction对象进行深度复制
 		byte[] serializeBytes = SerializeUtils.serialize(this);
 		Transaction copyTx = (Transaction) SerializeUtils.unSerialize(serializeBytes);
-		return HashUtils.sha256(SerializeUtils.serialize(copyTx));
+		return HashUtils.sha256Hex(SerializeUtils.serialize(copyTx));
 	}
 
 	@Override
@@ -140,7 +142,7 @@ public class Transaction {
 				", publicKey='" + WalletUtils.publicKeyEncode(publicKey) + '\'' +
 				", amount=" + amount +
 				", timestamp=" + timestamp +
-				", txHash='" + txHash + '\'' +
+				", txHash=" + txHash +
 				", data=" + data +
 				'}';
 	}

@@ -1,19 +1,17 @@
-package com.aizone.blockchain.consensus;
+package com.aizone.blockchain.mine.pow;
 
 import java.math.BigInteger;
 
 /**
- * <p> 工作量计算结果 </p>
- *
- * @author wangwei
- * @date 2018/02/04
+ * PoW 计算结果
+ * @author yangjian
  */
 public class PowResult {
 
     /**
      * 计数器
      */
-    private long nonce;
+    private Long nonce;
     /**
      * hash值
      */
@@ -29,11 +27,11 @@ public class PowResult {
         this.target = target;
     }
 
-    public long getNonce() {
+    public Long getNonce() {
         return nonce;
     }
 
-    public void setNonce(long nonce) {
+    public void setNonce(Long nonce) {
         this.nonce = nonce;
     }
 

@@ -1,10 +1,14 @@
-package com.aizone.blockchain.controller;
+package com.aizone.blockchain.mvc.controller;
 
+import com.aizone.blockchain.mvc.vo.TransactionVo;
 import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.core.BlockChain;
 import com.aizone.blockchain.core.Transaction;
+import com.aizone.blockchain.utils.DBUtils;
 import com.aizone.blockchain.utils.JsonVo;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +44,7 @@ public class BlockController {
 	 * @return
 	 */
 	@GetMapping("/mine")
-	public JsonVo mine(HttpServletRequest request) {
+	public JsonVo mine(HttpServletRequest request) throws Exception {
 
 		Block block = blockChain.mining();
 		JsonVo vo = new JsonVo();
@@ -57,23 +61,33 @@ public class BlockController {
 	 */
 	@GetMapping("/block/view")
 	public JsonVo viewChain(HttpServletRequest request) {
+
+		Optional<Block> block = DBUtils.getLastBlock();
 		JsonVo success = JsonVo.success();
-		success.setItem(blockChain);
+		if (block.isPresent()) {
+			success.setItem(block.get());
+		}
 		return success;
 
 	}
 
 	/**
 	 * 发送交易
-	 * @param transaction
+	 * @param txVo
 	 * @return
 	 */
 	@PostMapping("/transactions/new")
-	public JsonVo sendTransaction(@RequestBody Transaction transaction) {
-		Preconditions.checkNotNull(transaction.getSender(), "sender is needed.");
-		Preconditions.checkNotNull(transaction.getRecipient(), "recipient is needed.");
-		Preconditions.checkNotNull(transaction.getAmount(), "Amount is needed.");
-		return JsonVo.success();
+	public JsonVo sendTransaction(@RequestBody TransactionVo txVo) {
+		Preconditions.checkNotNull(txVo.getSender(), "Sender is needed.");
+		Preconditions.checkNotNull(txVo.getRecipient(), "Recipient is needed.");
+		Preconditions.checkNotNull(txVo.getAmount(), "Amount is needed.");
+		Preconditions.checkNotNull(txVo.getPrivateKey(), "Private Key is needed.");
+		Transaction tx = new Transaction();
+		BeanUtils.copyProperties(txVo, tx);
+		Transaction transaction = blockChain.sendTransaction(tx, txVo.getPrivateKey());
+		JsonVo success = JsonVo.success();
+		success.setItem(transaction);
+		return success;
 	}
 
 	/**
@@ -83,6 +97,16 @@ public class BlockController {
 	 */
 	@PostMapping("/node/add")
 	public JsonVo addNode(HttpServletRequest request) {
+		return JsonVo.success();
+	}
+
+	/**
+	 * 测试节点心跳，判断是会否可用节点
+	 * @param request
+	 * @return
+	 */
+	@GetMapping("/ping")
+	public JsonVo ping(HttpServletRequest request) {
 		return JsonVo.success();
 	}
 

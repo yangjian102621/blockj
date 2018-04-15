@@ -31,6 +31,10 @@ public class JsonVo {
 		this.item = item;
 	}
 
+	public static JsonVo instance(int code, String message) {
+		return new JsonVo(code, message);
+	}
+
 	public JsonVo(int code, String message) {
 		this.code = code;
 		this.message = message;

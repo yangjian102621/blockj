@@ -3,6 +3,8 @@ package com.aizone.blockchain.utils;
 import com.aizone.blockchain.encrypt.SignUtils;
 import com.aizone.blockchain.encrypt.WalletUtils;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.KeyPair;
 
@@ -12,6 +14,8 @@ import java.security.KeyPair;
  * @since 18-4-9
  */
 public class SignUtilsTest {
+
+	static Logger logger = LoggerFactory.getLogger(SignUtilsTest.class);
 
 	@Test
 	public void sign() throws Exception {

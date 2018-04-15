@@ -19,6 +19,9 @@ import java.util.Arrays;
  */
 public class WalletUtils {
 
+	/**
+	 * 加密字符集合
+	 */
 	private static final String ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 	/**
@@ -78,7 +81,7 @@ public class WalletUtils {
 		digest.update(sha256Bytes, 0, sha256Bytes.length);
 		byte[] ripemd160Bytes = new byte[digest.getDigestSize()];
 		digest.doFinal(ripemd160Bytes, 0);
-		//3. 取上一步结果，前面加入地址版本号（比特币主网版本号“0x00”）
+		//3. 取上一步结果，前面加入地址版本号（主网版本号“0x00”）
 		byte[] networkID = new BigInteger("00", 16).toByteArray();
 		byte[] extendedRipemd160Bytes = ByteUtils.add(networkID, ripemd160Bytes);
 		//4. 取上一步结果，计算 SHA-256 哈希值

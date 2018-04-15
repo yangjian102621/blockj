@@ -3,10 +3,13 @@ package com.aizone.blockchain;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * @author yangjian
+ */
 @SpringBootApplication
-public class BlockchainApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(BlockchainApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 }

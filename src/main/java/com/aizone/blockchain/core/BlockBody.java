@@ -1,8 +1,5 @@
 package com.aizone.blockchain.core;
 
-import com.aizone.blockchain.encrypt.HashUtils;
-import com.aizone.blockchain.utils.ByteUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,19 +38,6 @@ public class BlockBody implements Serializable {
 	 */
 	public void addTransaction(Transaction transaction) {
 		transactions.add(transaction);
-	}
-
-	/**
-	 * 对区块中的交易信息进行Hash计算
-	 *
-	 * @return
-	 */
-	public byte[] hashTransaction() {
-		byte[][] txIdArrays = new byte[this.getTransactions().size()][];
-		for (int i = 0; i < this.getTransactions().size(); i++) {
-			txIdArrays[i] = this.getTransactions().get(i).hash();
-		}
-		return HashUtils.sha256(ByteUtils.merge(txIdArrays));
 	}
 
 }

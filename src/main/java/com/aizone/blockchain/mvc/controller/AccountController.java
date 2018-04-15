@@ -1,4 +1,4 @@
-package com.aizone.blockchain.controller;
+package com.aizone.blockchain.mvc.controller;
 
 import com.aizone.blockchain.utils.JsonVo;
 import com.aizone.blockchain.wallet.Account;
@@ -29,5 +29,14 @@ public class AccountController {
 		Account account = Personal.newAccount();
 		return new JsonVo(JsonVo.CODE_SUCCESS, "New account created, please remember your Address and Private Key.",
 				account);
+	}
+
+	/**
+	 * 列出所有的账号
+	 * @param request
+	 * @return
+	 */
+	public JsonVo listAccounts(HttpServletRequest request) {
+		return JsonVo.success();
 	}
 }

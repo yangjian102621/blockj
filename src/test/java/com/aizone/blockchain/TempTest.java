@@ -13,10 +13,14 @@ public class TempTest {
 
 	@Test
 	public void run() {
-		BigInteger targetValue = BigInteger.valueOf(1).shiftLeft((256 - 15));
-		BigInteger bigInteger = BigInteger.valueOf(1).shiftLeft((224));
-		System.out.println(targetValue.divide(bigInteger));
-		System.out.println(BigInteger.ONE);
+//		BigInteger targetValue = BigInteger.valueOf(1).shiftLeft((256 - 15));
+//		BigInteger bigInteger = BigInteger.valueOf(1).shiftLeft((224));
+//		System.out.println(targetValue.divide(bigInteger));
+//		System.out.println(BigInteger.ONE);
+
+		//System.out.println("blocks_"+1);
+		BigInteger bigInteger = new BigInteger("01010", 10);
+		System.out.println(bigInteger);
 
 	}
 
