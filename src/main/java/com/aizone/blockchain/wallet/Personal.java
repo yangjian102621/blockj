@@ -1,7 +1,7 @@
 package com.aizone.blockchain.wallet;
 
 import com.aizone.blockchain.encrypt.WalletUtils;
-import com.aizone.blockchain.utils.DBUtils;
+import com.aizone.blockchain.db.DBUtils;
 import com.google.common.base.Optional;
 import org.rocksdb.RocksDBException;
 
@@ -19,6 +19,7 @@ public class Personal {
 	 * @return
 	 */
 	public static Account newAccount() throws Exception {
+
 		KeyPair keyPair = WalletUtils.generateKeyPair();
 		Account account = new Account(keyPair.getPublic().getEncoded());
 		DBUtils.putAccount(account);

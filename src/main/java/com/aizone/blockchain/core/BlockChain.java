@@ -1,7 +1,9 @@
 package com.aizone.blockchain.core;
 
-import com.aizone.blockchain.db.DBAccess;
+import com.aizone.blockchain.db.DBUtils;
 import com.aizone.blockchain.encrypt.HashUtils;
+import com.aizone.blockchain.encrypt.SignUtils;
+import com.aizone.blockchain.enums.TransactionStatusEnum;
 import com.aizone.blockchain.mine.Miner;
 import com.aizone.blockchain.utils.HttpUtils;
 import com.aizone.blockchain.utils.JsonVo;
@@ -34,9 +36,6 @@ public class BlockChain {
 
 	@Autowired
 	Miner miner;
-
-	@Autowired
-	DBAccess dbAccess;
 
 	/**
 	 * 节点列表
@@ -76,8 +75,44 @@ public class BlockChain {
 
 		Optional<Block> lastBlock = getLastBlock();
 		Block block = miner.newBlock(lastBlock);
+		this.getUnPackedTransactions().forEach(e -> block.getBody().addTransaction(e));
+		for (Transaction transaction : block.getBody().getTransactions()) {
+			synchronized (this) {
+
+				Optional<Account> recipient = DBUtils.getAccount(transaction.getRecipient());
+				//挖矿奖励
+				if (null == transaction.getSender()) {
+					recipient.get().setBalance(recipient.get().getBalance().add(transaction.getAmount()));
+					DBUtils.putAccount(recipient.get());
+					continue;
+				}
+				//账户转账
+				Optional<Account> sender = DBUtils.getAccount(transaction.getSender());
+				//验证签名
+				boolean verify = SignUtils.verify(sender.get().getPublicKey(), transaction.getSign(), transaction.toString());
+				if (!verify) {
+					transaction.setStatus(TransactionStatusEnum.FAIL);
+					transaction.setErrorMessage("交易签名错误");
+					continue;
+				}
+				//验证账户余额
+				if (sender.get().getBalance().compareTo(transaction.getAmount()) == -1) {
+					transaction.setStatus(TransactionStatusEnum.FAIL);
+					transaction.setErrorMessage("账户余额不足");
+					continue;
+				}
+
+				//执行转账操作
+				sender.get().setBalance(sender.get().getBalance().subtract(transaction.getAmount()));
+				recipient.get().setBalance(recipient.get().getBalance().add(transaction.getAmount()));
+				DBUtils.putAccount(sender.get());
+				DBUtils.putAccount(recipient.get());
+			}
+		}
+		//清空待打包交易
+		this.unPackedTransactions.clear();
 		//存储区块
-		dbAccess.putBlock(block);
+		DBUtils.putBlock(block);
 		logger.info("Find a New Block, {}", block);
 		return block;
 	}
@@ -87,15 +122,22 @@ public class BlockChain {
 	 * @param transaction
 	 * @param privateKey 付款人私钥，用来签名交易
 	 */
-	public Transaction sendTransaction(Transaction transaction, String privateKey) {
+	public Transaction sendTransaction(Transaction transaction, String privateKey) throws Exception {
 
-		transaction.setTxHash(HashUtils.sha256Hex(transaction.toString()));
 		//从数据库查询到用户的公钥
-		Optional<Account> account = dbAccess.getAccount(transaction.getRecipient());
-		if (account.isPresent()) {
+		Optional<Account> sender = DBUtils.getAccount(transaction.getSender());
+		Optional<Account> recipient = DBUtils.getAccount(transaction.getRecipient());
+		if (!sender.isPresent()) {
+			throw new RuntimeException("付款人地址不存在");
+		}
+		if (!recipient.isPresent()) {
 			throw new RuntimeException("收款人地址不存在");
 		}
-		transaction.setPublicKey(account.get().getPublicKey());
+		transaction.setPublicKey(sender.get().getPublicKey());
+		transaction.setTxHash(HashUtils.sha256Hex(transaction.toString()));
+		//签名
+		String sign = SignUtils.sign(privateKey, transaction.toString());
+		transaction.setSign(sign);
 		//打包数据到待挖区块
 		this.unPackedTransactions.add(transaction);
 		return transaction;
@@ -106,7 +148,7 @@ public class BlockChain {
 	 * @return
 	 */
 	public Optional<Block> getLastBlock() {
-		return dbAccess.getLastBlock();
+		return DBUtils.getLastBlock();
 	}
 
 	/**

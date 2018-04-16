@@ -1,13 +1,17 @@
 package com.aizone.blockchain.mvc.controller;
 
+import com.aizone.blockchain.db.DBUtils;
 import com.aizone.blockchain.utils.JsonVo;
 import com.aizone.blockchain.wallet.Account;
 import com.aizone.blockchain.wallet.Personal;
+import com.google.common.base.Optional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author yangjian
@@ -32,11 +36,34 @@ public class AccountController {
 	}
 
 	/**
+	 * 获取挖矿账号
+	 * @param request
+	 * @return
+	 */
+	@GetMapping("/coinbase")
+	public JsonVo coinbase(HttpServletRequest request) {
+
+		Optional<Account> coinBaseAccount = DBUtils.getCoinBaseAccount();
+		JsonVo success = JsonVo.success();
+		if (coinBaseAccount.isPresent()) {
+			success.setItem(coinBaseAccount.get());
+		} else {
+			success.setMessage("CoinBase Account is not created");
+		}
+		return success;
+	}
+
+	/**
 	 * 列出所有的账号
 	 * @param request
 	 * @return
 	 */
+	@GetMapping("/list")
 	public JsonVo listAccounts(HttpServletRequest request) {
-		return JsonVo.success();
+
+		List<Account> accounts = DBUtils.listAccounts();
+		JsonVo success = JsonVo.success();
+		success.setItem(accounts);
+		return success;
 	}
 }

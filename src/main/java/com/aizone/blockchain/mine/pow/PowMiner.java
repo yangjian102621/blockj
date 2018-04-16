@@ -8,7 +8,7 @@ import com.aizone.blockchain.encrypt.HashUtils;
 import com.aizone.blockchain.encrypt.SignUtils;
 import com.aizone.blockchain.encrypt.WalletUtils;
 import com.aizone.blockchain.mine.Miner;
-import com.aizone.blockchain.utils.DBUtils;
+import com.aizone.blockchain.db.DBUtils;
 import com.aizone.blockchain.wallet.Account;
 import com.google.common.base.Optional;
 import org.springframework.stereotype.Component;
@@ -40,9 +40,9 @@ public class PowMiner implements Miner {
 		Transaction transaction = new Transaction();
 		//获取挖矿账户
 		Account account;
-		Optional<Account> coinbaseAccount = DBUtils.getCoinBaseAccount();
-		if (coinbaseAccount.isPresent()) {
-			account = coinbaseAccount.get();
+		Optional<Account> coinBaseAccount = DBUtils.getCoinBaseAccount();
+		if (coinBaseAccount.isPresent()) {
+			account = coinBaseAccount.get();
 		} else {
 			//创建挖矿账户
 			KeyPair keyPair = WalletUtils.generateKeyPair();

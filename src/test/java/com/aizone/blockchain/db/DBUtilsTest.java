@@ -1,6 +1,5 @@
 package com.aizone.blockchain.db;
 
-import com.aizone.blockchain.utils.DBUtils;
 import com.google.common.base.Optional;
 import org.junit.Test;
 import org.slf4j.Logger;

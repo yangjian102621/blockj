@@ -40,4 +40,10 @@ public class BlockBody implements Serializable {
 		transactions.add(transaction);
 	}
 
+	@Override
+	public String toString() {
+		return "BlockBody{" +
+				"transactions=" + transactions +
+				'}';
+	}
 }

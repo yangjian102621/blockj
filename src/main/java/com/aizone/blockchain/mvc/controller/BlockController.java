@@ -4,7 +4,7 @@ import com.aizone.blockchain.mvc.vo.TransactionVo;
 import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.core.BlockChain;
 import com.aizone.blockchain.core.Transaction;
-import com.aizone.blockchain.utils.DBUtils;
+import com.aizone.blockchain.db.DBUtils;
 import com.aizone.blockchain.utils.JsonVo;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -77,7 +77,7 @@ public class BlockController {
 	 * @return
 	 */
 	@PostMapping("/transactions/new")
-	public JsonVo sendTransaction(@RequestBody TransactionVo txVo) {
+	public JsonVo sendTransaction(@RequestBody TransactionVo txVo) throws Exception {
 		Preconditions.checkNotNull(txVo.getSender(), "Sender is needed.");
 		Preconditions.checkNotNull(txVo.getRecipient(), "Recipient is needed.");
 		Preconditions.checkNotNull(txVo.getAmount(), "Amount is needed.");

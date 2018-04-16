@@ -25,6 +25,10 @@ public class TransactionVo {
 	 * 付款人私钥
 	 */
 	private String privateKey;
+	/**
+	 * 附加数据
+	 */
+	private String data;
 
 	public String getSender() {
 		return sender;
@@ -56,5 +60,13 @@ public class TransactionVo {
 
 	public void setPrivateKey(String privateKey) {
 		this.privateKey = privateKey;
+	}
+
+	public String getData() {
+		return data;
+	}
+
+	public void setData(String data) {
+		this.data = data;
 	}
 }

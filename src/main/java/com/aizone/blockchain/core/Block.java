@@ -41,4 +41,12 @@ public class Block implements Serializable {
 	public void setBody(BlockBody body) {
 		this.body = body;
 	}
+
+	@Override
+	public String toString() {
+		return "Block{" +
+				"header=" + header +
+				", body=" + body.toString() +
+				'}';
+	}
 }

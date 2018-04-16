@@ -1,10 +1,10 @@
-package com.aizone.blockchain.utils;
+package com.aizone.blockchain.db;
 
 import com.aizone.blockchain.core.Block;
-import com.aizone.blockchain.db.DBAccess;
-import com.aizone.blockchain.db.RocksDBAccess;
 import com.aizone.blockchain.wallet.Account;
 import com.google.common.base.Optional;
+
+import java.util.List;
 
 /**
  * 数据库工具类
@@ -13,10 +13,10 @@ import com.google.common.base.Optional;
  */
 public class DBUtils {
 
-	static DBAccess db;
+	static RocksDBAccess rocksDBAccess;
 
 	static {
-		db = new RocksDBAccess();
+		rocksDBAccess = new RocksDBAccess();
 	}
 
 	/**
@@ -25,7 +25,7 @@ public class DBUtils {
 	 * @return
 	 */
 	public static boolean putLastBlockIndex(Object lastBlock) {
-		return db.putLastBlockIndex(lastBlock);
+		return rocksDBAccess.putLastBlockIndex(lastBlock);
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class DBUtils {
 	 * @return
 	 */
 	public static Optional<Object> getLastBlockIndex() {
-		return db.getLastBlockIndex();
+		return rocksDBAccess.getLastBlockIndex();
 	}
 
 	/**
@@ -42,7 +42,7 @@ public class DBUtils {
 	 * @return
 	 */
 	public static boolean putBlock(Block block) {
-		return db.putBlock(block);
+		return rocksDBAccess.putBlock(block);
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class DBUtils {
 	 * @return
 	 */
 	public static Optional<Block> getBlock(Object blockIndex) {
-		return db.getBlock(blockIndex);
+		return rocksDBAccess.getBlock(blockIndex.toString());
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class DBUtils {
 	 * @return
 	 */
 	public static Optional<Block> getLastBlock() {
-		return db.getLastBlock();
+		return rocksDBAccess.getLastBlock();
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class DBUtils {
 	 * @param account
 	 */
 	public static boolean putAccount(Account account) {
-		return db.putAccount(account);
+		return rocksDBAccess.putAccount(account);
 	}
 
 	/**
@@ -76,15 +76,15 @@ public class DBUtils {
 	 * @return
 	 */
 	public static Optional<Account> getAccount(String address) {
-		return db.getAccount(address);
+		return rocksDBAccess.getAccount(address);
 	}
 
 	/**
-	 * 设置挖矿账户
-	 * @param account
+	 * 设置挖矿账户地址
+	 * @param address
 	 */
-	public static boolean putCoinBaseAccount(Optional<Account> account) {
-		return db.putCoinBaseAccount(account);
+	public static boolean putCoinBaseAddress(String address) {
+		return rocksDBAccess.putCoinBaseAddress(address);
 	}
 
 	/**
@@ -92,7 +92,20 @@ public class DBUtils {
 	 * @return
 	 */
 	public static Optional<Account> getCoinBaseAccount() {
-		return db.getCoinBaseAccount();
+		return rocksDBAccess.getCoinBaseAccount();
+	}
+
+	/**
+	 * 设置挖矿账号
+	 * @param account
+	 * @return
+	 */
+	public static boolean putCoinBaseAccount(Optional<Account> account) {
+		if(account.isPresent()) {
+			rocksDBAccess.putCoinBaseAddress(account.get().getAddress());
+			return rocksDBAccess.putAccount(account.get());
+		}
+		return false;
 	}
 
 	/**
@@ -101,8 +114,8 @@ public class DBUtils {
 	 * @param value
 	 * @return
 	 */
-	public static boolean put(Object key, Object value) {
-		return db.put(key, value);
+	public static boolean put(String key, Object value) {
+		return rocksDBAccess.put(key, value);
 	}
 
 	/**
@@ -110,8 +123,16 @@ public class DBUtils {
 	 * @param key
 	 * @return
 	 */
-	public static Optional<Object> get(Object key) {
-		return db.get(key);
+	public static Optional<Object> get(String key) {
+		return rocksDBAccess.get(key);
+	}
+
+	/**
+	 * 查询所有的用户
+	 * @return
+	 */
+	public static List<Account> listAccounts() {
+		return rocksDBAccess.seekByKey(RocksDBAccess.WALLETS_BUCKET_PREFIX);
 	}
 
 	/**
@@ -119,7 +140,7 @@ public class DBUtils {
 	 * @param key
 	 * @return
 	 */
-	public static boolean delete(Object key) {
-		return db.delete(key);
+	public static boolean delete(String key) {
+		return rocksDBAccess.delete(key);
 	}
 }

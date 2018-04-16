@@ -2,6 +2,7 @@ package com.aizone.blockchain.core;
 
 import com.aizone.blockchain.encrypt.HashUtils;
 import com.aizone.blockchain.encrypt.WalletUtils;
+import com.aizone.blockchain.enums.TransactionStatusEnum;
 import com.aizone.blockchain.utils.SerializeUtils;
 
 import java.io.Serializable;
@@ -37,12 +38,19 @@ public class Transaction {
 	/**
 	 * 交易时间戳
 	 */
-	private long timestamp;
-
+	private Long timestamp;
 	/**
 	 * 交易 Hash 值
 	 */
 	private String txHash;
+	/**
+	 * 交易状态
+	 */
+	private TransactionStatusEnum status = TransactionStatusEnum.SUCCESS;
+	/**
+	 * 交易错误信息
+	 */
+	private String errorMessage;
 	/**
 	 * 附加数据
 	 */
@@ -123,6 +131,22 @@ public class Transaction {
 		this.data = data;
 	}
 
+	public TransactionStatusEnum getStatus() {
+		return status;
+	}
+
+	public void setStatus(TransactionStatusEnum status) {
+		this.status = status;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+
 	/**
 	 * 计算交易信息的Hash值
 	 * @return
@@ -143,6 +167,7 @@ public class Transaction {
 				", amount=" + amount +
 				", timestamp=" + timestamp +
 				", txHash=" + txHash +
+				", status=" + status.getName() +
 				", data=" + data +
 				'}';
 	}

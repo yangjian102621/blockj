@@ -4,18 +4,19 @@ import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.utils.SerializeUtils;
 import com.aizone.blockchain.wallet.Account;
 import com.google.common.base.Optional;
-import org.rocksdb.Options;
-import org.rocksdb.RocksDB;
-import org.rocksdb.RocksDBException;
+import org.rocksdb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * DBAccess 的 RocksDB 实现
+ * RocksDB 操作封装
  * @author yangjian
  * @since 18-4-10
  */
-public class RocksDBAccess implements DBAccess {
+public class RocksDBAccess {
 
 	static Logger logger = LoggerFactory.getLogger(RocksDBAccess.class);
 
@@ -35,12 +36,11 @@ public class RocksDBAccess implements DBAccess {
 	/**
 	 * 挖矿账户
 	 */
-	public static final String COIN_BASE_ACCOUNT = "coinbase_wallet";
-
+	public static final String COIN_BASE_ADDRESS = "coinbase_address";
 	/**
-	 * 最后一个区块的 hash 在 DB 中的存储 key
+	 * 最后一个区块的区块高度
 	 */
-	public static final String LAST_BLOCK_HASH_KEY = BLOCKS_BUCKET_PREFIX+"last_block";
+	public static final String LAST_BLOCK_INDEX = BLOCKS_BUCKET_PREFIX+"last_block";
 
 	public RocksDBAccess() {
 		initRocksDB();
@@ -62,18 +62,16 @@ public class RocksDBAccess implements DBAccess {
 	 * @param lastBlock
 	 * @return
 	 */
-	@Override
 	public boolean putLastBlockIndex(Object lastBlock) {
-		return this.put(LAST_BLOCK_HASH_KEY, lastBlock);
+		return this.put(LAST_BLOCK_INDEX, lastBlock);
 	}
 
 	/**
 	 * 获取最新一个区块的Hash值
 	 * @return
 	 */
-	@Override
 	public Optional<Object> getLastBlockIndex() {
-		return this.get(LAST_BLOCK_HASH_KEY);
+		return this.get(LAST_BLOCK_INDEX);
 	}
 
 	/**
@@ -81,7 +79,6 @@ public class RocksDBAccess implements DBAccess {
 	 * @param block
 	 * @return
 	 */
-	@Override
 	public boolean putBlock(Block block) {
 		return this.put(BLOCKS_BUCKET_PREFIX + block.getHeader().getIndex(), block);
 	}
@@ -91,8 +88,7 @@ public class RocksDBAccess implements DBAccess {
 	 * @param blockIndex
 	 * @return
 	 */
-	@Override
-	public Optional<Block> getBlock(Object blockIndex) {
+	public Optional<Block> getBlock(String blockIndex) {
 
 		Optional<Object> object = this.get(BLOCKS_BUCKET_PREFIX + blockIndex);
 		if (object.isPresent()) {
@@ -105,11 +101,10 @@ public class RocksDBAccess implements DBAccess {
 	 * 获取最后（最大高度）一个区块
 	 * @return
 	 */
-	@Override
 	public Optional<Block> getLastBlock() {
 		Optional<Object> blockIndex = getLastBlockIndex();
 		if (blockIndex.isPresent()) {
-			return this.getBlock(blockIndex.get());
+			return this.getBlock(blockIndex.get().toString());
 		}
 		return Optional.absent();
 	}
@@ -118,7 +113,6 @@ public class RocksDBAccess implements DBAccess {
 	 * 添加一个钱包账户
 	 * @param account
 	 */
-	@Override
 	public boolean putAccount(Account account) {
 		return this.put(WALLETS_BUCKET_PREFIX + account.getAddress(), account);
 	}
@@ -128,7 +122,6 @@ public class RocksDBAccess implements DBAccess {
 	 * @param address
 	 * @return
 	 */
-	@Override
 	public Optional<Account> getAccount(String address) {
 
 		Optional<Object> object = this.get(WALLETS_BUCKET_PREFIX + address);
@@ -140,27 +133,35 @@ public class RocksDBAccess implements DBAccess {
 
 	/**
 	 * 设置挖矿账户
-	 * @param account
+	 * @param address
 	 */
-	@Override
-	public boolean putCoinBaseAccount(Optional<Account> account) {
-		if (account.isPresent()) {
-			return this.put(COIN_BASE_ACCOUNT, account.get());
+	public boolean putCoinBaseAddress(String address) {
+		return this.put(COIN_BASE_ADDRESS, address);
+	}
+
+	/**
+	 * 获取挖矿账户地址
+	 * @return
+	 */
+	public Optional<String> getCoinBaseAddress() {
+		Optional<Object> object = this.get(COIN_BASE_ADDRESS);
+		if (object.isPresent()) {
+			return Optional.of((String) object.get());
 		}
-		return false;
+		return Optional.absent();
 	}
 
 	/**
 	 * 获取挖矿账户
 	 * @return
 	 */
-	@Override
 	public Optional<Account> getCoinBaseAccount() {
-		Optional<Object> object = this.get(COIN_BASE_ACCOUNT);
-		if (object.isPresent()) {
-			return Optional.of((Account) object.get());
+		Optional<String> address = getCoinBaseAddress();
+		if (address.isPresent()) {
+			return getAccount(address.get());
+		} else {
+			return Optional.absent();
 		}
-		return Optional.absent();
 	}
 
 	/**
@@ -169,10 +170,9 @@ public class RocksDBAccess implements DBAccess {
 	 * @param value
 	 * @return
 	 */
-	@Override
-	public boolean put(Object key, Object value) {
+	public boolean put(String key, Object value) {
 		try {
-			rocksDB.put(SerializeUtils.serialize(key), SerializeUtils.serialize(value));
+			rocksDB.put(key.getBytes(), SerializeUtils.serialize(value));
 			return true;
 		} catch (Exception e) {
 			logger.error("ERROR for RocksDB : {}", e);
@@ -185,10 +185,9 @@ public class RocksDBAccess implements DBAccess {
 	 * @param key
 	 * @return
 	 */
-	@Override
-	public Optional<Object> get(Object key) {
+	public Optional<Object> get(String key) {
 		try {
-			return Optional.of(SerializeUtils.unSerialize(rocksDB.get(SerializeUtils.serialize(key))));
+			return Optional.of(SerializeUtils.unSerialize(rocksDB.get(key.getBytes())));
 		} catch (Exception e) {
 			logger.error("ERROR for RocksDB : {}", e);
 			return Optional.absent();
@@ -200,14 +199,29 @@ public class RocksDBAccess implements DBAccess {
 	 * @param key
 	 * @return
 	 */
-	@Override
-	public boolean delete(Object key) {
+	public boolean delete(String key) {
 		try {
-			rocksDB.delete(SerializeUtils.serialize(key));
+			rocksDB.delete(key.getBytes());
 			return true;
 		} catch (Exception e) {
 			return false;
 		}
+	}
+
+	/**
+	 * 根据前缀搜索
+	 * @param keyPrefix
+	 * @return
+	 */
+	public <T> List<T> seekByKey(String keyPrefix) {
+
+		ArrayList<T> ts = new ArrayList<>();
+		RocksIterator iterator = rocksDB.newIterator(new ReadOptions());
+		byte[] key = keyPrefix.getBytes();
+		for (iterator.seek(key); iterator.isValid(); iterator.next()) {
+			ts.add((T) SerializeUtils.unSerialize(iterator.value()));
+		}
+		return ts;
 	}
 
 	/**

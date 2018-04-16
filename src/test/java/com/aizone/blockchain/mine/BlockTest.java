@@ -2,7 +2,7 @@ package com.aizone.blockchain.mine;
 
 import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.mine.pow.PowMiner;
-import com.aizone.blockchain.utils.DBUtils;
+import com.aizone.blockchain.db.DBUtils;
 import com.google.common.base.Optional;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -17,6 +17,10 @@ public class BlockTest {
 
 	static Logger logger = LoggerFactory.getLogger(BlockTest.class);
 
+	/**
+	 * 挖矿
+	 * @throws Exception
+	 */
 	@Test
 	public void newBlock() throws Exception {
 		PowMiner powMiner = new PowMiner();
@@ -27,6 +31,9 @@ public class BlockTest {
 		System.out.println(block.getHeader());
 	}
 
+	/**
+	 * 获取最后一个区块
+	 */
 	@Test
 	public void getLastBlock() {
 		Optional<Block> block = DBUtils.getLastBlock();
