@@ -71,14 +71,14 @@
 			<version>19.0</version>
 		</dependency>
 		
-		<!-- 对象序列化/反序列化框架 -->
+		<!-- Serialization utils -->
 		<dependency>
 			<groupId>com.esotericsoftware</groupId>
 			<artifactId>kryo</artifactId>
 			<version>4.0.1</version>
 		</dependency>
 		
-		<!-- httpclient 工具类-->
+		<!-- httpclient utils-->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -108,6 +108,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<optional>true</optional>
+		</dependency>
+		
+		<!-- Network framework -->
+		<dependency>
+			<groupId>org.t-io</groupId>
+			<artifactId>tio-core</artifactId>
+			<version>2.0.8.v20180205-RELEASE</version>
 		</dependency>
 	</dependencies>
 
