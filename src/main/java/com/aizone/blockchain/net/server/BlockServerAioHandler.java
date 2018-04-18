@@ -1,6 +1,6 @@
 package com.aizone.blockchain.net.server;
 
-import com.aizone.blockchain.net.base.BlockAioHandler;
+import com.aizone.blockchain.net.base.BaseAioHandler;
 import com.aizone.blockchain.net.base.BlockPacket;
 import org.tio.core.Aio;
 import org.tio.core.ChannelContext;
@@ -8,10 +8,10 @@ import org.tio.core.intf.Packet;
 import org.tio.server.intf.ServerAioHandler;
 
 /**
- * 服务端 AioHandler 实现
+ * 区块同步服务端 AioHandler 实现
  * @author yangjian
  */
-public class BlockServerAioHandler extends BlockAioHandler implements ServerAioHandler {
+public class BlockServerAioHandler extends BaseAioHandler implements ServerAioHandler {
 
 	/**
 	 * 处理消息

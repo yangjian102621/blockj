@@ -1,0 +1,9 @@
+# tio 网络框架配置
+tio:
+  heart-timeout: 5000
+  client-group-name: aizone-block-client
+  server-group-context-name: aizone-block-server
+  # 服务端监听的端口
+  server-port: 6789
+  # 有时候需要绑定ip，不需要则null
+  server-ip: null

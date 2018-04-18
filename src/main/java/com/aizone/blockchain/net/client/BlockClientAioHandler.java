@@ -1,16 +1,16 @@
 package com.aizone.blockchain.net.client;
 
-import com.aizone.blockchain.net.base.BlockAioHandler;
+import com.aizone.blockchain.net.base.BaseAioHandler;
 import com.aizone.blockchain.net.base.BlockPacket;
 import org.tio.client.intf.ClientAioHandler;
 import org.tio.core.ChannelContext;
 import org.tio.core.intf.Packet;
 
 /**
- * 客户端 AioHandler 实现
+ * 区块同步客户端 AioHandler 实现
  * @author yangjian
  */
-public class BlockClientAioHandler extends BlockAioHandler implements ClientAioHandler {
+public class BlockClientAioHandler extends BaseAioHandler implements ClientAioHandler {
 
 	/**
 	 * 心跳包

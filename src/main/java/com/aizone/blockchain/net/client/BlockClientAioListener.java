@@ -33,7 +33,7 @@ public class BlockClientAioListener implements ClientAioListener {
             //重新发送消息
             logger.info("重新发送消息");
             BlockPacket packet = new BlockPacket();
-            packet.setBody("hello world".getBytes(BlockPacket.CHARSET));
+            packet.setBody("Fuck you block Chain.".getBytes(BlockPacket.CHARSET));
             Aio.send(channelContext, packet);
         } else {
             logger.info("连接失败：server地址为-" + channelContext.getServerNode());

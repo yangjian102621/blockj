@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
  * @author yangjian
  * @since 18-4-17
  */
-public abstract class BlockAioHandler {
+public abstract class BaseAioHandler {
 
 	/**
 	 * 解码：把接收到的ByteBuffer，解码成应用可以识别的业务消息包

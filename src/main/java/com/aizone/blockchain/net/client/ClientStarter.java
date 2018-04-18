@@ -1,18 +1,22 @@
 package com.aizone.blockchain.net.client;
 
+import com.aizone.blockchain.db.DBUtils;
+import com.aizone.blockchain.event.ClientRequestEvent;
+import com.aizone.blockchain.net.ApplicationContextProvider;
 import com.aizone.blockchain.net.base.BlockPacket;
-import com.aizone.blockchain.net.base.Const;
+import com.aizone.blockchain.net.base.Node;
+import com.aizone.blockchain.net.conf.TioProperties;
+import com.google.common.base.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.tio.client.AioClient;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.ClientGroupContext;
-import org.tio.client.ReconnConf;
-import org.tio.client.intf.ClientAioHandler;
-import org.tio.client.intf.ClientAioListener;
 import org.tio.core.Aio;
-import org.tio.core.Node;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 客户端启动程序
@@ -22,33 +26,12 @@ import javax.annotation.PostConstruct;
 @Component
 public class ClientStarter {
 
-	/**
-	 * 服务器节点
-	 */
-	public static Node serverNode = new Node(Const.SERVER, Const.PORT);
+	@Resource
+	private ClientGroupContext clientGroupContext;
+	@Autowired
+	private TioProperties tioProperties;
 
-	/**
-	 * handler, 包括编码、解码、消息处理
-	 */
-	public static ClientAioHandler aioClientHandler = new BlockClientAioHandler();
-
-	/**
-	 * 事件监听器，可以为null，但建议自己实现该接口，可以参考showcase了解些接口
-	 */
-	public static ClientAioListener aioListener = new BlockClientAioListener();
-
-	/**
-	 * 断链后自动连接的，不想自动连接请设为null
-	 */
-	private static ReconnConf reconnConf = new ReconnConf(5000L);
-
-	/**
-	 * 一组连接共用的上下文对象
-	 */
-	public ClientGroupContext clientGroupContext = new ClientGroupContext(aioClientHandler, aioListener, reconnConf);
-
-	public AioClient aioClient = null;
-	public ClientChannelContext clientChannelContext = null;
+	private AioClient aioClient;
 
 	/**
 	 * 启动程序入口
@@ -56,16 +39,54 @@ public class ClientStarter {
 	@PostConstruct
 	public void clientStart() throws Exception {
 
-		clientGroupContext.setHeartbeatTimeout(Const.TIMEOUT);
+		//加载数据库中的节点数据
+		Optional<List<Node>> nodeList = DBUtils.getNodeList();
 		aioClient = new AioClient(clientGroupContext);
-		clientChannelContext = aioClient.connect(serverNode);
-		//连上后，发条消息玩玩
-		send();
+		if (nodeList.isPresent()) {
+			for (Node node : nodeList.get()) {
+				addNode(node.getIp(), node.getPort());
+			}
+		}
 	}
 
-	private void send() throws Exception {
+	/**
+	 * 向服务端打招呼
+	 * @param clientChannelContext
+	 * @throws Exception
+	 */
+	private void sayHello(ClientChannelContext clientChannelContext) {
 		BlockPacket packet = new BlockPacket();
-		packet.setBody("hello world".getBytes(BlockPacket.CHARSET));
-		Aio.send(clientChannelContext, packet);
+		try {
+			packet.setBody("Fuck you, block chain.".getBytes(BlockPacket.CHARSET));
+			Aio.send(clientChannelContext, packet);
+		} catch (Exception e) {
+
+		}
+	}
+
+	/**
+	 * 对客户端群发消息
+	 * @param blockPacket
+	 */
+	public void sendGroup(BlockPacket blockPacket) {
+
+		//对外发出client请求事件
+		ApplicationContextProvider.publishEvent(new ClientRequestEvent(blockPacket));
+		//发送消息到一个group
+		Aio.sendToGroup(clientGroupContext, tioProperties.getClientGroupName(), blockPacket);
+	}
+
+	/**
+	 * 添加节点
+	 * @param serverIp
+	 * @param port
+	 */
+	public void addNode(String serverIp, int port) throws Exception {
+
+		Node node = new Node(serverIp, port);
+		ClientChannelContext channelContext = aioClient.connect(node);
+		sayHello(channelContext);
+		Aio.bindGroup(channelContext, tioProperties.getClientGroupName());
+
 	}
 }

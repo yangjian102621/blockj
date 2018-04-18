@@ -5,8 +5,7 @@ import com.aizone.blockchain.encrypt.HashUtils;
 import com.aizone.blockchain.encrypt.SignUtils;
 import com.aizone.blockchain.enums.TransactionStatusEnum;
 import com.aizone.blockchain.mine.Miner;
-import com.aizone.blockchain.utils.HttpUtils;
-import com.aizone.blockchain.utils.JsonVo;
+import com.aizone.blockchain.net.client.ClientStarter;
 import com.aizone.blockchain.wallet.Account;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
@@ -14,10 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.tio.core.Node;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -33,14 +31,16 @@ public class BlockChain {
 	 * json 处理工具
 	 */
 	static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	@Autowired
+	ClientStarter clientStarter;
 
 	@Autowired
 	Miner miner;
 
 	/**
-	 * 节点列表
+	 * 区块链节点列表
 	 */
-	private List<String> nodes;
+	private List<Node> nodes;
 	/**
 	 * 未打包的交易列表
 	 */
@@ -51,11 +51,11 @@ public class BlockChain {
 		this.nodes = new ArrayList<>();
 	}
 
-	public List<String> getNodes() {
+	public List<Node> getNodes() {
 		return nodes;
 	}
 
-	public void setNodes(List<String> nodes) {
+	public void setNodes(List<Node> nodes) {
 		this.nodes = nodes;
 	}
 
@@ -153,23 +153,14 @@ public class BlockChain {
 
 	/**
 	 * 添加一个节点
-	 * @param node
+	 * @param ip
+	 * @param port
 	 * @return
 	 */
-	public boolean addNode(String node) {
+	public boolean addNode(String ip, int port) {
 
-		//检测是否是一个有效的节点地址，使用 ping 测试节点的状态
-		HashMap<String, Object> map = new HashMap<>(1);
-		try {
-			String s = HttpUtils.get(node + "/chain/ping", map);
-			JsonVo vo = OBJECT_MAPPER.readValue(s, JsonVo.class);
-			if (vo.getCode() == JsonVo.CODE_SUCCESS) {
-				nodes.add(node);
-				return true;
-			}
-		} catch (IOException e) {
-			return false;
-		}
+		Node node = new Node(ip, port);
+
 		return false;
 	}
 }

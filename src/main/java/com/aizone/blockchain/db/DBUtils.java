@@ -1,9 +1,11 @@
 package com.aizone.blockchain.db;
 
 import com.aizone.blockchain.core.Block;
+import com.aizone.blockchain.net.base.Node;
 import com.aizone.blockchain.wallet.Account;
 import com.google.common.base.Optional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,7 +15,11 @@ import java.util.List;
  */
 public class DBUtils {
 
-	static RocksDBAccess rocksDBAccess;
+	private static RocksDBAccess rocksDBAccess;
+	/**
+	 * 客户端节点列表存储 key
+	 */
+	private static final String CLIENT_NODES_LIST_KEY = "client-node-list";
 
 	static {
 		rocksDBAccess = new RocksDBAccess();
@@ -133,6 +139,52 @@ public class DBUtils {
 	 */
 	public static List<Account> listAccounts() {
 		return rocksDBAccess.seekByKey(RocksDBAccess.WALLETS_BUCKET_PREFIX);
+	}
+
+	/**
+	 * 获取客户端节点列表
+	 * @return
+	 */
+	public static Optional<List<Node>> getNodeList() {
+		Optional<Object> nodes = rocksDBAccess.get(CLIENT_NODES_LIST_KEY);
+		if (nodes.isPresent()) {
+			return Optional.of((List<Node>) nodes.get());
+		}
+		return Optional.absent();
+	}
+
+	/**
+	 * 保存客户端节点列表
+	 * @param nodes
+	 * @return
+	 */
+	public static boolean putNodeList(List<Node> nodes) {
+		return rocksDBAccess.put(CLIENT_NODES_LIST_KEY, nodes);
+	}
+
+	/**
+	 * 添加一个客户端节点
+	 * @param node
+	 * @return
+	 */
+	public static boolean addNode(Node node) {
+		Optional<List<Node>> nodeList = getNodeList();
+		if (nodeList.isPresent()) {
+			nodeList.get().add(node);
+			return putNodeList(nodeList.get());
+		} else {
+			ArrayList<Node> nodes = new ArrayList<>();
+			nodes.add(node);
+			return putNodeList(nodes);
+		}
+	}
+
+	/**
+	 * 清空所有节点
+	 * @return
+	 */
+	public static boolean clearNodes() {
+		return delete(CLIENT_NODES_LIST_KEY);
 	}
 
 	/**
