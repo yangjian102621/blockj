@@ -1,6 +1,6 @@
-package com.aizone.blockchain.mvc.controller;
+package com.aizone.blockchain.web.controller;
 
-import com.aizone.blockchain.mvc.vo.TransactionVo;
+import com.aizone.blockchain.web.vo.TransactionVo;
 import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.core.BlockChain;
 import com.aizone.blockchain.core.Transaction;

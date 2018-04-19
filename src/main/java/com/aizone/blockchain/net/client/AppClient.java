@@ -23,7 +23,7 @@ import java.util.List;
  *
  */
 @Component
-public class ClientStarter {
+public class AppClient {
 
 	@Resource
 	private ClientGroupContext clientGroupContext;

@@ -8,7 +8,7 @@ import com.aizone.blockchain.event.MineBlockEvent;
 import com.aizone.blockchain.event.SendTransactionEvent;
 import com.aizone.blockchain.mine.Miner;
 import com.aizone.blockchain.net.ApplicationContextProvider;
-import com.aizone.blockchain.net.client.ClientStarter;
+import com.aizone.blockchain.net.client.AppClient;
 import com.aizone.blockchain.wallet.Account;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
@@ -35,7 +35,7 @@ public class BlockChain {
 	 */
 	static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	@Autowired
-	ClientStarter clientStarter;
+	AppClient appClient;
 
 	@Autowired
 	Miner miner;

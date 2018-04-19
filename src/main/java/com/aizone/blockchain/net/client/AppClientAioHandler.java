@@ -1,9 +1,14 @@
 package com.aizone.blockchain.net.client;
 
+import com.aizone.blockchain.core.Block;
+import com.aizone.blockchain.db.DBUtils;
+import com.aizone.blockchain.mine.pow.ProofOfWork;
 import com.aizone.blockchain.net.base.BaseAioHandler;
 import com.aizone.blockchain.net.base.MessagePacket;
 import com.aizone.blockchain.net.base.MessagePacketType;
 import com.aizone.blockchain.utils.SerializeUtils;
+import com.aizone.blockchain.vo.TransactionConfirmVo;
+import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -43,9 +48,49 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 
 				case MessagePacketType.RES_CONFRIM_TRANSACTION:
 					logger.info("收到交易确认响应");
+					TransactionConfirmVo confirmVo = (TransactionConfirmVo) SerializeUtils.unSerialize(body);
+					if (confirmVo.isConfirmed()) {
+						logger.info("交易确认成功， {}", confirmVo.getTransaction());
+					} else {
+						logger.error("交易确认失败, {}", confirmVo.getTransaction());
+					}
 					break;
 
-			}
+				case MessagePacketType.RES_SYNC_NEXT_BLOCK:
+					Block block = (Block) SerializeUtils.unSerialize(body);
+					logger.info("收到区块同步回应, 区块头信息为， {}", block.getHeader());
+					/**
+					 * 验证区块是否合法
+					 * 1. 验证改区块前一个区块是否存在，且 previousHash 是否合法（暂时不做验证）
+					 * 2. 验证该区块本身 hash 是否合法
+					 */
+					boolean blockValidate = true;
+					if (block.getHeader().getIndex() > 1) {
+						Optional<Block> prevBlock = DBUtils.getBlock(block.getHeader().getIndex()-1);
+						boolean check = prevBlock.get().getHeader().getHash().equals(block.getHeader()
+								.getPreviousHash());
+						if (prevBlock.isPresent()
+								&& !check) {
+							blockValidate = false;
+						}
+					}
+					//是否符合工作量证明
+					ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block);
+					if (!proofOfWork.validate()) {
+						blockValidate = false;
+					}
+
+					if (blockValidate && DBUtils.putBlock(block)) {
+						//更新最新区块高度
+						DBUtils.putLastBlockIndex(block.getHeader().getIndex());
+						logger.info("区块同步成功， {}", block.getHeader());
+					} else {
+						logger.error("区块同步失败， {}", block.getHeader());
+					}
+
+				default:
+					break;
+			} //end of switch
 
 		}
 

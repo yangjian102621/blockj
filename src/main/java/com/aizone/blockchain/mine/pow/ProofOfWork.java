@@ -39,7 +39,7 @@ public class ProofOfWork {
         return new ProofOfWork(block, targetValue);
     }
 
-    public ProofOfWork(Block block, BigInteger target) {
+    private ProofOfWork(Block block, BigInteger target) {
         this.block = block;
         this.target = target;
     }

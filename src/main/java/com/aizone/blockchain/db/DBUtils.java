@@ -30,7 +30,7 @@ public class DBUtils {
 	 * @param lastBlock
 	 * @return
 	 */
-	public static boolean putLastBlockIndex(Object lastBlock) {
+	public synchronized static boolean putLastBlockIndex(Object lastBlock) {
 		return rocksDBAccess.putLastBlockIndex(lastBlock);
 	}
 

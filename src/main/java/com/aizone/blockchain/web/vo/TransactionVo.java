@@ -1,4 +1,4 @@
-package com.aizone.blockchain.mvc.vo;
+package com.aizone.blockchain.web.vo;
 
 import java.math.BigDecimal;
 

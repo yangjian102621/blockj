@@ -15,7 +15,7 @@ import java.io.IOException;
  * @author yangjian
  */
 @Component
-public class ServerStarter {
+public class AppServer {
 
 	@Resource
 	private ServerGroupContext serverGroupContext;

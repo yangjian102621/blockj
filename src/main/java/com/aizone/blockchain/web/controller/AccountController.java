@@ -1,4 +1,4 @@
-package com.aizone.blockchain.mvc.controller;
+package com.aizone.blockchain.web.controller;
 
 import com.aizone.blockchain.db.DBUtils;
 import com.aizone.blockchain.utils.JsonVo;

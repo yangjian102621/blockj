@@ -1,4 +1,4 @@
-package com.aizone.blockchain.mvc.handler;
+package com.aizone.blockchain.web.handler;
 
 import com.aizone.blockchain.utils.JsonVo;
 import org.slf4j.Logger;
