@@ -7,3 +7,11 @@ tio:
   server-port: 6789
   # 有时候需要绑定ip，不需要则null
   server-ip: null
+
+# 关闭 tio 日志
+logging:
+  level:
+    org:
+      tio:
+        server: OFF
+        client: OFF

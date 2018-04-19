@@ -4,7 +4,10 @@ import com.aizone.blockchain.db.DBUtils;
 import com.aizone.blockchain.encrypt.HashUtils;
 import com.aizone.blockchain.encrypt.SignUtils;
 import com.aizone.blockchain.enums.TransactionStatusEnum;
+import com.aizone.blockchain.event.MineBlockEvent;
+import com.aizone.blockchain.event.SendTransactionEvent;
 import com.aizone.blockchain.mine.Miner;
+import com.aizone.blockchain.net.ApplicationContextProvider;
 import com.aizone.blockchain.net.client.ClientStarter;
 import com.aizone.blockchain.wallet.Account;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -114,6 +117,9 @@ public class BlockChain {
 		//存储区块
 		DBUtils.putBlock(block);
 		logger.info("Find a New Block, {}", block);
+
+		//触发挖矿事件，并等待其他节点确认区块
+		ApplicationContextProvider.publishEvent(new MineBlockEvent(block));
 		return block;
 	}
 
@@ -140,6 +146,9 @@ public class BlockChain {
 		transaction.setSign(sign);
 		//打包数据到待挖区块
 		this.unPackedTransactions.add(transaction);
+
+		//触发发送交易事件，向全网广播交易，并等待确认
+		ApplicationContextProvider.publishEvent(new SendTransactionEvent(transaction));
 		return transaction;
 	}
 

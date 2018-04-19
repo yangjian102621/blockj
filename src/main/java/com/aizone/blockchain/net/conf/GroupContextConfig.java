@@ -1,19 +1,15 @@
 package com.aizone.blockchain.net.conf;
 
-import com.aizone.blockchain.net.client.BlockClientAioHandler;
-import com.aizone.blockchain.net.client.BlockClientAioListener;
-import com.aizone.blockchain.net.server.BlockServerAioHandler;
-import com.aizone.blockchain.net.server.BlockServerAioListener;
+import com.aizone.blockchain.net.client.AppClientAioHandler;
+import com.aizone.blockchain.net.client.AppClientAioListener;
+import com.aizone.blockchain.net.server.AppServerAioHandler;
+import com.aizone.blockchain.net.server.AppServerAioListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.tio.client.ClientGroupContext;
 import org.tio.client.ReconnConf;
-import org.tio.client.intf.ClientAioHandler;
-import org.tio.client.intf.ClientAioListener;
 import org.tio.server.ServerGroupContext;
-import org.tio.server.intf.ServerAioHandler;
-import org.tio.server.intf.ServerAioListener;
 
 /**
  * Group context 配置
@@ -27,18 +23,39 @@ public class GroupContextConfig {
 	TioProperties tioProperties;
 
 	/**
+	 * 客户端消息 handler, 包括编码、解码、消息处理
+	 */
+	@Autowired
+	AppClientAioHandler clientAioHandler;
+
+	/**
+	 * 客户端事件监听器
+	 */
+	@Autowired
+	AppClientAioListener clientAioListener;
+
+	/**
+	 * 服务端消息 handler, 包括编码、解码、消息处理
+	 */
+	@Autowired
+	AppServerAioHandler serverAioHandler;
+
+	/**
+	 * 服务端事件监听器
+	 */
+	@Autowired
+	AppServerAioListener serverAioListener;
+
+	/**
 	 * 客户端一组连接共用的上下文对象
 	 * @return
 	 */
 	@Bean
 	public ClientGroupContext clientGroupContext() {
-		//handler, 包括编码、解码、消息处理
-		ClientAioHandler aioHandler = new BlockClientAioHandler();
-		//事件监听器
-		ClientAioListener aioListener = new BlockClientAioListener();
+
 		//断链后自动连接
 		ReconnConf reconnConf = new ReconnConf(5000L, 20);
-		ClientGroupContext clientGroupContext = new ClientGroupContext(aioHandler, aioListener, reconnConf);
+		ClientGroupContext clientGroupContext = new ClientGroupContext(clientAioHandler, clientAioListener, reconnConf);
 		//设置心跳包时间间隔
 		clientGroupContext.setHeartbeatTimeout(tioProperties.getHeartTimeout());
 		return clientGroupContext;
@@ -51,15 +68,10 @@ public class GroupContextConfig {
 	@Bean
 	public ServerGroupContext serverGroupContext() {
 
-		//handler, 包括编码、解码、消息处理
-		ServerAioHandler aioHandler = new BlockServerAioHandler();
-		//事件监听器
-		ServerAioListener aioListener = new BlockServerAioListener();
-
 		ServerGroupContext serverGroupContext = new ServerGroupContext(
 				tioProperties.getServerGroupContextName(),
-				aioHandler,
-				aioListener);
+				serverAioHandler,
+				serverAioListener);
 		serverGroupContext.setHeartbeatTimeout(tioProperties.getHeartTimeout());
 
 		return serverGroupContext;

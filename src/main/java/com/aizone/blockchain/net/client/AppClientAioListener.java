@@ -1,9 +1,12 @@
 package com.aizone.blockchain.net.client;
 
-import com.aizone.blockchain.net.base.BlockPacket;
-import com.aizone.blockchain.net.base.Const;
+import com.aizone.blockchain.net.base.MessagePacket;
+import com.aizone.blockchain.net.conf.TioProperties;
+import com.aizone.blockchain.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.tio.client.intf.ClientAioListener;
 import org.tio.core.Aio;
 import org.tio.core.ChannelContext;
@@ -15,9 +18,13 @@ import org.tio.core.intf.Packet;
  *
  * @author yangjian
  */
-public class BlockClientAioListener implements ClientAioListener {
+@Component
+public class AppClientAioListener implements ClientAioListener {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
+
+    @Autowired
+    TioProperties tioProperties;
 
     @Override
     public void onAfterClose(ChannelContext channelContext, Throwable throwable, String s, boolean b) throws Exception {
@@ -29,11 +36,10 @@ public class BlockClientAioListener implements ClientAioListener {
     public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect) throws Exception {
         if (isConnected || isReconnect) {
             logger.info("连接成功：server地址为-" + channelContext.getServerNode());
-            Aio.bindGroup(channelContext, Const.GROUP_NAME);
+            Aio.bindGroup(channelContext, tioProperties.getClientGroupName());
             //重新发送消息
-            logger.info("重新发送消息");
-            BlockPacket packet = new BlockPacket();
-            packet.setBody("Fuck you block Chain.".getBytes(BlockPacket.CHARSET));
+            MessagePacket packet = new MessagePacket();
+            packet.setBody(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE));
             Aio.send(channelContext, packet);
         } else {
             logger.info("连接失败：server地址为-" + channelContext.getServerNode());

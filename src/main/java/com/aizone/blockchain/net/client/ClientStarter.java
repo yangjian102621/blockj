@@ -1,11 +1,10 @@
 package com.aizone.blockchain.net.client;
 
 import com.aizone.blockchain.db.DBUtils;
-import com.aizone.blockchain.event.ClientRequestEvent;
-import com.aizone.blockchain.net.ApplicationContextProvider;
-import com.aizone.blockchain.net.base.BlockPacket;
+import com.aizone.blockchain.net.base.MessagePacket;
 import com.aizone.blockchain.net.base.Node;
 import com.aizone.blockchain.net.conf.TioProperties;
+import com.aizone.blockchain.utils.SerializeUtils;
 import com.google.common.base.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -50,30 +49,11 @@ public class ClientStarter {
 	}
 
 	/**
-	 * 向服务端打招呼
-	 * @param clientChannelContext
-	 * @throws Exception
+	 * 发送消息到一个group
+	 * @param messagePacket
 	 */
-	private void sayHello(ClientChannelContext clientChannelContext) {
-		BlockPacket packet = new BlockPacket();
-		try {
-			packet.setBody("Fuck you, block chain.".getBytes(BlockPacket.CHARSET));
-			Aio.send(clientChannelContext, packet);
-		} catch (Exception e) {
-
-		}
-	}
-
-	/**
-	 * 对客户端群发消息
-	 * @param blockPacket
-	 */
-	public void sendGroup(BlockPacket blockPacket) {
-
-		//对外发出client请求事件
-		ApplicationContextProvider.publishEvent(new ClientRequestEvent(blockPacket));
-		//发送消息到一个group
-		Aio.sendToGroup(clientGroupContext, tioProperties.getClientGroupName(), blockPacket);
+	public void sendGroup(MessagePacket messagePacket) {
+		Aio.sendToGroup(clientGroupContext, tioProperties.getClientGroupName(), messagePacket);
 	}
 
 	/**
@@ -85,8 +65,7 @@ public class ClientStarter {
 
 		Node node = new Node(serverIp, port);
 		ClientChannelContext channelContext = aioClient.connect(node);
-		sayHello(channelContext);
+		Aio.send(channelContext, new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE)));
 		Aio.bindGroup(channelContext, tioProperties.getClientGroupName());
-
 	}
 }

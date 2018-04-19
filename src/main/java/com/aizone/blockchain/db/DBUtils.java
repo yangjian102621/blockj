@@ -167,7 +167,7 @@ public class DBUtils {
 	 * @param node
 	 * @return
 	 */
-	public static boolean addNode(Node node) {
+	public synchronized static boolean addNode(Node node) {
 		Optional<List<Node>> nodeList = getNodeList();
 		if (nodeList.isPresent()) {
 			nodeList.get().add(node);
