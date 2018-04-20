@@ -1,12 +1,18 @@
 package com.aizone.blockchain.net.client;
 
 import com.aizone.blockchain.db.DBUtils;
+import com.aizone.blockchain.event.FetchNextBlockEvent;
+import com.aizone.blockchain.net.ApplicationContextProvider;
 import com.aizone.blockchain.net.base.MessagePacket;
 import com.aizone.blockchain.net.base.Node;
 import com.aizone.blockchain.net.conf.TioProperties;
 import com.aizone.blockchain.utils.SerializeUtils;
 import com.google.common.base.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.tio.client.AioClient;
 import org.tio.client.ClientChannelContext;
@@ -31,6 +37,8 @@ public class AppClient {
 	private TioProperties tioProperties;
 
 	private AioClient aioClient;
+
+	private static Logger logger = LoggerFactory.getLogger(AppClient.class);
 
 	/**
 	 * 启动程序入口
@@ -67,5 +75,10 @@ public class AppClient {
 		ClientChannelContext channelContext = aioClient.connect(node);
 		Aio.send(channelContext, new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE)));
 		Aio.bindGroup(channelContext, tioProperties.getClientGroupName());
+	}
+
+	@EventListener(ApplicationReadyEvent.class)
+	public void fetchNextBlock() {
+		ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(null));
 	}
 }

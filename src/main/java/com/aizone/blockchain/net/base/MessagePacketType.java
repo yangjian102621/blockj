@@ -8,7 +8,7 @@ package com.aizone.blockchain.net.base;
 public interface MessagePacketType {
 
 	/**
-	 * 普通字符串消息
+	 * 发送字符串消息
 	 */
 	byte STRING_MESSAGE = 0;
 
@@ -25,12 +25,12 @@ public interface MessagePacketType {
 	/**
 	 * 请求确认交易
 	 */
-	byte REQ_CONFRIM_TRANSACTION = 2;
+	byte REQ_CONFIRM_TRANSACTION = 2;
 
 	/**
 	 * 响应确认交易
 	 */
-	byte RES_CONFRIM_TRANSACTION = -2;
+	byte RES_CONFIRM_TRANSACTION = -2;
 
 	/**
 	 * 请求同步下一个区块
@@ -41,5 +41,15 @@ public interface MessagePacketType {
 	 * 响应同步下一个区块
 	 */
 	byte RES_SYNC_NEXT_BLOCK = -3;
+
+	/**
+	 * 请求同步新的账户
+	 */
+	byte REQ_NEW_ACCOUNT = 4;
+
+	/**
+	 * 响应同步新账户
+	 */
+	byte RES_NEW_ACCOUNT = -4;
 
 }

@@ -147,7 +147,7 @@ public class BlockChain {
 		//打包数据到待挖区块
 		this.unPackedTransactions.add(transaction);
 
-		//触发发送交易事件，向全网广播交易，并等待确认
+		//触发交易事件，向全网广播交易，并等待确认
 		ApplicationContextProvider.publishEvent(new SendTransactionEvent(transaction));
 		return transaction;
 	}
