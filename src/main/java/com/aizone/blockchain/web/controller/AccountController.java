@@ -1,10 +1,11 @@
 package com.aizone.blockchain.web.controller;
 
-import com.aizone.blockchain.db.DBUtils;
+import com.aizone.blockchain.db.DBAccess;
 import com.aizone.blockchain.utils.JsonVo;
 import com.aizone.blockchain.wallet.Account;
 import com.aizone.blockchain.wallet.Personal;
 import com.google.common.base.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,11 @@ import java.util.List;
 @RequestMapping("/account")
 public class AccountController {
 
+	@Autowired
+	private Personal personal;
+	@Autowired
+	private DBAccess dbAccess;
+
 	/**
 	 * 创建账户
 	 * @param request
@@ -30,7 +36,7 @@ public class AccountController {
 	public JsonVo newAccount(HttpServletRequest request) throws Exception {
 
 		String password = request.getParameter("password");
-		Account account = Personal.newAccount();
+		Account account = personal.newAccount();
 		return new JsonVo(JsonVo.CODE_SUCCESS, "New account created, please remember your Address and Private Key.",
 				account);
 	}
@@ -43,7 +49,7 @@ public class AccountController {
 	@GetMapping("/coinbase")
 	public JsonVo coinbase(HttpServletRequest request) {
 
-		Optional<Account> coinBaseAccount = DBUtils.getCoinBaseAccount();
+		Optional<Account> coinBaseAccount = dbAccess.getCoinBaseAccount();
 		JsonVo success = JsonVo.success();
 		if (coinBaseAccount.isPresent()) {
 			success.setItem(coinBaseAccount.get());
@@ -61,7 +67,7 @@ public class AccountController {
 	@GetMapping("/list")
 	public JsonVo listAccounts(HttpServletRequest request) {
 
-		List<Account> accounts = DBUtils.listAccounts();
+		List<Account> accounts = dbAccess.listAccounts();
 		JsonVo success = JsonVo.success();
 		success.setItem(accounts);
 		return success;

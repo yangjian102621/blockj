@@ -4,13 +4,14 @@ import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.core.BlockBody;
 import com.aizone.blockchain.core.BlockHeader;
 import com.aizone.blockchain.core.Transaction;
+import com.aizone.blockchain.db.DBAccess;
 import com.aizone.blockchain.encrypt.HashUtils;
 import com.aizone.blockchain.encrypt.SignUtils;
 import com.aizone.blockchain.encrypt.WalletUtils;
 import com.aizone.blockchain.mine.Miner;
-import com.aizone.blockchain.db.DBUtils;
 import com.aizone.blockchain.wallet.Account;
 import com.google.common.base.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.security.KeyPair;
@@ -22,6 +23,9 @@ import java.security.KeyPair;
  */
 @Component
 public class PowMiner implements Miner {
+
+	@Autowired
+	private DBAccess dbAccess;
 
 	@Override
 	public Block newBlock(Optional<Block> block) throws Exception {
@@ -40,7 +44,7 @@ public class PowMiner implements Miner {
 		Transaction transaction = new Transaction();
 		//获取挖矿账户
 		Account account;
-		Optional<Account> coinBaseAccount = DBUtils.getCoinBaseAccount();
+		Optional<Account> coinBaseAccount = dbAccess.getCoinBaseAccount();
 		if (coinBaseAccount.isPresent()) {
 			account = coinBaseAccount.get();
 		} else {
@@ -48,7 +52,7 @@ public class PowMiner implements Miner {
 			KeyPair keyPair = WalletUtils.generateKeyPair();
 			account = new Account(WalletUtils.privateKeyToString(keyPair.getPrivate()), keyPair.getPublic()
 					.getEncoded());
-			DBUtils.putCoinBaseAccount(Optional.of(account));
+			dbAccess.putCoinBaseAccount(account);
 		}
 		transaction.setRecipient(account.getAddress());
 		transaction.setPublicKey(account.getPublicKey());
@@ -68,7 +72,7 @@ public class PowMiner implements Miner {
 		newBlock.getBody().addTransaction(transaction);
 
 		//更新最后一个区块索引
-		DBUtils.putLastBlockIndex(newBlock.getHeader().getIndex());
+		dbAccess.putLastBlockIndex(newBlock.getHeader().getIndex());
 		return newBlock;
 	}
 

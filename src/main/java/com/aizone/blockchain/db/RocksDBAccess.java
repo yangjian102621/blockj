@@ -1,12 +1,16 @@
 package com.aizone.blockchain.db;
 
+import com.aizone.blockchain.conf.RocksDbProperties;
 import com.aizone.blockchain.core.Block;
+import com.aizone.blockchain.net.base.Node;
 import com.aizone.blockchain.utils.SerializeUtils;
 import com.aizone.blockchain.wallet.Account;
 import com.google.common.base.Optional;
 import org.rocksdb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,14 +20,11 @@ import java.util.List;
  * @author yangjian
  * @since 18-4-10
  */
-public class RocksDBAccess {
+@Component
+public class RocksDBAccess implements DBAccess {
 
 	static Logger logger = LoggerFactory.getLogger(RocksDBAccess.class);
 
-	/**
-	 * 区块数据存储路径
-	 */
-	public static final String DATA_DIR = "block-data";
 	private RocksDB rocksDB;
 	/**
 	 * 区块数据存储 hash 桶前缀
@@ -42,65 +43,56 @@ public class RocksDBAccess {
 	 */
 	public static final String LAST_BLOCK_INDEX = BLOCKS_BUCKET_PREFIX+"last_block";
 
+	/**
+	 * 客户端节点列表存储 key
+	 */
+	private static final String CLIENT_NODES_LIST_KEY = "client-node-list";
+
+	@Autowired
+	private RocksDbProperties properties;
+
 	public RocksDBAccess() {
-		initRocksDB();
+		//
 	}
 
 	/**
 	 * 初始化RocksDB
 	 */
-	private void initRocksDB() {
+	@Autowired
+	public void initRocksDB() {
 		try {
-			rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), DATA_DIR);
+			rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), properties.getDataDir());
 		} catch (RocksDBException e) {
 			e.printStackTrace();
 		}
 	}
 
-	/**
-	 * 更新最新一个区块的Hash值
-	 * @param lastBlock
-	 * @return
-	 */
+	@Override
 	public boolean putLastBlockIndex(Object lastBlock) {
 		return this.put(LAST_BLOCK_INDEX, lastBlock);
 	}
 
-	/**
-	 * 获取最新一个区块的Hash值
-	 * @return
-	 */
+	@Override
 	public Optional<Object> getLastBlockIndex() {
 		return this.get(LAST_BLOCK_INDEX);
 	}
 
-	/**
-	 * 保存区块
-	 * @param block
-	 * @return
-	 */
+	@Override
 	public boolean putBlock(Block block) {
 		return this.put(BLOCKS_BUCKET_PREFIX + block.getHeader().getIndex(), block);
 	}
 
-	/**
-	 * 获取指定的区块, 根据区块高度去获取
-	 * @param blockIndex
-	 * @return
-	 */
-	public Optional<Block> getBlock(String blockIndex) {
+	@Override
+	public Optional<Block> getBlock(Object blockIndex) {
 
-		Optional<Object> object = this.get(BLOCKS_BUCKET_PREFIX + blockIndex);
+		Optional<Object> object = this.get(BLOCKS_BUCKET_PREFIX + String.valueOf(blockIndex));
 		if (object.isPresent()) {
 			return Optional.of((Block) object.get());
 		}
 		return Optional.absent();
 	}
 
-	/**
-	 * 获取最后（最大高度）一个区块
-	 * @return
-	 */
+	@Override
 	public Optional<Block> getLastBlock() {
 		Optional<Object> blockIndex = getLastBlockIndex();
 		if (blockIndex.isPresent()) {
@@ -109,19 +101,12 @@ public class RocksDBAccess {
 		return Optional.absent();
 	}
 
-	/**
-	 * 添加一个钱包账户
-	 * @param account
-	 */
+	@Override
 	public boolean putAccount(Account account) {
 		return this.put(WALLETS_BUCKET_PREFIX + account.getAddress(), account);
 	}
 
-	/**
-	 * 获取指定的钱包账户
-	 * @param address
-	 * @return
-	 */
+	@Override
 	public Optional<Account> getAccount(String address) {
 
 		Optional<Object> object = this.get(WALLETS_BUCKET_PREFIX + address);
@@ -131,18 +116,12 @@ public class RocksDBAccess {
 		return Optional.absent();
 	}
 
-	/**
-	 * 设置挖矿账户
-	 * @param address
-	 */
+	@Override
 	public boolean putCoinBaseAddress(String address) {
 		return this.put(COIN_BASE_ADDRESS, address);
 	}
 
-	/**
-	 * 获取挖矿账户地址
-	 * @return
-	 */
+	@Override
 	public Optional<String> getCoinBaseAddress() {
 		Optional<Object> object = this.get(COIN_BASE_ADDRESS);
 		if (object.isPresent()) {
@@ -151,10 +130,7 @@ public class RocksDBAccess {
 		return Optional.absent();
 	}
 
-	/**
-	 * 获取挖矿账户
-	 * @return
-	 */
+	@Override
 	public Optional<Account> getCoinBaseAccount() {
 		Optional<String> address = getCoinBaseAddress();
 		if (address.isPresent()) {
@@ -164,12 +140,46 @@ public class RocksDBAccess {
 		}
 	}
 
-	/**
-	 * 往数据库添加|更新一条数据
-	 * @param key
-	 * @param value
-	 * @return
-	 */
+	@Override
+	public boolean putCoinBaseAccount(Account account) {
+
+		putCoinBaseAddress(account.getAddress());
+		return putAccount(account);
+	}
+
+	@Override
+	public Optional<List<Node>> getNodeList() {
+		Optional<Object> nodes = this.get(CLIENT_NODES_LIST_KEY);
+		if (nodes.isPresent()) {
+			return Optional.of((List<Node>) nodes.get());
+		}
+		return Optional.absent();
+	}
+
+	@Override
+	public boolean putNodeList(List<Node> nodes) {
+		return this.put(CLIENT_NODES_LIST_KEY, nodes);
+	}
+
+	@Override
+	public synchronized boolean addNode(Node node) {
+		Optional<List<Node>> nodeList = getNodeList();
+		if (nodeList.isPresent()) {
+			nodeList.get().add(node);
+			return putNodeList(nodeList.get());
+		} else {
+			ArrayList<Node> nodes = new ArrayList<>();
+			nodes.add(node);
+			return putNodeList(nodes);
+		}
+	}
+
+	@Override
+	public void clearNodes() {
+		delete(CLIENT_NODES_LIST_KEY);
+	}
+
+	@Override
 	public boolean put(String key, Object value) {
 		try {
 			rocksDB.put(key.getBytes(), SerializeUtils.serialize(value));
@@ -180,11 +190,7 @@ public class RocksDBAccess {
 		}
 	}
 
-	/**
-	 * 获取某一条指定的数据
-	 * @param key
-	 * @return
-	 */
+	@Override
 	public Optional<Object> get(String key) {
 		try {
 			return Optional.of(SerializeUtils.unSerialize(rocksDB.get(key.getBytes())));
@@ -194,11 +200,7 @@ public class RocksDBAccess {
 		}
 	}
 
-	/**
-	 * 删除一条数据
-	 * @param key
-	 * @return
-	 */
+	@Override
 	public boolean delete(String key) {
 		try {
 			rocksDB.delete(key.getBytes());
@@ -208,11 +210,7 @@ public class RocksDBAccess {
 		}
 	}
 
-	/**
-	 * 根据前缀搜索
-	 * @param keyPrefix
-	 * @return
-	 */
+	@Override
 	public <T> List<T> seekByKey(String keyPrefix) {
 
 		ArrayList<T> ts = new ArrayList<>();
@@ -224,9 +222,18 @@ public class RocksDBAccess {
 		return ts;
 	}
 
-	/**
-	 * 关闭数据库
-	 */
+	@Override
+	public List<Account> listAccounts() {
+
+		List<Object> objects = seekByKey(WALLETS_BUCKET_PREFIX);
+		List<Account> accounts = new ArrayList<>();
+		for (Object o : objects) {
+			accounts.add((Account) o);
+		}
+		return accounts;
+	}
+
+	@Override
 	public void closeDB() {
 		if (null != rocksDB) {
 			rocksDB.close();

@@ -1,11 +1,11 @@
 package com.aizone.blockchain.web.controller;
 
-import com.aizone.blockchain.web.vo.TransactionVo;
 import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.core.BlockChain;
 import com.aizone.blockchain.core.Transaction;
-import com.aizone.blockchain.db.DBUtils;
+import com.aizone.blockchain.db.DBAccess;
 import com.aizone.blockchain.utils.JsonVo;
+import com.aizone.blockchain.web.vo.TransactionVo;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import org.springframework.beans.BeanUtils;
@@ -29,6 +29,8 @@ public class BlockController {
 	 * 收款人公钥，测试数据
 	 */
 	private static final String SENDER_PUBLIC_KEY = "";
+	@Autowired
+	private DBAccess dbAccess;
 
 	@Autowired
 	private BlockChain blockChain;
@@ -62,7 +64,7 @@ public class BlockController {
 	@GetMapping("/block/view")
 	public JsonVo viewChain(HttpServletRequest request) {
 
-		Optional<Block> block = DBUtils.getLastBlock();
+		Optional<Block> block = dbAccess.getLastBlock();
 		JsonVo success = JsonVo.success();
 		if (block.isPresent()) {
 			success.setItem(block.get());

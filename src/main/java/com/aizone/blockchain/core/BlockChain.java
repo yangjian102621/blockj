@@ -1,6 +1,6 @@
 package com.aizone.blockchain.core;
 
-import com.aizone.blockchain.db.DBUtils;
+import com.aizone.blockchain.db.DBAccess;
 import com.aizone.blockchain.encrypt.HashUtils;
 import com.aizone.blockchain.encrypt.SignUtils;
 import com.aizone.blockchain.enums.TransactionStatusEnum;
@@ -8,6 +8,7 @@ import com.aizone.blockchain.event.MineBlockEvent;
 import com.aizone.blockchain.event.SendTransactionEvent;
 import com.aizone.blockchain.mine.Miner;
 import com.aizone.blockchain.net.ApplicationContextProvider;
+import com.aizone.blockchain.net.base.Node;
 import com.aizone.blockchain.net.client.AppClient;
 import com.aizone.blockchain.wallet.Account;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.tio.core.Node;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,21 +29,20 @@ import java.util.List;
 @Component
 public class BlockChain {
 
-	static Logger logger = LoggerFactory.getLogger(BlockChain.class);
+	private static Logger logger = LoggerFactory.getLogger(BlockChain.class);
+
+	@Autowired
+	private DBAccess dbAccess;
 	/**
 	 * json 处理工具
 	 */
-	static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	@Autowired
-	AppClient appClient;
+	private AppClient appClient;
 
 	@Autowired
-	Miner miner;
+	private Miner miner;
 
-	/**
-	 * 区块链节点列表
-	 */
-	private List<Node> nodes;
 	/**
 	 * 未打包的交易列表
 	 */
@@ -51,15 +50,6 @@ public class BlockChain {
 
 	public BlockChain() {
 		this.unPackedTransactions = new ArrayList<>();
-		this.nodes = new ArrayList<>();
-	}
-
-	public List<Node> getNodes() {
-		return nodes;
-	}
-
-	public void setNodes(List<Node> nodes) {
-		this.nodes = nodes;
 	}
 
 	public List<Transaction> getUnPackedTransactions() {
@@ -82,15 +72,15 @@ public class BlockChain {
 		for (Transaction transaction : block.getBody().getTransactions()) {
 			synchronized (this) {
 
-				Optional<Account> recipient = DBUtils.getAccount(transaction.getRecipient());
+				Optional<Account> recipient = dbAccess.getAccount(transaction.getRecipient());
 				//挖矿奖励
 				if (null == transaction.getSender()) {
 					recipient.get().setBalance(recipient.get().getBalance().add(transaction.getAmount()));
-					DBUtils.putAccount(recipient.get());
+					dbAccess.putAccount(recipient.get());
 					continue;
 				}
 				//账户转账
-				Optional<Account> sender = DBUtils.getAccount(transaction.getSender());
+				Optional<Account> sender = dbAccess.getAccount(transaction.getSender());
 				//验证签名
 				boolean verify = SignUtils.verify(sender.get().getPublicKey(), transaction.getSign(), transaction.toString());
 				if (!verify) {
@@ -108,14 +98,14 @@ public class BlockChain {
 				//执行转账操作
 				sender.get().setBalance(sender.get().getBalance().subtract(transaction.getAmount()));
 				recipient.get().setBalance(recipient.get().getBalance().add(transaction.getAmount()));
-				DBUtils.putAccount(sender.get());
-				DBUtils.putAccount(recipient.get());
+				dbAccess.putAccount(sender.get());
+				dbAccess.putAccount(recipient.get());
 			}
 		}
 		//清空待打包交易
 		this.unPackedTransactions.clear();
 		//存储区块
-		DBUtils.putBlock(block);
+		dbAccess.putBlock(block);
 		logger.info("Find a New Block, {}", block);
 
 		//触发挖矿事件，并等待其他节点确认区块
@@ -131,8 +121,8 @@ public class BlockChain {
 	public Transaction sendTransaction(Transaction transaction, String privateKey) throws Exception {
 
 		//从数据库查询到用户的公钥
-		Optional<Account> sender = DBUtils.getAccount(transaction.getSender());
-		Optional<Account> recipient = DBUtils.getAccount(transaction.getRecipient());
+		Optional<Account> sender = dbAccess.getAccount(transaction.getSender());
+		Optional<Account> recipient = dbAccess.getAccount(transaction.getRecipient());
 		if (!sender.isPresent()) {
 			throw new RuntimeException("付款人地址不存在");
 		}
@@ -157,7 +147,7 @@ public class BlockChain {
 	 * @return
 	 */
 	public Optional<Block> getLastBlock() {
-		return DBUtils.getLastBlock();
+		return dbAccess.getLastBlock();
 	}
 
 	/**
@@ -166,10 +156,10 @@ public class BlockChain {
 	 * @param port
 	 * @return
 	 */
-	public boolean addNode(String ip, int port) {
+	public void addNode(String ip, int port) throws Exception {
 
+		appClient.addNode(ip, port);
 		Node node = new Node(ip, port);
-
-		return false;
+		dbAccess.addNode(node);
 	}
 }

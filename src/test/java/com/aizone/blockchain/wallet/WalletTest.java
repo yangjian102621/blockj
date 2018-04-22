@@ -1,9 +1,10 @@
 package com.aizone.blockchain.wallet;
 
-import com.aizone.blockchain.db.DBUtils;
+import com.aizone.blockchain.db.DBAccess;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -16,13 +17,18 @@ public class WalletTest {
 
 	Logger logger = LoggerFactory.getLogger(getClass());
 
+	@Autowired
+	private DBAccess dbAccess;
+	@Autowired
+	private Personal personal;
+
 	/**
 	 * 创建一个钱包账户
 	 * @throws Exception
 	 */
 	@Test
 	public void newAccount() throws Exception {
-		Account account = Personal.newAccount();
+		Account account = personal.newAccount();
 		logger.info("New Account : {}", account);
 	}
 
@@ -32,7 +38,7 @@ public class WalletTest {
 	@Test
 	public void listAccounts() {
 		//查找所有的用户
-		List<Account> accounts = DBUtils.listAccounts();
+		List<Account> accounts = dbAccess.listAccounts();
 		accounts.forEach(a -> logger.info("List Account ===> {}", a));
 	}
 

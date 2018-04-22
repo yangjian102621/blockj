@@ -1,8 +1,6 @@
 package com.aizone.blockchain.net.client;
 
-import com.aizone.blockchain.db.DBUtils;
-import com.aizone.blockchain.event.FetchNextBlockEvent;
-import com.aizone.blockchain.net.ApplicationContextProvider;
+import com.aizone.blockchain.db.DBAccess;
 import com.aizone.blockchain.net.base.MessagePacket;
 import com.aizone.blockchain.net.base.Node;
 import com.aizone.blockchain.net.conf.TioProperties;
@@ -11,8 +9,6 @@ import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.tio.client.AioClient;
 import org.tio.client.ClientChannelContext;
@@ -37,6 +33,8 @@ public class AppClient {
 	private TioProperties tioProperties;
 
 	private AioClient aioClient;
+	@Autowired
+	private DBAccess dbAccess;
 
 	private static Logger logger = LoggerFactory.getLogger(AppClient.class);
 
@@ -47,7 +45,7 @@ public class AppClient {
 	public void clientStart() throws Exception {
 
 		//加载数据库中的节点数据
-		Optional<List<Node>> nodeList = DBUtils.getNodeList();
+		Optional<List<Node>> nodeList = dbAccess.getNodeList();
 		aioClient = new AioClient(clientGroupContext);
 		if (nodeList.isPresent()) {
 			for (Node node : nodeList.get()) {
@@ -77,8 +75,8 @@ public class AppClient {
 		Aio.bindGroup(channelContext, tioProperties.getClientGroupName());
 	}
 
-	@EventListener(ApplicationReadyEvent.class)
-	public void fetchNextBlock() {
-		ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(null));
-	}
+//	@EventListener(ApplicationReadyEvent.class)
+//	public void fetchNextBlock() {
+//		ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(null));
+//	}
 }

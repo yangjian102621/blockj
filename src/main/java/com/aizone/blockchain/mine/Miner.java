@@ -28,13 +28,13 @@ public interface Miner {
 	 * @return
 	 * @throws Exception
 	 */
-	public Block newBlock(Optional<Block> block) throws Exception;
+	Block newBlock(Optional<Block> block) throws Exception;
 
 	/**
 	 * 检验一个区块
 	 * @param block
 	 * @return
 	 */
-	public boolean validateBlock(Block block);
+	boolean validateBlock(Block block);
 
 }

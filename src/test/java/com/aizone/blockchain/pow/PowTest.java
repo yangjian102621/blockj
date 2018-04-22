@@ -13,6 +13,7 @@ import com.aizone.blockchain.wallet.Personal;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 
@@ -25,12 +26,15 @@ public class PowTest {
 
 	static Logger logger = LoggerFactory.getLogger(PowTest.class);
 
+	@Autowired
+	private Personal personal;
+
 	@Test
 	public void main() throws Exception {
 
 		BlockHeader header = new BlockHeader(1, null);
 		BlockBody body = new BlockBody();
-		Account account = Personal.newAccount();
+		Account account = personal.newAccount();
 		Transaction transaction = new Transaction(null, account.getAddress(), BigDecimal.valueOf(50));
 		transaction.setData("Mining Reward");
 		transaction.setPublicKey(account.getPublicKey());

@@ -1,7 +1,7 @@
 package com.aizone.blockchain.listener;
 
 import com.aizone.blockchain.core.Block;
-import com.aizone.blockchain.db.DBUtils;
+import com.aizone.blockchain.db.DBAccess;
 import com.aizone.blockchain.event.FetchNextBlockEvent;
 import com.aizone.blockchain.event.MineBlockEvent;
 import com.aizone.blockchain.net.base.MessagePacket;
@@ -33,6 +33,8 @@ public class BlockEventListener {
 	private AppClient appClient;
 	@Autowired
 	private TioProperties tioProperties;
+	@Autowired
+	private DBAccess dbAccess;
 
 	private static Logger logger = LoggerFactory.getLogger(AppClient.class);
 
@@ -62,7 +64,7 @@ public class BlockEventListener {
 		if (null != event) {
 			blockIndex = (Integer) event.getSource();
 		} else {
-			Optional<Object> lastBlockIndex = DBUtils.getLastBlockIndex();
+			Optional<Object> lastBlockIndex = dbAccess.getLastBlockIndex();
 			if (lastBlockIndex.isPresent()) {
 				blockIndex = (Integer) lastBlockIndex.get();
 			}

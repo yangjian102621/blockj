@@ -30,7 +30,7 @@ public class TransactionEventListener {
 
 		Transaction transaction = (Transaction) event.getSource();
 		MessagePacket messagePacket = new MessagePacket();
-		messagePacket.setType(MessagePacketType.REQ_CONFRIM_TRANSACTION);
+		messagePacket.setType(MessagePacketType.REQ_CONFIRM_TRANSACTION);
 		messagePacket.setBody(SerializeUtils.serialize(transaction));
 		appClient.sendGroup(messagePacket);
 	}

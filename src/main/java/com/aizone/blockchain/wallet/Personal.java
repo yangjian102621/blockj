@@ -1,9 +1,11 @@
 package com.aizone.blockchain.wallet;
 
+import com.aizone.blockchain.db.DBAccess;
 import com.aizone.blockchain.encrypt.WalletUtils;
-import com.aizone.blockchain.db.DBUtils;
 import com.google.common.base.Optional;
 import org.rocksdb.RocksDBException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.security.KeyPair;
 
@@ -12,17 +14,21 @@ import java.security.KeyPair;
  * @author yangjian
  * @since 18-4-6
  */
+@Component
 public class Personal {
+
+	@Autowired
+	private DBAccess dbAccess;
 
 	/**
 	 * 创建一个默认账户
 	 * @return
 	 */
-	public static Account newAccount() throws Exception {
+	public Account newAccount() throws Exception {
 
 		KeyPair keyPair = WalletUtils.generateKeyPair();
 		Account account = new Account(keyPair.getPublic().getEncoded());
-		DBUtils.putAccount(account);
+		dbAccess.putAccount(account);
 		account.setPrivateKey(WalletUtils.privateKeyToString(keyPair.getPrivate()));
 		return account;
 	}
@@ -33,11 +39,11 @@ public class Personal {
 	 * @param password
 	 * @throws RocksDBException
 	 */
-	public static void lockAccount(String address, String password) throws RocksDBException {
-		Optional<Account> account = DBUtils.getAccount(address);
+	public void lockAccount(String address, String password) throws RocksDBException {
+		Optional<Account> account = dbAccess.getAccount(address);
 		if (account.isPresent()) {
 			account.get().setLocked(true);
-			DBUtils.putAccount(account.get());
+			dbAccess.putAccount(account.get());
 		}
 	}
 
@@ -47,11 +53,11 @@ public class Personal {
 	 * @param password
 	 * @throws RocksDBException
 	 */
-	public static void unLockAccount(String address, String password) throws RocksDBException {
-		Optional<Account> account = DBUtils.getAccount(address);
+	public void unLockAccount(String address, String password) throws RocksDBException {
+		Optional<Account> account = dbAccess.getAccount(address);
 		if (account.isPresent()) {
 			account.get().setLocked(false);
-			DBUtils.putAccount(account.get());
+			dbAccess.putAccount(account.get());
 		}
 	}
 }

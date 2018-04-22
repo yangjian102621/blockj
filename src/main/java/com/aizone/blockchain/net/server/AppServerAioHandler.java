@@ -2,7 +2,7 @@ package com.aizone.blockchain.net.server;
 
 import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.core.Transaction;
-import com.aizone.blockchain.db.DBUtils;
+import com.aizone.blockchain.db.DBAccess;
 import com.aizone.blockchain.encrypt.SignUtils;
 import com.aizone.blockchain.encrypt.WalletUtils;
 import com.aizone.blockchain.net.base.BaseAioHandler;
@@ -14,6 +14,7 @@ import com.aizone.blockchain.wallet.Account;
 import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.tio.core.Aio;
 import org.tio.core.ChannelContext;
@@ -28,6 +29,8 @@ import org.tio.server.intf.ServerAioHandler;
 public class AppServerAioHandler extends BaseAioHandler implements ServerAioHandler {
 
 	private static Logger logger = LoggerFactory.getLogger(AppServerAioHandler.class);
+	@Autowired
+	private DBAccess dbAccess;
 
 	/**
 	 * 处理消息
@@ -71,7 +74,7 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 
 						Integer blockIndex = (Integer) SerializeUtils.unSerialize(body);
 						logger.info("收到区块同步请求, 同步区块高度为， {}", blockIndex);
-						Optional<Block> block = DBUtils.getBlock(blockIndex);
+						Optional<Block> block = dbAccess.getBlock(blockIndex);
 						if (block.isPresent()) {
 							responseVo.setItem(block.get());
 							responseVo.setSuccess(true);
@@ -87,10 +90,11 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 					case MessagePacketType.REQ_NEW_ACCOUNT:
 						Account account = (Account) SerializeUtils.unSerialize(body);
 						if (WalletUtils.verifyAddress(account.getAddress())) {
-							DBUtils.putAccount(account);
+							dbAccess.putAccount(account);
 							responseVo.setSuccess(true);
 						} else {
 							responseVo.setSuccess(false);
+							responseVo.setMessage("不合法的钱包地址");
 						}
 						responseVo.setItem(account);
 						resPacket.setType(MessagePacketType.RES_NEW_ACCOUNT);

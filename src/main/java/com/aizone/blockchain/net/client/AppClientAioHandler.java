@@ -2,7 +2,7 @@ package com.aizone.blockchain.net.client;
 
 import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.core.Transaction;
-import com.aizone.blockchain.db.DBUtils;
+import com.aizone.blockchain.db.DBAccess;
 import com.aizone.blockchain.event.FetchNextBlockEvent;
 import com.aizone.blockchain.mine.pow.ProofOfWork;
 import com.aizone.blockchain.net.ApplicationContextProvider;
@@ -15,6 +15,7 @@ import com.aizone.blockchain.wallet.Account;
 import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.tio.client.intf.ClientAioHandler;
 import org.tio.core.ChannelContext;
@@ -28,6 +29,8 @@ import org.tio.core.intf.Packet;
 public class AppClientAioHandler extends BaseAioHandler implements ClientAioHandler {
 
 	private static Logger logger = LoggerFactory.getLogger(AppClientAioHandler.class);
+	@Autowired
+	private DBAccess dbAccess;
 
 	/**
 	 * 心跳包
@@ -84,7 +87,7 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 					 */
 					boolean blockValidate = true;
 					if (block.getHeader().getIndex() > 1) {
-						Optional<Block> prevBlock = DBUtils.getBlock(block.getHeader().getIndex()-1);
+						Optional<Block> prevBlock = dbAccess.getBlock(block.getHeader().getIndex()-1);
 						boolean check = prevBlock.get().getHeader().getHash().equals(block.getHeader()
 								.getPreviousHash());
 						if (prevBlock.isPresent()
@@ -100,12 +103,12 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 
 					if (blockValidate) {
 						//更新最新区块高度
-						Optional<Object> lastBlockIndex = DBUtils.getLastBlockIndex();
+						Optional<Object> lastBlockIndex = dbAccess.getLastBlockIndex();
 						if (lastBlockIndex.isPresent()) {
 							Integer blockIndex = (Integer) lastBlockIndex.get();
 							if (blockIndex  < block.getHeader().getIndex()) {
-								DBUtils.putBlock(block);
-								DBUtils.putLastBlockIndex(block.getHeader().getIndex());
+								dbAccess.putBlock(block);
+								dbAccess.putLastBlockIndex(block.getHeader().getIndex());
 							}
 						}
 						logger.info("区块同步成功， {}", block.getHeader());
