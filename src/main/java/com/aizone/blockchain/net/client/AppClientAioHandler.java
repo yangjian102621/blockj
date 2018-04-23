@@ -2,9 +2,9 @@ package com.aizone.blockchain.net.client;
 
 import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.core.Transaction;
+import com.aizone.blockchain.core.TransactionExecutor;
 import com.aizone.blockchain.db.DBAccess;
 import com.aizone.blockchain.event.FetchNextBlockEvent;
-import com.aizone.blockchain.mine.pow.ProofOfWork;
 import com.aizone.blockchain.net.ApplicationContextProvider;
 import com.aizone.blockchain.net.base.BaseAioHandler;
 import com.aizone.blockchain.net.base.MessagePacket;
@@ -21,6 +21,8 @@ import org.tio.client.intf.ClientAioHandler;
 import org.tio.core.ChannelContext;
 import org.tio.core.intf.Packet;
 
+import java.util.List;
+
 /**
  * 客户端 AioHandler 实现
  * @author yangjian
@@ -31,6 +33,8 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 	private static Logger logger = LoggerFactory.getLogger(AppClientAioHandler.class);
 	@Autowired
 	private DBAccess dbAccess;
+	@Autowired
+	private TransactionExecutor executor;
 
 	/**
 	 * 心跳包
@@ -80,28 +84,8 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 					}
 					Block block = (Block) responseVo.getItem();
 					logger.info("收到区块同步回应, 区块头信息为， {}", block.getHeader());
-					/**
-					 * 验证区块是否合法
-					 * 1. 验证改区块前一个区块是否存在，且 previousHash 是否合法（暂时不做验证）
-					 * 2. 验证该区块本身 hash 是否合法
-					 */
-					boolean blockValidate = true;
-					if (block.getHeader().getIndex() > 1) {
-						Optional<Block> prevBlock = dbAccess.getBlock(block.getHeader().getIndex()-1);
-						boolean check = prevBlock.get().getHeader().getHash().equals(block.getHeader()
-								.getPreviousHash());
-						if (prevBlock.isPresent()
-								&& !check) {
-							blockValidate = false;
-						}
-					}
-					//检查是否符合工作量证明
-					ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block);
-					if (!proofOfWork.validate()) {
-						blockValidate = false;
-					}
 
-					if (blockValidate) {
+					if (checkBlock(block, dbAccess)) {
 						//更新最新区块高度
 						Optional<Object> lastBlockIndex = dbAccess.getLastBlockIndex();
 						if (lastBlockIndex.isPresent()) {
@@ -127,9 +111,12 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 					Block newBlock = (Block) responseVo.getItem();
 					if (responseVo.isSuccess()) {
 						logger.info("区块确认成功, {}", newBlock);
+						//执行区块中的交易，同步账户的余额
+						executor.run(newBlock);
 					} else {
-						logger.error("区块确认失败, {}, 返回错误信息：{}", newBlock, responseVo.getMessage());
+						logger.error("区块确认失败, {}, 返回错误信息：{}", responseVo.getMessage(), newBlock);
 					}
+					break;
 
 				//同步最新账户
 				case MessagePacketType.RES_NEW_ACCOUNT:
@@ -142,6 +129,19 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 						logger.error("同步账户失败, {}", account);
 					}
 					break;
+
+				//同步所有的账号
+				case MessagePacketType.RES_ACCOUNTS_LIST:
+					responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
+					List<Account> accounts = (List<Account>) responseVo.getItem();
+					for (Account e : accounts) {
+						Optional<Object> acc = dbAccess.get(e.getAddress());
+						//已有账号跳过
+						if (acc.isPresent()) {
+							continue;
+						}
+						dbAccess.putAccount(e);
+					}
 
 				default:
 					break;

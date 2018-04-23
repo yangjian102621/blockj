@@ -100,7 +100,6 @@ public class BlockHeader implements Serializable {
 				", difficulty=" + difficulty +
 				", nonce=" + nonce +
 				", timestamp=" + timestamp +
-				", hash='" + hash + '\'' +
 				", previousHash='" + previousHash + '\'' +
 				'}';
 	}

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * @author yangjian
@@ -94,21 +95,17 @@ public class BlockController {
 
 	/**
 	 * 添加节点
-	 * @param request
+	 * @param node
 	 * @return
+	 * @throws Exception
 	 */
 	@PostMapping("/node/add")
-	public JsonVo addNode(HttpServletRequest request) {
-		return JsonVo.success();
-	}
+	public JsonVo addNode(@RequestBody Map<String, Object> node) throws Exception {
 
-	/**
-	 * 测试节点心跳，判断是会否可用节点
-	 * @param request
-	 * @return
-	 */
-	@GetMapping("/ping")
-	public JsonVo ping(HttpServletRequest request) {
+		Preconditions.checkNotNull(node.get("ip"), "server ip is needed.");
+		Preconditions.checkNotNull(node.get("port"), "server port is need.");
+
+		blockChain.addNode(String.valueOf(node.get("ip")), (Integer) node.get("port"));
 		return JsonVo.success();
 	}
 

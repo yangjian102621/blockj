@@ -2,6 +2,8 @@ package com.aizone.blockchain.wallet;
 
 import com.aizone.blockchain.db.DBAccess;
 import com.aizone.blockchain.encrypt.WalletUtils;
+import com.aizone.blockchain.event.NewAccountEvent;
+import com.aizone.blockchain.net.ApplicationContextProvider;
 import com.google.common.base.Optional;
 import org.rocksdb.RocksDBException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,8 @@ public class Personal {
 		Account account = new Account(keyPair.getPublic().getEncoded());
 		dbAccess.putAccount(account);
 		account.setPrivateKey(WalletUtils.privateKeyToString(keyPair.getPrivate()));
+		//发布同步账号事件
+		ApplicationContextProvider.publishEvent(new NewAccountEvent(account));
 		return account;
 	}
 

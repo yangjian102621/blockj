@@ -7,14 +7,12 @@ import com.aizone.blockchain.core.Transaction;
 import com.aizone.blockchain.db.DBAccess;
 import com.aizone.blockchain.encrypt.HashUtils;
 import com.aizone.blockchain.encrypt.SignUtils;
-import com.aizone.blockchain.encrypt.WalletUtils;
 import com.aizone.blockchain.mine.Miner;
 import com.aizone.blockchain.wallet.Account;
+import com.aizone.blockchain.wallet.Personal;
 import com.google.common.base.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.security.KeyPair;
 
 /**
  * PoW 挖矿算法实现
@@ -26,6 +24,8 @@ public class PowMiner implements Miner {
 
 	@Autowired
 	private DBAccess dbAccess;
+	@Autowired
+	private Personal personal;
 
 	@Override
 	public Block newBlock(Optional<Block> block) throws Exception {
@@ -49,9 +49,7 @@ public class PowMiner implements Miner {
 			account = coinBaseAccount.get();
 		} else {
 			//创建挖矿账户
-			KeyPair keyPair = WalletUtils.generateKeyPair();
-			account = new Account(WalletUtils.privateKeyToString(keyPair.getPrivate()), keyPair.getPublic()
-					.getEncoded());
+			account = personal.newAccount();
 			dbAccess.putCoinBaseAccount(account);
 		}
 		transaction.setRecipient(account.getAddress());

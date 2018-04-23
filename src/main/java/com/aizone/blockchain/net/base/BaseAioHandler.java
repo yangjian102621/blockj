@@ -1,5 +1,11 @@
 package com.aizone.blockchain.net.base;
 
+import com.aizone.blockchain.core.Block;
+import com.aizone.blockchain.db.DBAccess;
+import com.aizone.blockchain.encrypt.HashUtils;
+import com.aizone.blockchain.mine.pow.ProofOfWork;
+import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import org.tio.core.ChannelContext;
 import org.tio.core.GroupContext;
 import org.tio.core.exception.AioDecodeException;
@@ -90,6 +96,38 @@ public abstract class BaseAioHandler {
 			buffer.put(body);
 		}
 		return buffer;
+	}
+
+	/**
+	 * 检验区块是否合法
+	 * 1. 验证改区块前一个区块是否存在，且 previousHash 是否合法（暂时不做验证）
+	 * 2. 验证该区块本身 hash 是否合法
+	 * @param block
+	 * @param dbAccess
+	 * @return
+	 */
+	public boolean checkBlock(Block block, DBAccess dbAccess) {
+
+		//创世区块
+		if (block.getHeader().getIndex() == 1) {
+			return Objects.equal(block.getHeader().getHash(), HashUtils.sha256Hex(block.getHeader().toString()));
+		}
+
+		boolean blockValidate = true;
+		if (block.getHeader().getIndex() > 1) {
+			Optional<Block> prevBlock = dbAccess.getBlock(block.getHeader().getIndex()-1);
+			if (prevBlock.isPresent()
+					&& prevBlock.get().getHeader().getHash().equals(block.getHeader().getPreviousHash())) {
+				blockValidate = false;
+			}
+		}
+		//检查是否符合工作量证明
+		ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block);
+		if (!proofOfWork.validate()) {
+			blockValidate = false;
+		}
+
+		return blockValidate;
 	}
 
 }

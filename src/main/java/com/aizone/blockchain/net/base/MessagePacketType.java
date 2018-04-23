@@ -52,4 +52,14 @@ public interface MessagePacketType {
 	 */
 	byte RES_NEW_ACCOUNT = -4;
 
+	/**
+	 * 请求获取账户列表
+	 */
+	byte REQ_ACCOUNTS_LIST = 5;
+
+	/**
+	 * 响应同步账户列表
+	 */
+	byte RES_ACCOUNTS_LIST = -5;
+
 }

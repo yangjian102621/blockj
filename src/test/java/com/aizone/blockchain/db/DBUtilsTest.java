@@ -1,5 +1,6 @@
 package com.aizone.blockchain.db;
 
+import com.aizone.blockchain.Application;
 import com.aizone.blockchain.net.base.Node;
 import com.google.common.base.Optional;
 import org.junit.Test;
@@ -8,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,8 +18,8 @@ import java.util.UUID;
  * @author yangjian
  * @since 18-4-10
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = Application.class)
 public class DBUtilsTest {
 
 	static Logger logger = LoggerFactory.getLogger(DBUtilsTest.class);

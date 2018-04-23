@@ -1,10 +1,14 @@
 package com.aizone.blockchain.wallet;
 
+import com.aizone.blockchain.Application;
 import com.aizone.blockchain.db.DBAccess;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
@@ -13,6 +17,8 @@ import java.util.List;
  * @author yangjian
  * @since 18-4-16
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = Application.class)
 public class WalletTest {
 
 	Logger logger = LoggerFactory.getLogger(getClass());

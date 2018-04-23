@@ -44,9 +44,10 @@ public class AppClient {
 	@PostConstruct
 	public void clientStart() throws Exception {
 
+		aioClient = new AioClient(clientGroupContext);
 		//加载数据库中的节点数据
 		Optional<List<Node>> nodeList = dbAccess.getNodeList();
-		aioClient = new AioClient(clientGroupContext);
+
 		if (nodeList.isPresent()) {
 			for (Node node : nodeList.get()) {
 				addNode(node.getIp(), node.getPort());
@@ -73,6 +74,7 @@ public class AppClient {
 		ClientChannelContext channelContext = aioClient.connect(node);
 		Aio.send(channelContext, new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE)));
 		Aio.bindGroup(channelContext, tioProperties.getClientGroupName());
+		logger.info("添加节点成功, {}", node);
 	}
 
 //	@EventListener(ApplicationReadyEvent.class)
