@@ -46,7 +46,6 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 		byte[] body = messagePacket.getBody();
 		byte type = messagePacket.getType();
 		if (body != null) {
-
 			logger.info("响应节点信息， {}", channelContext.getServerNode());
 			switch (type) {
 
@@ -120,6 +119,10 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 			return;
 		}
 		Block block = (Block) responseVo.getItem();
+		//当前高度的区块已经存在，略过
+		if (dbAccess.getBlock(block.getHeader().getIndex()).isPresent()) {
+			return;
+		}
 		if (checkBlock(block, dbAccess)) {
 			//更新最新区块高度
 			Optional<Object> lastBlockIndex = dbAccess.getLastBlockIndex();
@@ -139,7 +142,7 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 		} else {
 			logger.error("区块同步失败， 重新发起同步 {}", block.getHeader());
 			//重新发起同步请求
-			ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(block.getHeader().getIndex()-1));
+			//ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(block.getHeader().getIndex()-1));
 		}
 	}
 

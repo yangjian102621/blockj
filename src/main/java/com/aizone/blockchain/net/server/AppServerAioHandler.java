@@ -48,7 +48,7 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 		byte[] body = messagePacket.getBody();
 
 		if (body != null) {
-
+			logger.info("请求节点信息， {}", channelContext.getClientNode());
 			if (body != null) {
 				MessagePacket resPacket = null;
 				switch (type) {
@@ -195,6 +195,7 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 		ServerResponseVo responseVo = new ServerResponseVo();
 		MessagePacket resPacket = new MessagePacket();
 		Account account = (Account) SerializeUtils.unSerialize(body);
+		logger.info("收到新账户同步请求： {}", account);
 		if (WalletUtils.verifyAddress(account.getAddress())) {
 			dbAccess.putAccount(account);
 			responseVo.setSuccess(true);
