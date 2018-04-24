@@ -23,7 +23,6 @@ public class AppServerAioListener implements ServerAioListener {
 
 	@Override
 	public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect) {
-//		log.info("onAfterConnected channelContext:{}, isConnected:{}, isReconnect:{}", channelContext, isConnected, isReconnect);
 
 	}
 

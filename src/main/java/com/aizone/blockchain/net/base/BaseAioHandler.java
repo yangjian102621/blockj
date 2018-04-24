@@ -113,12 +113,12 @@ public abstract class BaseAioHandler {
 			return Objects.equal(block.getHeader().getHash(), HashUtils.sha256Hex(block.getHeader().toString()));
 		}
 
-		boolean blockValidate = true;
+		boolean blockValidate = false;
 		if (block.getHeader().getIndex() > 1) {
 			Optional<Block> prevBlock = dbAccess.getBlock(block.getHeader().getIndex()-1);
 			if (prevBlock.isPresent()
 					&& prevBlock.get().getHeader().getHash().equals(block.getHeader().getPreviousHash())) {
-				blockValidate = false;
+				blockValidate = true;
 			}
 		}
 		//检查是否符合工作量证明

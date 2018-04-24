@@ -1,8 +1,6 @@
 package com.aizone.blockchain.net.client;
 
-import com.aizone.blockchain.net.base.MessagePacket;
 import com.aizone.blockchain.net.conf.TioProperties;
-import com.aizone.blockchain.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +35,6 @@ public class AppClientAioListener implements ClientAioListener {
         if (isConnected || isReconnect) {
             logger.info("连接成功：server地址为-" + channelContext.getServerNode());
             Aio.bindGroup(channelContext, tioProperties.getClientGroupName());
-            //重新发送消息
-            MessagePacket packet = new MessagePacket();
-            packet.setBody(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE));
-            Aio.send(channelContext, packet);
         } else {
             logger.info("连接失败：server地址为-" + channelContext.getServerNode());
         }

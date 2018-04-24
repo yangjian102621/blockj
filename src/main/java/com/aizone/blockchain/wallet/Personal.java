@@ -31,9 +31,9 @@ public class Personal {
 		KeyPair keyPair = WalletUtils.generateKeyPair();
 		Account account = new Account(keyPair.getPublic().getEncoded());
 		dbAccess.putAccount(account);
-		account.setPrivateKey(WalletUtils.privateKeyToString(keyPair.getPrivate()));
 		//发布同步账号事件
 		ApplicationContextProvider.publishEvent(new NewAccountEvent(account));
+		account.setPrivateKey(WalletUtils.privateKeyToString(keyPair.getPrivate()));
 		return account;
 	}
 

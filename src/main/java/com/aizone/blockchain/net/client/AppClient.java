@@ -1,7 +1,10 @@
 package com.aizone.blockchain.net.client;
 
 import com.aizone.blockchain.db.DBAccess;
+import com.aizone.blockchain.event.FetchNextBlockEvent;
+import com.aizone.blockchain.net.ApplicationContextProvider;
 import com.aizone.blockchain.net.base.MessagePacket;
+import com.aizone.blockchain.net.base.MessagePacketType;
 import com.aizone.blockchain.net.base.Node;
 import com.aizone.blockchain.net.conf.TioProperties;
 import com.aizone.blockchain.utils.SerializeUtils;
@@ -9,6 +12,8 @@ import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.tio.client.AioClient;
 import org.tio.client.ClientChannelContext;
@@ -53,6 +58,7 @@ public class AppClient {
 				addNode(node.getIp(), node.getPort());
 			}
 		}
+
 	}
 
 	/**
@@ -77,8 +83,33 @@ public class AppClient {
 		logger.info("添加节点成功, {}", node);
 	}
 
-//	@EventListener(ApplicationReadyEvent.class)
-//	public void fetchNextBlock() {
-//		ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(null));
-//	}
+	/**
+	 * 启动的时候自动开始区块同步
+	 */
+	@EventListener(ApplicationReadyEvent.class)
+	public void fetchNextBlock() {
+		ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(0));
+
+	}
+
+	/**
+	 * 同步账户列表
+	 */
+	@EventListener(ApplicationReadyEvent.class)
+	public void fetchAccounts() {
+		MessagePacket packet = new MessagePacket();
+		packet.setType(MessagePacketType.REQ_ACCOUNTS_LIST);
+		packet.setBody(SerializeUtils.serialize(MessagePacket.FETCH_ACCOUNT_LIST_SYMBOL));
+		sendGroup(packet);
+	}
+
+	@EventListener(ApplicationReadyEvent.class)
+	public void fetchNodeList() {
+
+		logger.info("++++++++++++++++++++++++++ 开始获取在线节点 +++++++++++++++++++++++++++");
+		MessagePacket packet = new MessagePacket();
+		packet.setType(MessagePacketType.REQ_NODE_LIST);
+		packet.setBody(SerializeUtils.serialize(MessagePacket.FETCH_NODE_LIST_SYMBOL));
+		sendGroup(packet);
+	}
 }

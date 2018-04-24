@@ -62,4 +62,14 @@ public interface MessagePacketType {
 	 */
 	byte RES_ACCOUNTS_LIST = -5;
 
+	/**
+	 * 请求获取节点列表
+	 */
+	byte REQ_NODE_LIST = 6;
+
+	/**
+	 * 响应获取节点列表
+	 */
+	byte RES_NODE_LIST = -6;
+
 }

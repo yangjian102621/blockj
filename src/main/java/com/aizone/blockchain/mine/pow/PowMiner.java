@@ -61,7 +61,7 @@ public class PowMiner implements Miner {
 
 		//如果不是创世区块，则使用工作量证明挖矿
 		if (block.isPresent()) {
-			ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block.get());
+			ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(newBlock);
 			PowResult result = proofOfWork.run();
 			newBlock.getHeader().setDifficulty(result.getTarget());
 			newBlock.getHeader().setNonce(result.getNonce());

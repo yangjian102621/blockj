@@ -2,14 +2,10 @@ package com.aizone.blockchain.net.client;
 
 import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.core.Transaction;
-import com.aizone.blockchain.core.TransactionExecutor;
 import com.aizone.blockchain.db.DBAccess;
 import com.aizone.blockchain.event.FetchNextBlockEvent;
 import com.aizone.blockchain.net.ApplicationContextProvider;
-import com.aizone.blockchain.net.base.BaseAioHandler;
-import com.aizone.blockchain.net.base.MessagePacket;
-import com.aizone.blockchain.net.base.MessagePacketType;
-import com.aizone.blockchain.net.base.ServerResponseVo;
+import com.aizone.blockchain.net.base.*;
 import com.aizone.blockchain.utils.SerializeUtils;
 import com.aizone.blockchain.wallet.Account;
 import com.google.common.base.Optional;
@@ -34,8 +30,7 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 	@Autowired
 	private DBAccess dbAccess;
 	@Autowired
-	private TransactionExecutor executor;
-
+	private AppClient appClient;
 	/**
 	 * 心跳包
 	 */
@@ -51,8 +46,7 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 		byte[] body = messagePacket.getBody();
 		byte type = messagePacket.getType();
 		if (body != null) {
-			//服务端响应 VO
-			ServerResponseVo responseVo;
+
 			logger.info("响应节点信息， {}", channelContext.getServerNode());
 			switch (type) {
 
@@ -64,92 +58,160 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 
 				//确认交易回复
 				case MessagePacketType.RES_CONFIRM_TRANSACTION:
-
-					logger.info("收到交易确认响应");
-					responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
-					Transaction tx = (Transaction) responseVo.getItem();
-					if (responseVo.isSuccess()) {
-						logger.info("交易确认成功， {}", tx);
-					} else {
-						logger.error("交易确认失败, {}", tx);
-					}
+					this.confirmTransaction(body);
 					break;
 
 				//同步区块回复
 				case MessagePacketType.RES_SYNC_NEXT_BLOCK:
-					responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
-					if (!responseVo.isSuccess()) {
-						logger.error("区块同步失败, "+responseVo.getMessage());
-						return;
-					}
-					Block block = (Block) responseVo.getItem();
-					logger.info("收到区块同步回应, 区块头信息为， {}", block.getHeader());
-
-					if (checkBlock(block, dbAccess)) {
-						//更新最新区块高度
-						Optional<Object> lastBlockIndex = dbAccess.getLastBlockIndex();
-						if (lastBlockIndex.isPresent()) {
-							Integer blockIndex = (Integer) lastBlockIndex.get();
-							if (blockIndex  < block.getHeader().getIndex()) {
-								dbAccess.putBlock(block);
-								dbAccess.putLastBlockIndex(block.getHeader().getIndex());
-							}
-						}
-						logger.info("区块同步成功， {}", block.getHeader());
-						//继续同步下一个区块
-						ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(null));
-					} else {
-						logger.error("区块同步失败， {}", block.getHeader());
-						//重新发起同步请求
-						ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(block.getHeader().getIndex()));
-					}
+					this.fetchNextBlock(body);
 					break;
 
 				//请求生成新的区块
 				case MessagePacketType.RES_NEW_BLOCK:
-					responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
-					Block newBlock = (Block) responseVo.getItem();
-					if (responseVo.isSuccess()) {
-						logger.info("区块确认成功, {}", newBlock);
-						//执行区块中的交易，同步账户的余额
-						executor.run(newBlock);
-					} else {
-						logger.error("区块确认失败, {}, 返回错误信息：{}", responseVo.getMessage(), newBlock);
-					}
+					this.newBlock(body);
 					break;
 
 				//同步最新账户
 				case MessagePacketType.RES_NEW_ACCOUNT:
-
-					responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
-					Account account = (Account) responseVo.getItem();
-					if (responseVo.isSuccess()) {
-						logger.info("同步账户成功， {}", account);
-					} else {
-						logger.error("同步账户失败, {}", account);
-					}
+					this.newAccount(body);
 					break;
 
 				//同步所有的账号
 				case MessagePacketType.RES_ACCOUNTS_LIST:
-					responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
-					List<Account> accounts = (List<Account>) responseVo.getItem();
-					for (Account e : accounts) {
-						Optional<Object> acc = dbAccess.get(e.getAddress());
-						//已有账号跳过
-						if (acc.isPresent()) {
-							continue;
-						}
-						dbAccess.putAccount(e);
-					}
-
-				default:
+					this.getAccountList(body);
 					break;
+
+				case MessagePacketType.RES_NODE_LIST:
+					this.getNodeList(body);
+					break;
+
 			} //end of switch
 
 		}
 
 		return;
+	}
+
+	/**
+	 * 交易确认
+	 * @param body
+	 */
+	public void confirmTransaction(byte[] body) {
+
+		logger.info("收到交易确认响应");
+		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
+		Transaction tx = (Transaction) responseVo.getItem();
+		if (responseVo.isSuccess()) {
+			logger.info("交易确认成功， {}", tx);
+		} else {
+			logger.error("交易确认失败, {}", tx);
+		}
+	}
+
+	/**
+	 * 同步下一个区块
+	 * @param body
+	 */
+	public void fetchNextBlock(byte[] body) {
+
+		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
+		if (!responseVo.isSuccess()) {
+			logger.error("区块同步失败, "+responseVo.getMessage());
+			return;
+		}
+		Block block = (Block) responseVo.getItem();
+		if (checkBlock(block, dbAccess)) {
+			//更新最新区块高度
+			Optional<Object> lastBlockIndex = dbAccess.getLastBlockIndex();
+			if (lastBlockIndex.isPresent()) {
+				Integer blockIndex = (Integer) lastBlockIndex.get();
+				if (blockIndex  < block.getHeader().getIndex()) {
+					dbAccess.putBlock(block);
+					dbAccess.putLastBlockIndex(block.getHeader().getIndex());
+				}
+			} else {
+				dbAccess.putBlock(block);
+				dbAccess.putLastBlockIndex(block.getHeader().getIndex());
+			}
+			logger.info("区块同步成功， {}", block.getHeader());
+			//继续同步下一个区块
+			ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(0));
+		} else {
+			logger.error("区块同步失败， 重新发起同步 {}", block.getHeader());
+			//重新发起同步请求
+			ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(block.getHeader().getIndex()-1));
+		}
+	}
+
+	/**
+	 * 新区块确认
+	 * @param body
+	 */
+	public void newBlock(byte[] body) {
+		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
+		Block newBlock = (Block) responseVo.getItem();
+		if (responseVo.isSuccess()) {
+			logger.info("区块确认成功, {}", newBlock);
+		} else {
+			logger.error("区块确认失败, {}, {}", responseVo.getMessage(), newBlock);
+		}
+	}
+
+	/**
+	 * 同步新账户
+	 * @param body
+	 */
+	public void newAccount(byte[] body) {
+		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
+		Account account = (Account) responseVo.getItem();
+		if (responseVo.isSuccess()) {
+			logger.info("新账户同步账户成功， {}", account);
+		} else {
+			logger.error("新账户同步账户失败, {}", account);
+		}
+	}
+
+	/**
+	 * 更新账户列表
+	 * @param body
+	 */
+	public void getAccountList(byte[] body) {
+
+		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
+		if (!responseVo.isSuccess()) {
+			return;
+		}
+		List<Account> accounts = (List<Account>) responseVo.getItem();
+		for (Account e : accounts) {
+			Optional<Account> acc = dbAccess.getAccount(e.getAddress());
+			//已有账号跳过
+			if (acc.isPresent()) {
+				logger.info("账户已存在：{}", e);
+				continue;
+			}
+			if (dbAccess.putAccount(e)) {
+				logger.info("同步账户成功：{}", e);
+			}
+
+		}
+	}
+
+	/**
+	 * 获取节点列表
+	 * @param body
+	 */
+	public void getNodeList(byte[] body) throws Exception {
+
+		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
+		if (!responseVo.isSuccess()) {
+			return;
+		}
+		List<Node> nodes = (List<Node>) responseVo.getItem();
+		for (Node node : nodes) {
+			dbAccess.addNode(node);
+			appClient.addNode(node.getIp(), node.getPort());
+		}
+
 	}
 
 	/**

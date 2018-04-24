@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class RocksDBAccess implements DBAccess {
 	/**
 	 * 初始化RocksDB
 	 */
-	@Autowired
+	@PostConstruct
 	public void initRocksDB() {
 		try {
 			rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), properties.getDataDir());
@@ -165,8 +166,11 @@ public class RocksDBAccess implements DBAccess {
 	public synchronized boolean addNode(Node node) {
 		Optional<List<Node>> nodeList = getNodeList();
 		if (nodeList.isPresent()) {
-			nodeList.get().add(node);
-			return putNodeList(nodeList.get());
+			if (!nodeList.get().contains(node)) {
+				nodeList.get().add(node);
+				return putNodeList(nodeList.get());
+			}
+			return true;
 		} else {
 			ArrayList<Node> nodes = new ArrayList<>();
 			nodes.add(node);
@@ -185,7 +189,9 @@ public class RocksDBAccess implements DBAccess {
 			rocksDB.put(key.getBytes(), SerializeUtils.serialize(value));
 			return true;
 		} catch (Exception e) {
-			logger.error("ERROR for RocksDB : {}", e);
+			if (logger.isDebugEnabled()) {
+				logger.error("ERROR for RocksDB : {}", e);
+			}
 			return false;
 		}
 	}
@@ -195,7 +201,9 @@ public class RocksDBAccess implements DBAccess {
 		try {
 			return Optional.of(SerializeUtils.unSerialize(rocksDB.get(key.getBytes())));
 		} catch (Exception e) {
-			logger.error("ERROR for RocksDB : {}", e);
+			if (logger.isDebugEnabled()) {
+				logger.error("ERROR for RocksDB : {}", e);
+			}
 			return Optional.absent();
 		}
 	}

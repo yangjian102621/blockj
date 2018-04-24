@@ -3,7 +3,6 @@ package com.aizone.blockchain.mine.pow;
 import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.encrypt.HashUtils;
 import com.aizone.blockchain.utils.ByteUtils;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
@@ -69,7 +68,7 @@ public class ProofOfWork {
      */
     public boolean validate() {
         byte[] data = this.prepareData(this.getBlock().getHeader().getNonce());
-        return new BigInteger(DigestUtils.sha256Hex(data), 16).compareTo(this.target) == -1;
+        return new BigInteger(HashUtils.sha256Hex(data), 16).compareTo(this.target) == -1;
     }
 
     /**
@@ -81,7 +80,7 @@ public class ProofOfWork {
      */
     private byte[] prepareData(long nonce) {
         byte[] prevBlockHashBytes = {};
-        if (StringUtils.isNoneBlank(this.getBlock().getHeader().getPreviousHash())) {
+        if (StringUtils.isNotBlank(this.getBlock().getHeader().getPreviousHash())) {
             prevBlockHashBytes = new BigInteger(this.getBlock().getHeader().getPreviousHash(), 16).toByteArray();
         }
 

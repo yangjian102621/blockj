@@ -13,7 +13,18 @@ public class MessagePacket extends Packet {
 	 */
 	public static final int HEADER_LENGTH = 5;
 
-	public static final String HELLO_MESSAGE = "连接节点成功.";
+	/**
+	 * 打招呼信息
+	 */
+	public static final String HELLO_MESSAGE = "Hello world.";
+	/**
+	 * 获取账户列表的消息信号
+	 */
+	public static final String FETCH_ACCOUNT_LIST_SYMBOL = "get_accounts_list";
+	/**
+	 * 获取节点列表的消息信号
+	 */
+	public static final String FETCH_NODE_LIST_SYMBOL = "get_nodes_list";
 	/**
 	 * 消息类别，类别值在 MessagePacketType 常量类中定义
 	 */
