@@ -6,7 +6,6 @@ import com.aizone.blockchain.core.BlockHeader;
 import com.aizone.blockchain.core.Transaction;
 import com.aizone.blockchain.db.DBAccess;
 import com.aizone.blockchain.encrypt.HashUtils;
-import com.aizone.blockchain.encrypt.SignUtils;
 import com.aizone.blockchain.mine.Miner;
 import com.aizone.blockchain.wallet.Account;
 import com.aizone.blockchain.wallet.Personal;
@@ -30,6 +29,12 @@ public class PowMiner implements Miner {
 	@Override
 	public Block newBlock(Optional<Block> block) throws Exception {
 
+		//获取挖矿账户
+		Account account;
+		Optional<Account> coinBaseAccount = dbAccess.getCoinBaseAccount();
+		if (!coinBaseAccount.isPresent()) {
+			throw new RuntimeException("没有找到挖矿账户，请先创建挖矿账户.");
+		}
 		Block newBlock;
 		if (block.isPresent()) {
 			Block prev = block.get();
@@ -42,22 +47,13 @@ public class PowMiner implements Miner {
 		}
 		//创建挖矿奖励交易
 		Transaction transaction = new Transaction();
-		//获取挖矿账户
-		Account account;
-		Optional<Account> coinBaseAccount = dbAccess.getCoinBaseAccount();
-		if (coinBaseAccount.isPresent()) {
-			account = coinBaseAccount.get();
-		} else {
-			//创建挖矿账户
-			account = personal.newAccount();
-			dbAccess.putCoinBaseAccount(account);
-		}
+
+		account = coinBaseAccount.get();
 		transaction.setRecipient(account.getAddress());
 		transaction.setPublicKey(account.getPublicKey());
 		transaction.setData("Miner Reward.");
 		transaction.setTxHash(transaction.hash());
 		transaction.setAmount(Miner.MINING_REWARD);
-		transaction.setSign(SignUtils.sign(account.getPrivateKey(), transaction.toString()));
 
 		//如果不是创世区块，则使用工作量证明挖矿
 		if (block.isPresent()) {

@@ -10,7 +10,6 @@ import com.aizone.blockchain.net.ApplicationContextProvider;
 import com.aizone.blockchain.net.base.Node;
 import com.aizone.blockchain.net.client.AppClient;
 import com.aizone.blockchain.wallet.Account;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +28,7 @@ public class BlockChain {
 
 	@Autowired
 	private DBAccess dbAccess;
-	/**
-	 * json 处理工具
-	 */
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
 	@Autowired
 	private AppClient appClient;
 
@@ -57,6 +53,7 @@ public class BlockChain {
 		//清空交易池
 		transactionPool.clearTransactions();
 		//存储区块
+		dbAccess.putLastBlockIndex(block.getHeader().getIndex());
 		dbAccess.putBlock(block);
 		logger.info("Find a New Block, {}", block);
 

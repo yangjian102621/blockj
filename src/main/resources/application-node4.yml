@@ -11,5 +11,15 @@ tio:
   server-group-context-name: aizone-block-server
   # 服务端监听的端口
   server-port: 7891
-  # 有时候需要绑定ip，不需要则null
-  server-ip: null
+  # 服务端绑定的 IP
+  server-ip: 127.0.0.1
+  nodes:
+    -
+      ip: 127.0.0.1
+      port: 5678
+    -
+      ip: 127.0.0.1
+      port: 6789
+    -
+      ip: 127.0.0.1
+      port: 7890

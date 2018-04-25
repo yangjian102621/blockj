@@ -5,7 +5,6 @@ import com.aizone.blockchain.encrypt.WalletUtils;
 import com.aizone.blockchain.event.NewAccountEvent;
 import com.aizone.blockchain.net.ApplicationContextProvider;
 import com.google.common.base.Optional;
-import org.rocksdb.RocksDBException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,38 +29,16 @@ public class Personal {
 
 		KeyPair keyPair = WalletUtils.generateKeyPair();
 		Account account = new Account(keyPair.getPublic().getEncoded());
+		//不存储私钥
 		dbAccess.putAccount(account);
 		//发布同步账号事件
 		ApplicationContextProvider.publishEvent(new NewAccountEvent(account));
 		account.setPrivateKey(WalletUtils.privateKeyToString(keyPair.getPrivate()));
+		//如果没有发现挖矿账号, 则优先创建挖矿账号
+		Optional<Account> coinBaseAccount = dbAccess.getCoinBaseAccount();
+		if (!coinBaseAccount.isPresent()) {
+			dbAccess.putCoinBaseAccount(account);
+		}
 		return account;
-	}
-
-	/**
-	 * 锁定账户
-	 * @param address
-	 * @param password
-	 * @throws RocksDBException
-	 */
-	public void lockAccount(String address, String password) throws RocksDBException {
-		Optional<Account> account = dbAccess.getAccount(address);
-		if (account.isPresent()) {
-			account.get().setLocked(true);
-			dbAccess.putAccount(account.get());
-		}
-	}
-
-	/**
-	 * 解锁账户
-	 * @param address
-	 * @param password
-	 * @throws RocksDBException
-	 */
-	public void unLockAccount(String address, String password) throws RocksDBException {
-		Optional<Account> account = dbAccess.getAccount(address);
-		if (account.isPresent()) {
-			account.get().setLocked(false);
-			dbAccess.putAccount(account.get());
-		}
 	}
 }

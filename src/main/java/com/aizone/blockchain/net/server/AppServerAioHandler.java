@@ -169,6 +169,7 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 		Block newBlock = (Block) SerializeUtils.unSerialize(body);
 		logger.info("收到新区块确认请求： {}", newBlock);
 		if (checkBlock(newBlock, dbAccess)) {
+			dbAccess.putLastBlockIndex(newBlock.getHeader().getIndex());
 			dbAccess.putBlock(newBlock);
 			responseVo.setSuccess(true);
 			//执行区块中的交易，同步账户的余额

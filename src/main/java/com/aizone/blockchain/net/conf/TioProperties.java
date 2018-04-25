@@ -1,9 +1,11 @@
 package com.aizone.blockchain.net.conf;
 
+import com.aizone.blockchain.net.base.Node;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * tio 网络框架配置信息
@@ -38,6 +40,8 @@ public class TioProperties {
 	 * 服务端绑定的 ip
 	 */
 	private String serverIp;
+
+	private List<Node> nodes;
 
 	public int getHeartTimeout() {
 		return heartTimeout;
@@ -77,5 +81,13 @@ public class TioProperties {
 
 	public void setServerIp(String serverIp) {
 		this.serverIp = serverIp;
+	}
+
+	public List<Node> getNodes() {
+		return nodes;
+	}
+
+	public void setNodes(List<Node> nodes) {
+		this.nodes = nodes;
 	}
 }

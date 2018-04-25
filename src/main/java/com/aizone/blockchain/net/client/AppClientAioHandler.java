@@ -140,7 +140,7 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 			//继续同步下一个区块
 			ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(0));
 		} else {
-			logger.error("区块同步失败， 重新发起同步 {}", block.getHeader());
+			logger.error("区块同步失败，{}", block.getHeader());
 			//重新发起同步请求
 			//ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(block.getHeader().getIndex()-1));
 		}

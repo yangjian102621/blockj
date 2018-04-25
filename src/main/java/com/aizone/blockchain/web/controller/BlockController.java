@@ -4,6 +4,7 @@ import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.core.BlockChain;
 import com.aizone.blockchain.core.Transaction;
 import com.aizone.blockchain.db.DBAccess;
+import com.aizone.blockchain.net.base.Node;
 import com.aizone.blockchain.utils.JsonVo;
 import com.aizone.blockchain.web.vo.TransactionVo;
 import com.google.common.base.Optional;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -110,13 +112,19 @@ public class BlockController {
 	}
 
 	/**
-	 * 手动同步节点区块
+	 * 查看节点列表
 	 * @param request
 	 * @return
 	 */
-	@GetMapping("node/sync")
-	public JsonVo sync(HttpServletRequest request) {
-		return JsonVo.success();
+	@GetMapping("node/view")
+	public JsonVo nodeList(HttpServletRequest request) {
+
+		Optional<List<Node>> nodeList = dbAccess.getNodeList();
+		JsonVo success = JsonVo.success();
+		if (nodeList.isPresent()) {
+			success.setItem(nodeList.get());
+		}
+		return success;
 	}
 
 }

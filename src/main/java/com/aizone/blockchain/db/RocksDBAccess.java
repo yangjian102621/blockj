@@ -3,6 +3,7 @@ package com.aizone.blockchain.db;
 import com.aizone.blockchain.conf.RocksDbProperties;
 import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.net.base.Node;
+import com.aizone.blockchain.net.conf.TioProperties;
 import com.aizone.blockchain.utils.SerializeUtils;
 import com.aizone.blockchain.wallet.Account;
 import com.google.common.base.Optional;
@@ -50,7 +51,10 @@ public class RocksDBAccess implements DBAccess {
 	private static final String CLIENT_NODES_LIST_KEY = "client-node-list";
 
 	@Autowired
-	private RocksDbProperties properties;
+	private RocksDbProperties rocksDbProperties;
+
+	@Autowired
+	private TioProperties tioProperties;
 
 	public RocksDBAccess() {
 		//
@@ -62,7 +66,7 @@ public class RocksDBAccess implements DBAccess {
 	@PostConstruct
 	public void initRocksDB() {
 		try {
-			rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), properties.getDataDir());
+			rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), rocksDbProperties.getDataDir());
 		} catch (RocksDBException e) {
 			e.printStackTrace();
 		}
@@ -166,11 +170,17 @@ public class RocksDBAccess implements DBAccess {
 	public synchronized boolean addNode(Node node) {
 		Optional<List<Node>> nodeList = getNodeList();
 		if (nodeList.isPresent()) {
-			if (!nodeList.get().contains(node)) {
-				nodeList.get().add(node);
-				return putNodeList(nodeList.get());
+			//已经存在的节点跳过
+			if (nodeList.get().contains(node)) {
+				return true;
 			}
-			return true;
+			//跳过自身节点
+			Node self = new Node(tioProperties.getServerIp(), tioProperties.getServerPort());
+			if (self.equals(node)) {
+				return true;
+			}
+			nodeList.get().add(node);
+			return putNodeList(nodeList.get());
 		} else {
 			ArrayList<Node> nodes = new ArrayList<>();
 			nodes.add(node);

@@ -52,13 +52,18 @@ public class AppClient {
 		aioClient = new AioClient(clientGroupContext);
 		//加载数据库中的节点数据
 		Optional<List<Node>> nodeList = dbAccess.getNodeList();
-
+		List<Node> nodes = null;
 		if (nodeList.isPresent()) {
-			for (Node node : nodeList.get()) {
-				addNode(node.getIp(), node.getPort());
-			}
-		}
+			nodes = nodeList.get();
 
+			//初始化配置 properties 中的节点
+		} else if (null != tioProperties.getNodes()) {
+			nodes = tioProperties.getNodes();
+		}
+		// 添加节点
+		for (Node node : nodes) {
+			addNode(node.getIp(), node.getPort());
+		}
 	}
 
 	/**

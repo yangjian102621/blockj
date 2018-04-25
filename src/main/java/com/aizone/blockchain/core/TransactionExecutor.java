@@ -19,6 +19,9 @@ public class TransactionExecutor {
 	@Autowired
 	private DBAccess dbAccess;
 
+	@Autowired
+	private TransactionPool transactionPool;
+
 	/**
 	 * 执行区块中的交易
 	 * @param block
@@ -58,5 +61,8 @@ public class TransactionExecutor {
 				dbAccess.putAccount(recipient.get());
 			}//end synchronize
 		}// end for
+
+		//清空交易池
+		transactionPool.clearTransactions();
 	}
 }
