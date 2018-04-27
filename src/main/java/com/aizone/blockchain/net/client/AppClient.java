@@ -85,6 +85,7 @@ public class AppClient {
 		ClientChannelContext channelContext = aioClient.connect(node);
 		Aio.send(channelContext, new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE)));
 		Aio.bindGroup(channelContext, tioProperties.getClientGroupName());
+		dbAccess.addNode(node);
 		logger.info("添加节点成功, {}", node);
 	}
 

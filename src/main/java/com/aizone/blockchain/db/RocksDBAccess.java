@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +66,13 @@ public class RocksDBAccess implements DBAccess {
 	 */
 	@PostConstruct
 	public void initRocksDB() {
+
 		try {
+			//如果数据库路径不存在，则创建路径
+			File directory = new File(System.getProperty("user.dir")+"/"+rocksDbProperties.getDataDir());
+			if (!directory.exists()) {
+				directory.mkdirs();
+			}
 			rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), rocksDbProperties.getDataDir());
 		} catch (RocksDBException e) {
 			e.printStackTrace();
