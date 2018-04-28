@@ -55,6 +55,8 @@ http://127.0.0.1:8081/chain/mine
 
 ![](attachs/new-block.png)
 
+![](attachs/new-block-t.png)
+
 > 发送交易， http://127.0.0.1:8081/chain/transactions/new
  
  请求方式为 POST， 参数如下
