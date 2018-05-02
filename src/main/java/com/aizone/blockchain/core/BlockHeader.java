@@ -1,5 +1,7 @@
 package com.aizone.blockchain.core;
 
+import com.aizone.blockchain.encrypt.HashUtils;
+
 import java.io.Serializable;
 import java.math.BigInteger;
 
@@ -100,7 +102,22 @@ public class BlockHeader implements Serializable {
 				", difficulty=" + difficulty +
 				", nonce=" + nonce +
 				", timestamp=" + timestamp +
+				", hash='" + hash + '\'' +
 				", previousHash='" + previousHash + '\'' +
 				'}';
+	}
+
+	/**
+	 * 获取区块头的 hash 值
+	 * @return
+	 */
+	public String toHash() {
+		return HashUtils.sha256Hex("BlockHeader{" +
+				"index=" + index +
+				", difficulty=" + difficulty +
+				", nonce=" + nonce +
+				", timestamp=" + timestamp +
+				", previousHash='" + previousHash + '\'' +
+				'}');
 	}
 }

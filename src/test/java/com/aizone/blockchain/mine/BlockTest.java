@@ -36,13 +36,16 @@ public class BlockTest {
 	@Test
 	public void newBlock() throws Exception {
 
-
 		Optional<Block> lastBlock = dbAccess.getLastBlock();
+		if (lastBlock.isPresent()) {
+			logger.info("Previous block ==> {}", lastBlock.get().getHeader());
+		}
 		Block block = miner.newBlock(lastBlock);
-		//存储区块
-		System.out.println(dbAccess.putBlock(block));
-		System.out.println(block.getHeader());
+		dbAccess.putBlock(block);
+		dbAccess.putLastBlockIndex(block.getHeader().getIndex());
+		logger.info("Block ====> {}", block.getHeader());
 	}
+
 
 	/**
 	 * 获取最后一个区块
@@ -51,7 +54,7 @@ public class BlockTest {
 	public void getLastBlock() {
 		Optional<Block> block = dbAccess.getLastBlock();
 		if (block.isPresent()) {
-			logger.info("Block ====> {}", block.get().getHeader().toString());
+			logger.info("Block ====> {}", block.get().getHeader());
 		}
 	}
 }

@@ -5,10 +5,8 @@ import com.aizone.blockchain.core.BlockBody;
 import com.aizone.blockchain.core.BlockHeader;
 import com.aizone.blockchain.core.Transaction;
 import com.aizone.blockchain.db.DBAccess;
-import com.aizone.blockchain.encrypt.HashUtils;
 import com.aizone.blockchain.mine.Miner;
 import com.aizone.blockchain.wallet.Account;
-import com.aizone.blockchain.wallet.Personal;
 import com.google.common.base.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,8 +21,6 @@ public class PowMiner implements Miner {
 
 	@Autowired
 	private DBAccess dbAccess;
-	@Autowired
-	private Personal personal;
 
 	@Override
 	public Block newBlock(Optional<Block> block) throws Exception {
@@ -79,7 +75,7 @@ public class PowMiner implements Miner {
 		BlockHeader header = new BlockHeader(1, null);
 		header.setNonce(PowMiner.GENESIS_BLOCK_NONCE);
 		header.setDifficulty(ProofOfWork.getTarget());
-		header.setHash(HashUtils.sha256Hex(header.toString()));
+		header.setHash(header.toHash());
 		BlockBody body = new BlockBody();
 		return new Block(header, body);
 	}

@@ -2,7 +2,6 @@ package com.aizone.blockchain.net.base;
 
 import com.aizone.blockchain.core.Block;
 import com.aizone.blockchain.db.DBAccess;
-import com.aizone.blockchain.encrypt.HashUtils;
 import com.aizone.blockchain.mine.pow.ProofOfWork;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
@@ -110,7 +109,7 @@ public abstract class BaseAioHandler {
 
 		//创世区块
 		if (block.getHeader().getIndex() == 1) {
-			return Objects.equal(block.getHeader().getHash(), HashUtils.sha256Hex(block.getHeader().toString()));
+			return Objects.equal(block.getHeader().getHash(), block.getHeader().toHash());
 		}
 
 		boolean blockValidate = false;

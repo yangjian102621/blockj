@@ -50,8 +50,8 @@ public class PowTest {
 
 		Block block = new Block(header, body);
 		ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block);
-		PowResult run = proofOfWork.run();
-		System.out.println(run);
+		PowResult result = proofOfWork.run();
+		logger.info("Pow result, {}", result);
 
 	}
 
