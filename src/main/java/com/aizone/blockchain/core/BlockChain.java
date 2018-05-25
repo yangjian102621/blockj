@@ -83,6 +83,12 @@ public class BlockChain {
 		//签名
 		String sign = SignUtils.sign(privateKey, transaction.toString());
 		transaction.setSign(sign);
+
+		//先验证私钥是否正确
+		if (!SignUtils.verify(sender.get().getPublicKey(), sign, transaction.toString())) {
+			throw new RuntimeException("私钥签名验证失败，非法的私钥");
+		}
+
 		//打包数据到交易池
 		transactionPool.addTransaction(transaction);
 
