@@ -84,5 +84,7 @@ http://127.0.0.1:8081/chain/mine
 
 ![](attachs/block-view.png)
 
+> 千呼万唤始出来，讨论群来了：
 
+![](attachs/wechat.png)
 
