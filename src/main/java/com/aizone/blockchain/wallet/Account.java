@@ -15,7 +15,7 @@ public class Account implements Serializable {
 	/**
 	 * 钱包私钥
 	 */
-	private String privateKey;
+	private transient String privateKey;
 
 	/**
 	 * 钱包公钥
