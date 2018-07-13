@@ -36,17 +36,6 @@
 			<scope>test</scope>
 		</dependency>
 		
-		<!--encrypt tools-->
-		<!--<dependency>-->
-			<!--<groupId>com.madgag.spongycastle</groupId>-->
-			<!--<artifactId>core</artifactId>-->
-			<!--<version>1.54.0.0</version>-->
-		<!--</dependency>-->
-		<!--<dependency>-->
-			<!--<groupId>cn.hutool</groupId>-->
-			<!--<artifactId>hutool-all</artifactId>-->
-			<!--<version>4.0.5</version>-->
-		<!--</dependency>-->
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
