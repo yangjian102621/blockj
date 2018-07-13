@@ -1,19 +1,20 @@
 package com.ppblock.blockchain.crypto;
 
+import com.ppblock.blockchain.constants.CryptoConstants;
 import com.ppblock.blockchain.utils.Numeric;
 import com.ppblock.blockchain.utils.Strings;
+import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.spec.ECParameterSpec;
 
 import java.math.BigInteger;
 import java.security.*;
-import java.security.spec.ECGenParameterSpec;
 import java.util.Arrays;
-
-import static com.ppblock.blockchain.crypto.SecureRandomUtils.secureRandom;
 
 
 /**
  * Crypto key utilities.
+ * @author yangjian
  */
 public class Keys {
 
@@ -43,9 +44,16 @@ public class Keys {
     static KeyPair createSecp256k1KeyPair() throws NoSuchProviderException,
             NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("ECDSA", "BC");
-        ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec("secp256k1");
-        keyPairGenerator.initialize(ecGenParameterSpec, secureRandom());
+        // 注册 BC Provider
+        Security.addProvider(new BouncyCastleProvider());
+        // 创建椭圆曲线算法的密钥对生成器
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(
+                CryptoConstants.KEY_GEN_ALGORITHM,
+                BouncyCastleProvider
+                .PROVIDER_NAME);
+        // 椭圆曲线（EC）域参数设定
+        ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(CryptoConstants.EC_PARAM_SPEC);
+        keyPairGenerator.initialize(ecSpec, new SecureRandom());
         return keyPairGenerator.generateKeyPair();
     }
 
@@ -56,7 +64,7 @@ public class Keys {
     }
 
     public static String getAddress(ECKeyPair ecKeyPair) {
-        return getAddress(ecKeyPair.getPublicKey());
+        return getAddress(ecKeyPair.getPublicKeyValue());
     }
 
     public static String getAddress(BigInteger publicKey) {
@@ -73,12 +81,23 @@ public class Keys {
                     + publicKeyNoPrefix;
         }
         String hash = Hash.sha3(publicKeyNoPrefix);
-        return hash.substring(hash.length() - ADDRESS_LENGTH_IN_HEX);  // right most 160 bits
+        // right most 160 bits
+        return Numeric.HEX_PREFIX + hash.substring(hash.length() - ADDRESS_LENGTH_IN_HEX);
+    }
+
+    /**
+     * get address with 0x prefix
+     * @param publicKey
+     * @return
+     */
+    public static String getAddressWithoutPrefix(BigInteger publicKey) {
+        return Numeric.cleanHexPrefix(getAddress(publicKey));
     }
 
     public static byte[] getAddress(byte[] publicKey) {
         byte[] hash = Hash.sha3(publicKey);
-        return Arrays.copyOfRange(hash, hash.length - 20, hash.length);  // right most 160 bits
+        // right most 160 bits
+        return Arrays.copyOfRange(hash, hash.length - 20, hash.length);
     }
 
     /**
@@ -108,15 +127,15 @@ public class Keys {
     }
 
     public static byte[] serialize(ECKeyPair ecKeyPair) {
-        byte[] privateKey = Numeric.toBytesPadded(ecKeyPair.getPrivateKey(), PRIVATE_KEY_SIZE);
-        byte[] publicKey = Numeric.toBytesPadded(ecKeyPair.getPublicKey(), PUBLIC_KEY_SIZE);
+        byte[] privateKey = Numeric.toBytesPadded(ecKeyPair.getPrivateKeyValue(), PRIVATE_KEY_SIZE);
+        byte[] publicKey = Numeric.toBytesPadded(ecKeyPair.getPublicKeyValue(), PUBLIC_KEY_SIZE);
 
         byte[] result = Arrays.copyOf(privateKey, PRIVATE_KEY_SIZE + PUBLIC_KEY_SIZE);
         System.arraycopy(publicKey, 0, result, PRIVATE_KEY_SIZE, PUBLIC_KEY_SIZE);
         return result;
     }
 
-    public static ECKeyPair deserialize(byte[] input) {
+    public static ECKeyPair deserialize(byte[] input) throws Exception {
         if (input.length != PRIVATE_KEY_SIZE + PUBLIC_KEY_SIZE) {
             throw new RuntimeException("Invalid input key size");
         }
@@ -125,5 +144,23 @@ public class Keys {
         BigInteger publicKey = Numeric.toBigInt(input, PRIVATE_KEY_SIZE, PUBLIC_KEY_SIZE);
 
         return new ECKeyPair(privateKey, publicKey);
+    }
+
+    /**
+     * 将 byte[] 公钥转成字符串
+     * @param publicKey
+     * @return
+     */
+    public static String publicKeyEncode(byte[] publicKey) {
+        return Base58.encode(publicKey);
+    }
+
+    /**
+     * 将字符串转成 byte[]
+     * @param publicKey
+     * @return
+     */
+    public static byte[] publicKeyDecode(String publicKey) {
+        return Base58.decode(publicKey);
     }
 }

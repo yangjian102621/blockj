@@ -3,7 +3,8 @@ package com.ppblock.blockchain.core;
 import com.google.common.base.Optional;
 import com.ppblock.blockchain.account.Account;
 import com.ppblock.blockchain.crypto.Credentials;
-import com.ppblock.blockchain.crypto.SignUtils;
+import com.ppblock.blockchain.crypto.Keys;
+import com.ppblock.blockchain.crypto.Sign;
 import com.ppblock.blockchain.db.DBAccess;
 import com.ppblock.blockchain.enums.TransactionStatusEnum;
 import com.ppblock.blockchain.event.MineBlockEvent;
@@ -88,15 +89,15 @@ public class BlockChain {
 		}
 		//构建交易对象
 		Transaction transaction = new Transaction(credentials.getAddress(), to, amount);
-		transaction.setPublicKey(credentials.getEcKeyPair().getPublicKey());
+		transaction.setPublicKey(Keys.publicKeyEncode(credentials.getEcKeyPair().getPublicKey().getEncoded()));
 		transaction.setStatus(TransactionStatusEnum.APPENDING);
 		transaction.setTxHash(transaction.hash());
 		//签名
-		String sign = SignUtils.sign(credentials.getEcKeyPair().getPrivateKey().toByteArray(), transaction.toString());
+		String sign = Sign.sign(credentials.getEcKeyPair().getPrivateKey(), transaction.toString());
 		transaction.setSign(sign);
 
 		//先验证私钥是否正确
-		if (!SignUtils.verify(credentials.getEcKeyPair().getPublicKey().toByteArray(), sign, transaction.toString())) {
+		if (!Sign.verify(credentials.getEcKeyPair().getPublicKey(), sign, transaction.toString())) {
 			throw new RuntimeException("私钥签名验证失败，非法的私钥");
 		}
 

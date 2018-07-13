@@ -5,7 +5,7 @@ package com.ppblock.blockchain.constants;
  * @author yangjian
  * @since 18-4-8
  */
-public interface EncryptConstants {
+public interface CryptoConstants {
 	/**
 	 * 椭圆曲线密钥生成算法，ECDSA
 	 */

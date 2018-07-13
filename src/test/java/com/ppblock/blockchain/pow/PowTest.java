@@ -44,7 +44,7 @@ public class PowTest {
 		transaction.setData("Mining Reward");
 		//transaction.setPublicKey(account.getPublicKey());
 		transaction.setTxHash(Hash.sha3(transaction.toString()));
-		//transaction.setSign(SignUtils.sign(account.getPrivateKey(), transaction.toString()));
+		//transaction.setSign(Sign.sign(account.getPrivateKey(), transaction.toString()));
 		body.addTransaction(transaction);
 
 		Block block = new Block(header, body);

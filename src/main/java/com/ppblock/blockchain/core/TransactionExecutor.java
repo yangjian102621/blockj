@@ -2,7 +2,8 @@ package com.ppblock.blockchain.core;
 
 import com.google.common.base.Optional;
 import com.ppblock.blockchain.account.Account;
-import com.ppblock.blockchain.crypto.SignUtils;
+import com.ppblock.blockchain.crypto.Keys;
+import com.ppblock.blockchain.crypto.Sign;
 import com.ppblock.blockchain.db.DBAccess;
 import com.ppblock.blockchain.enums.TransactionStatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,10 @@ public class TransactionExecutor {
 				//账户转账
 				Optional<Account> sender = dbAccess.getAccount(transaction.getFrom());
 				//验证签名
-				boolean verify = SignUtils.verify(transaction.getPublicKey().toByteArray(), transaction.getSign(), transaction
-						.toString());
+				boolean verify = Sign.verify(
+						Keys.publicKeyDecode(transaction.getPublicKey()),
+						transaction.getSign(),
+						transaction.toString());
 				if (!verify) {
 					transaction.setStatus(TransactionStatusEnum.FAIL);
 					transaction.setErrorMessage("交易签名错误");

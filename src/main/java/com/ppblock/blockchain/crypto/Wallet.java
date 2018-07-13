@@ -74,7 +74,7 @@ public class Wallet {
         byte[] iv = generateRandomBytes(16);
 
         byte[] privateKeyBytes =
-                Numeric.toBytesPadded(ecKeyPair.getPrivateKey(), Keys.PRIVATE_KEY_SIZE);
+                Numeric.toBytesPadded(ecKeyPair.getPrivateKeyValue(), Keys.PRIVATE_KEY_SIZE);
 
         byte[] cipherText = performCipherOperation(
                     Cipher.ENCRYPT_MODE, iv, encryptKey, privateKeyBytes);
@@ -173,7 +173,7 @@ public class Wallet {
     }
 
     public static ECKeyPair decrypt(String password, WalletFile walletFile)
-            throws CipherException {
+            throws Exception {
 
         validate(walletFile);
 

@@ -4,8 +4,6 @@ import com.ppblock.blockchain.utils.ByteUtils;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 
 import java.math.BigInteger;
-import java.security.PrivateKey;
-import java.security.interfaces.ECPrivateKey;
 import java.util.Arrays;
 
 /**
@@ -13,7 +11,7 @@ import java.util.Arrays;
  * @author yangjian
  * @since 18-4-8
  */
-public class AddressUtils {
+public class BtcAddress {
 
 	/**
 	 * 加密字符集合
@@ -21,37 +19,11 @@ public class AddressUtils {
 	private static final String ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 	/**
-	 * 将私钥转换转成字符串
-	 * @return
-	 */
-	public static String privateKeyToString(PrivateKey privateKey) {
-		return ((ECPrivateKey) privateKey).getS().toString(16);
-	}
-
-	/**
-	 * 将 byte[] 公钥转成字符串
+	 * 根据公钥生成比特币钱包地址
 	 * @param publicKey
 	 * @return
 	 */
-	public static String publicKeyEncode(byte[] publicKey) {
-		return Base58.encode(publicKey);
-	}
-
-	/**
-	 * 将字符串转成 byte[]
-	 * @param publicKey
-	 * @return
-	 */
-	public static byte[] publicKeyDecode(String publicKey) {
-		return Base58.decode(publicKey);
-	}
-
-	/**
-	 * 根据公钥生成钱包地址
-	 * @param publicKey
-	 * @return
-	 */
-	public static String generateAddress(byte[] publicKey) {
+	public static String getAddress(byte[] publicKey) {
 
 		//1. 计算公钥的 SHA-256 哈希值
 		byte[] sha256Bytes = Hash.sha3(publicKey);

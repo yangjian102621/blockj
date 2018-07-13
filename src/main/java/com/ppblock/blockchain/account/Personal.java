@@ -1,7 +1,7 @@
 package com.ppblock.blockchain.account;
 
 import com.google.common.base.Optional;
-import com.ppblock.blockchain.crypto.AddressUtils;
+import com.ppblock.blockchain.crypto.BtcAddress;
 import com.ppblock.blockchain.crypto.ECKeyPair;
 import com.ppblock.blockchain.crypto.Keys;
 import com.ppblock.blockchain.db.DBAccess;
@@ -30,7 +30,7 @@ public class Personal {
 	public Account newAccount() throws Exception {
 
 		ECKeyPair ecKeyPair = Keys.createEcKeyPair();
-		String address = AddressUtils.generateAddress(ecKeyPair.getPublicKey().toByteArray());
+		String address = BtcAddress.getAddress(ecKeyPair.getPublicKey().getEncoded());
 
 		Account account = new Account(address, BigDecimal.ZERO);
 		//不存储私钥

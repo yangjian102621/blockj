@@ -6,6 +6,8 @@ import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Arrays;
 
 /**
@@ -15,43 +17,80 @@ import java.util.Arrays;
  */
 public class ECKeyPair {
 
-    private final BigInteger privateKey;
-    private final BigInteger publicKey;
+    private final PrivateKey privateKey;
+    private final PublicKey publicKey;
+    private final BigInteger privateKeyValue;
+    private final BigInteger publicKeyValue;
 
-    public ECKeyPair(BigInteger privateKey, BigInteger publicKey) {
-        this.privateKey = privateKey;
-        this.publicKey = publicKey;
+    public ECKeyPair(BigInteger privateKeyValue, BigInteger publicKeyValue) throws Exception {
+        this.privateKeyValue = privateKeyValue;
+        this.publicKeyValue = publicKeyValue;
+        this.privateKey = Sign.privateKeyFromBigInteger(privateKeyValue);
+        this.publicKey = Sign.publicKeyFromPrivate(privateKeyValue);
     }
 
-    public BigInteger getPrivateKey() {
+    public ECKeyPair(PrivateKey privateKey, PublicKey publicKey) {
+        this.privateKey = privateKey;
+        this.publicKey = publicKey;
+        // 生成 BigInteger 形式的公钥和私钥
+        BCECPrivateKey bcecPrivateKey = (BCECPrivateKey) this.privateKey;
+        BCECPublicKey bcecPublicKey = (BCECPublicKey) this.publicKey;
+        // 分别计算公钥和私钥的值
+        BigInteger privateKeyValue = bcecPrivateKey.getD();
+        byte[] publicKeyBytes = bcecPublicKey.getQ().getEncoded(false);
+        BigInteger publicKeyValue = new BigInteger(1, Arrays.copyOfRange(publicKeyBytes, 1, publicKeyBytes.length));
+        this.privateKeyValue = privateKeyValue;
+        this.publicKeyValue = publicKeyValue;
+    }
+
+    public PrivateKey getPrivateKey() {
         return privateKey;
     }
 
-    public BigInteger getPublicKey() {
+    /**
+     * export the private key to hex string
+     * @return
+     */
+    public String exportPrivateKey() {
+
+        return Numeric.toHexStringNoPrefix(this.getPrivateKeyValue());
+    }
+
+    /**
+     * get the address
+     * @return
+     */
+    public String getAddress() {
+        return Keys.getAddress(this.getPublicKeyValue());
+    }
+
+    public PublicKey getPublicKey() {
         return publicKey;
+    }
+
+    public BigInteger getPrivateKeyValue() {
+        return privateKeyValue;
+    }
+
+    public BigInteger getPublicKeyValue() {
+        return publicKeyValue;
     }
 
     public static ECKeyPair create(KeyPair keyPair) {
         BCECPrivateKey privateKey = (BCECPrivateKey) keyPair.getPrivate();
         BCECPublicKey publicKey = (BCECPublicKey) keyPair.getPublic();
 
-        BigInteger privateKeyValue = privateKey.getD();
-
-        // Ethereum does not use encoded public keys like bitcoin - see
-        // https://en.bitcoin.it/wiki/Elliptic_Curve_Digital_Signature_Algorithm for details
-        // Additionally, as the first bit is a constant prefix (0x04) we ignore this value
-        byte[] publicKeyBytes = publicKey.getQ().getEncoded(false);
-        BigInteger publicKeyValue =
-                new BigInteger(1, Arrays.copyOfRange(publicKeyBytes, 1, publicKeyBytes.length));
-
-        return new ECKeyPair(privateKeyValue, publicKeyValue);
+        return new ECKeyPair(privateKey, publicKey);
     }
 
-    public static ECKeyPair create(BigInteger privateKey) {
-        return new ECKeyPair(privateKey, SignUtils.publicKeyFromPrivate(privateKey));
+    public static ECKeyPair create(BigInteger privateKeyValue) throws Exception {
+
+        PrivateKey privateKey = Sign.privateKeyFromBigInteger(privateKeyValue);
+        PublicKey publicKey = Sign.publicKeyFromPrivate(privateKeyValue);
+        return new ECKeyPair(privateKey, publicKey);
     }
 
-    public static ECKeyPair create(byte[] privateKey) {
+    public static ECKeyPair create(byte[] privateKey) throws Exception {
         return create(Numeric.toBigInt(privateKey));
     }
 

@@ -3,7 +3,8 @@ package com.ppblock.blockchain.crypto;
 import com.ppblock.blockchain.utils.Numeric;
 
 /**
- * Credentials wrapper.
+ * Credential(账户凭证) 封装
+ * @author yangjian.
  */
 public class Credentials {
 
@@ -28,11 +29,11 @@ public class Credentials {
         return new Credentials(ecKeyPair, address);
     }
 
-    public static Credentials create(String privateKey, String publicKey) {
+    public static Credentials create(String privateKey, String publicKey) throws Exception {
         return create(new ECKeyPair(Numeric.toBigInt(privateKey), Numeric.toBigInt(publicKey)));
     }
 
-    public static Credentials create(String privateKey) {
+    public static Credentials create(String privateKey) throws Exception {
         return create(ECKeyPair.create(Numeric.toBigInt(privateKey)));
     }
 

@@ -4,7 +4,6 @@ import com.ppblock.blockchain.crypto.Hash;
 import com.ppblock.blockchain.enums.TransactionStatusEnum;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 /**
  * 交易对象
@@ -28,7 +27,7 @@ public class Transaction {
 	/**
 	 * 收款人公钥
 	 */
-	private BigInteger publicKey;
+	private String publicKey;
 	/**
 	 * 交易金额
 	 */
@@ -89,11 +88,11 @@ public class Transaction {
 		this.to = to;
 	}
 
-	public BigInteger getPublicKey() {
+	public String getPublicKey() {
 		return publicKey;
 	}
 
-	public void setPublicKey(BigInteger publicKey) {
+	public void setPublicKey(String publicKey) {
 		this.publicKey = publicKey;
 	}
 

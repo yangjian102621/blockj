@@ -1,6 +1,6 @@
 package com.ppblock.blockchain.account;
 
-import com.ppblock.blockchain.crypto.AddressUtils;
+import com.ppblock.blockchain.crypto.BtcAddress;
 import com.ppblock.blockchain.crypto.ECKeyPair;
 import com.ppblock.blockchain.crypto.Keys;
 import org.junit.Test;
@@ -20,7 +20,7 @@ public class WalletTest {
 	public void generateWallet() throws Exception {
 
 		ECKeyPair ecKeyPair = Keys.createEcKeyPair();
-		String address = AddressUtils.generateAddress(ecKeyPair.getPublicKey().toByteArray());
+		String address = BtcAddress.getAddress(ecKeyPair.getPublicKey().getEncoded());
 
 		logger.info("address: "+ address);
 	}

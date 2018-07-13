@@ -95,7 +95,7 @@ public class WalletUtils {
      * @throws IOException if the destination cannot be written to
      */
     public static Bip39Wallet generateBip39Wallet(String password, File destinationDirectory)
-            throws CipherException, IOException {
+            throws Exception {
         byte[] initialEntropy = new byte[16];
         secureRandom.nextBytes(initialEntropy);
 
@@ -109,17 +109,17 @@ public class WalletUtils {
     }
 
     public static Credentials loadCredentials(String password, String source)
-            throws IOException, CipherException {
+            throws Exception {
         return loadCredentials(password, new File(source));
     }
 
     public static Credentials loadCredentials(String password, File source)
-            throws IOException, CipherException {
+            throws Exception {
         WalletFile walletFile = objectMapper.readValue(source, WalletFile.class);
         return Credentials.create(Wallet.decrypt(password, walletFile));
     }
 
-    public static Credentials loadBip39Credentials(String password, String mnemonic) {
+    public static Credentials loadBip39Credentials(String password, String mnemonic) throws Exception {
         byte[] seed = MnemonicUtils.generateSeed(mnemonic, password);
         return Credentials.create(ECKeyPair.create(sha256(seed)));
     }

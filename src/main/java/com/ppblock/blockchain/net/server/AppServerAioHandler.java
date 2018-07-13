@@ -4,9 +4,10 @@ import com.ppblock.blockchain.core.Block;
 import com.ppblock.blockchain.core.Transaction;
 import com.ppblock.blockchain.core.TransactionExecutor;
 import com.ppblock.blockchain.core.TransactionPool;
+import com.ppblock.blockchain.crypto.Keys;
 import com.ppblock.blockchain.db.DBAccess;
-import com.ppblock.blockchain.crypto.SignUtils;
-import com.ppblock.blockchain.crypto.AddressUtils;
+import com.ppblock.blockchain.crypto.Sign;
+import com.ppblock.blockchain.crypto.BtcAddress;
 import com.ppblock.blockchain.net.base.*;
 import com.ppblock.blockchain.utils.SerializeUtils;
 import com.ppblock.blockchain.account.Account;
@@ -121,7 +122,7 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 		logger.info("收到交易确认请求， {}", tx);
 		responseVo.setItem(tx);
 		//验证交易
-		if (SignUtils.verify(tx.getPublicKey().toByteArray(), tx.getSign(), tx.toString())) {
+		if (Sign.verify(Keys.publicKeyDecode(tx.getPublicKey()), tx.getSign(), tx.toString())) {
 			responseVo.setSuccess(true);
 			//将交易放入交易池
 			transactionPool.addTransaction(tx);
@@ -197,7 +198,7 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 		MessagePacket resPacket = new MessagePacket();
 		Account account = (Account) SerializeUtils.unSerialize(body);
 		logger.info("收到新账户同步请求： {}", account);
-		if (AddressUtils.verifyAddress(account.getAddress())) {
+		if (BtcAddress.verifyAddress(account.getAddress())) {
 			dbAccess.putAccount(account);
 			responseVo.setSuccess(true);
 		} else {
