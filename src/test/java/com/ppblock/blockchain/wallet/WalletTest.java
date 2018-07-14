@@ -15,15 +15,24 @@ import java.io.File;
 public class WalletTest {
 
 	static Logger logger = LoggerFactory.getLogger(WalletTest.class);
+	static final File WALLET_DIR = new File("./keystore");
+	static final String WALLET_PASS = "123456";
 
+	//初始化
+	static {
+		if (!WALLET_DIR.exists()) {
+			WALLET_DIR.mkdir();
+		}
+	}
+
+	/**
+	 * 生成默认普通钱包
+	 * @throws Exception
+	 */
 	@Test
 	public void generateWallet() throws Exception {
 
 		String password = "123456";
-		File walletDir = new File("./keystore");
-		if (!walletDir.exists()) {
-			walletDir.mkdir();
-		}
 		String name = WalletUtils.generateNewWalletFile(password, walletDir);
 		logger.info("wallet name: "+name);
 	}
