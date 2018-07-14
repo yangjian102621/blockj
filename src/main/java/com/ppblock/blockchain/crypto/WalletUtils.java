@@ -105,7 +105,25 @@ public class WalletUtils {
 
         String walletFile = generateWalletFile(password, privateKey, destinationDirectory, false);
 
-        return new Bip39Wallet(walletFile, mnemonic);
+        return new Bip39Wallet(privateKey, walletFile, mnemonic);
+    }
+
+    public static Bip39Wallet generateBip39Wallet(String password)
+            throws Exception {
+        byte[] initialEntropy = new byte[16];
+        secureRandom.nextBytes(initialEntropy);
+
+        String mnemonic = MnemonicUtils.generateMnemonic(initialEntropy);
+        byte[] seed = MnemonicUtils.generateSeed(mnemonic, password);
+        ECKeyPair privateKey = ECKeyPair.create(sha256(seed));
+
+
+        return new Bip39Wallet(privateKey, null, mnemonic);
+    }
+
+    public static Bip39Wallet generateBip39Wallet()
+            throws Exception {
+        return  generateBip39Wallet(null);
     }
 
     public static Credentials loadCredentials(String password, String source)
@@ -122,6 +140,10 @@ public class WalletUtils {
     public static Credentials loadBip39Credentials(String password, String mnemonic) throws Exception {
         byte[] seed = MnemonicUtils.generateSeed(mnemonic, password);
         return Credentials.create(ECKeyPair.create(sha256(seed)));
+    }
+
+    public static Credentials loadBip39Credentials(String mnemonic) throws Exception {
+        return loadBip39Credentials(null, mnemonic);
     }
 
     private static String getWalletFileName(WalletFile walletFile) {

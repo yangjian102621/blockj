@@ -1,9 +1,7 @@
 package com.ppblock.blockchain.account;
 
 import com.google.common.base.Optional;
-import com.ppblock.blockchain.crypto.BtcAddress;
 import com.ppblock.blockchain.crypto.ECKeyPair;
-import com.ppblock.blockchain.crypto.Keys;
 import com.ppblock.blockchain.db.DBAccess;
 import com.ppblock.blockchain.event.NewAccountEvent;
 import com.ppblock.blockchain.net.ApplicationContextProvider;
@@ -25,14 +23,12 @@ public class Personal {
 
 	/**
 	 * 创建一个默认账户
+	 * @param keyPair
 	 * @return
 	 */
-	public Account newAccount() throws Exception {
+	public Account newAccount(ECKeyPair keyPair) throws Exception {
 
-		ECKeyPair ecKeyPair = Keys.createEcKeyPair();
-		String address = BtcAddress.getAddress(ecKeyPair.getPublicKey().getEncoded());
-
-		Account account = new Account(address, BigDecimal.ZERO);
+		Account account = new Account(keyPair.getAddress(), BigDecimal.ZERO);
 		//不存储私钥
 		dbAccess.putAccount(account);
 		//发布同步账号事件

@@ -24,6 +24,14 @@ public class Credentials {
         return address;
     }
 
+    /**
+     * 生成比特币地址
+     * @return
+     */
+    public String getBtcAddress() {
+        return BtcAddress.getAddress(ecKeyPair.getPublicKey().getEncoded());
+    }
+
     public static Credentials create(ECKeyPair ecKeyPair) {
         String address = Numeric.prependHexPrefix(Keys.getAddress(ecKeyPair));
         return new Credentials(ecKeyPair, address);

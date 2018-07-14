@@ -1,15 +1,15 @@
 package com.ppblock.blockchain.web.controller;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.ppblock.blockchain.core.Block;
 import com.ppblock.blockchain.core.BlockChain;
 import com.ppblock.blockchain.core.Transaction;
+import com.ppblock.blockchain.crypto.Credentials;
 import com.ppblock.blockchain.db.DBAccess;
 import com.ppblock.blockchain.net.base.Node;
 import com.ppblock.blockchain.utils.JsonVo;
 import com.ppblock.blockchain.web.vo.TransactionVo;
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -87,11 +87,14 @@ public class BlockController {
 		Preconditions.checkNotNull(txVo.getRecipient(), "Recipient is needed.");
 		Preconditions.checkNotNull(txVo.getAmount(), "Amount is needed.");
 		Preconditions.checkNotNull(txVo.getPrivateKey(), "Private Key is needed.");
-		Transaction tx = new Transaction();
-		BeanUtils.copyProperties(txVo, tx);
-		//Transaction transaction = blockChain.sendTransaction(txVo.getSender(), txVo.getPrivateKey());
+		Credentials credentials = Credentials.create(txVo.getPrivateKey());
+		Transaction transaction = blockChain.sendTransaction(
+				credentials,
+				txVo.getRecipient(),
+				txVo.getAmount(),
+				txVo.getData());
 		JsonVo success = JsonVo.success();
-		//success.setItem(transaction);
+		success.setItem(transaction);
 		return success;
 	}
 

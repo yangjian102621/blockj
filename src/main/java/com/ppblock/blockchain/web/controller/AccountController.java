@@ -1,10 +1,13 @@
 package com.ppblock.blockchain.web.controller;
 
+import com.ppblock.blockchain.crypto.ECKeyPair;
+import com.ppblock.blockchain.crypto.Keys;
 import com.ppblock.blockchain.utils.JsonVo;
 import com.ppblock.blockchain.account.Account;
 import com.google.common.base.Optional;
 import com.ppblock.blockchain.account.Personal;
 import com.ppblock.blockchain.db.DBAccess;
+import com.ppblock.blockchain.web.vo.AccountVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,10 +38,12 @@ public class AccountController {
 	@PostMapping("/new")
 	public JsonVo newAccount(HttpServletRequest request) throws Exception {
 
-		String password = request.getParameter("password");
-		Account account = personal.newAccount();
+		ECKeyPair keyPair = Keys.createEcKeyPair();
+		Account account = personal.newAccount(keyPair);
+		AccountVo vo = (AccountVo) account;
+		vo.setPrivateKey(keyPair.exportPrivateKey());
 		return new JsonVo(JsonVo.CODE_SUCCESS, "New account created, please remember your Address and Private Key.",
-				account);
+				vo);
 	}
 
 	/**

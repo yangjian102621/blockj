@@ -2,9 +2,11 @@ package com.ppblock.blockchain.crypto;
 
 /**
  * Data class encapsulating a BIP-39 compatible Ethereum wallet.
+ * @author yangjian
  */
 public class Bip39Wallet {
 
+    private final ECKeyPair keyPair;
     /**
      * Path to wallet file.
      */
@@ -15,7 +17,8 @@ public class Bip39Wallet {
      */
     private final String mnemonic;
 
-    public Bip39Wallet(String filename, String mnemonic) {
+    public Bip39Wallet(ECKeyPair keyPair, String filename, String mnemonic) {
+        this.keyPair = keyPair;
         this.filename = filename;
         this.mnemonic = mnemonic;
     }
@@ -26,6 +29,10 @@ public class Bip39Wallet {
 
     public String getMnemonic() {
         return mnemonic;
+    }
+
+    public ECKeyPair getKeyPair() {
+        return keyPair;
     }
 
     @Override

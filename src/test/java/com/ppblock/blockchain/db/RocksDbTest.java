@@ -20,9 +20,9 @@ import java.util.UUID;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
-public class DBUtilsTest {
+public class RocksDbTest {
 
-	static Logger logger = LoggerFactory.getLogger(DBUtilsTest.class);
+	static Logger logger = LoggerFactory.getLogger(RocksDbTest.class);
 
 	static final String KEY = "test-data";
 
@@ -30,7 +30,7 @@ public class DBUtilsTest {
 	private DBAccess dbAccess;
 
 	@Test
-	public void main() throws Exception {
+	public void put() {
 		//put data
 		String data = UUID.randomUUID().toString();
 		dbAccess.put(KEY, data);

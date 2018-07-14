@@ -1,6 +1,7 @@
 package com.ppblock.blockchain.net.client;
 
 import com.google.common.base.Optional;
+import com.ppblock.blockchain.conf.Settings;
 import com.ppblock.blockchain.db.DBAccess;
 import com.ppblock.blockchain.event.FetchNextBlockEvent;
 import com.ppblock.blockchain.net.ApplicationContextProvider;
@@ -40,6 +41,8 @@ public class AppClient {
 	private AioClient aioClient;
 	@Autowired
 	private DBAccess dbAccess;
+	@Autowired
+	Settings settings;
 
 	private static Logger logger = LoggerFactory.getLogger(AppClient.class);
 
@@ -48,6 +51,10 @@ public class AppClient {
 	 */
 	@PostConstruct
 	public void clientStart() throws Exception {
+
+		if (!settings.isNodeDiscover()) {
+			return;
+		}
 
 		aioClient = new AioClient(clientGroupContext);
 		//加载数据库中的节点数据
@@ -71,6 +78,11 @@ public class AppClient {
 	 * @param messagePacket
 	 */
 	public void sendGroup(MessagePacket messagePacket) {
+
+		if (!settings.isNodeDiscover()) {
+			return;
+		}
+
 		Aio.sendToGroup(clientGroupContext, tioProperties.getClientGroupName(), messagePacket);
 	}
 
@@ -80,6 +92,10 @@ public class AppClient {
 	 * @param port
 	 */
 	public void addNode(String serverIp, int port) throws Exception {
+
+		if (!settings.isNodeDiscover()) {
+			return;
+		}
 
 		Node node = new Node(serverIp, port);
 		ClientChannelContext channelContext = aioClient.connect(node);
@@ -103,6 +119,7 @@ public class AppClient {
 	 */
 	@EventListener(ApplicationReadyEvent.class)
 	public void fetchAccounts() {
+
 		MessagePacket packet = new MessagePacket();
 		packet.setType(MessagePacketType.REQ_ACCOUNTS_LIST);
 		packet.setBody(SerializeUtils.serialize(MessagePacket.FETCH_ACCOUNT_LIST_SYMBOL));

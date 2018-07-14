@@ -21,7 +21,7 @@ public class AppExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
-    public JsonVo handle(HttpServletRequest request, HttpServletResponse response, Exception e) throws Exception {
+    public JsonVo handle(HttpServletRequest request, HttpServletResponse response, Exception e) {
 
         logger.error("ERROR ======> {}", e);
         return JsonVo.instance(JsonVo.CODE_SUCCESS, e.getMessage());

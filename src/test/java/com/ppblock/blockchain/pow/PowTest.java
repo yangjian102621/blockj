@@ -35,7 +35,7 @@ public class PowTest {
 	private Personal personal;
 
 	@Test
-	public void main() throws Exception {
+	public void run() throws Exception {
 
 		BlockHeader header = new BlockHeader(1, null);
 		BlockBody body = new BlockBody();

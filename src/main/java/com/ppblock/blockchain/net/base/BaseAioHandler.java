@@ -109,7 +109,7 @@ public abstract class BaseAioHandler {
 
 		//创世区块
 		if (block.getHeader().getIndex() == 1) {
-			return Objects.equal(block.getHeader().getHash(), block.getHeader().toHash());
+			return Objects.equal(block.getHeader().getHash(), block.getHeader().hash());
 		}
 
 		boolean blockValidate = false;

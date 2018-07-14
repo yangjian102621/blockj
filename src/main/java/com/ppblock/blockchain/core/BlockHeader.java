@@ -111,7 +111,7 @@ public class BlockHeader implements Serializable {
 	 * 获取区块头的 hash 值
 	 * @return
 	 */
-	public String toHash() {
+	public String hash() {
 		return Hash.sha3("BlockHeader{" +
 				"index=" + index +
 				", difficulty=" + difficulty +
