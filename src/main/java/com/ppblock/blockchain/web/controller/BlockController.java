@@ -2,6 +2,7 @@ package com.ppblock.blockchain.web.controller;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.ppblock.blockchain.conf.Settings;
 import com.ppblock.blockchain.core.Block;
 import com.ppblock.blockchain.core.BlockChain;
 import com.ppblock.blockchain.core.Transaction;
@@ -34,9 +35,11 @@ public class BlockController {
 	private static final String SENDER_PUBLIC_KEY = "";
 	@Autowired
 	private DBAccess dbAccess;
-
 	@Autowired
 	private BlockChain blockChain;
+	@Autowired
+	private Settings settings;
+
 
 	@GetMapping({"", "/", "index"})
 	public JsonVo index(HttpServletRequest request) {
@@ -83,16 +86,20 @@ public class BlockController {
 	 */
 	@PostMapping("/transactions/new")
 	public JsonVo sendTransaction(@RequestBody TransactionVo txVo) throws Exception {
-		Preconditions.checkNotNull(txVo.getSender(), "Sender is needed.");
-		Preconditions.checkNotNull(txVo.getRecipient(), "Recipient is needed.");
+		Preconditions.checkNotNull(txVo.getTo(), "Recipient is needed.");
 		Preconditions.checkNotNull(txVo.getAmount(), "Amount is needed.");
 		Preconditions.checkNotNull(txVo.getPrivateKey(), "Private Key is needed.");
 		Credentials credentials = Credentials.create(txVo.getPrivateKey());
 		Transaction transaction = blockChain.sendTransaction(
 				credentials,
-				txVo.getRecipient(),
+				txVo.getTo(),
 				txVo.getAmount(),
 				txVo.getData());
+
+		//如果开启了自动挖矿，则直接自动挖矿
+		if (settings.isAutoMining()) {
+			blockChain.mining();
+		}
 		JsonVo success = JsonVo.success();
 		success.setItem(transaction);
 		return success;

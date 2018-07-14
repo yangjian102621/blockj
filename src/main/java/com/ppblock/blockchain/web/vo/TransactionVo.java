@@ -12,11 +12,11 @@ public class TransactionVo {
 	/**
 	 * 付款人地址
 	 */
-	private String sender;
+	private String from;
 	/**
 	 * 收款人地址
 	 */
-	private String recipient;
+	private String to;
 	/**
 	 * 交易金额
 	 */
@@ -30,20 +30,20 @@ public class TransactionVo {
 	 */
 	private String data;
 
-	public String getSender() {
-		return sender;
+	public String getFrom() {
+		return from;
 	}
 
-	public void setSender(String sender) {
-		this.sender = sender;
+	public void setFrom(String from) {
+		this.from = from;
 	}
 
-	public String getRecipient() {
-		return recipient;
+	public String getTo() {
+		return to;
 	}
 
-	public void setRecipient(String recipient) {
-		this.recipient = recipient;
+	public void setTo(String to) {
+		this.to = to;
 	}
 
 	public BigDecimal getAmount() {

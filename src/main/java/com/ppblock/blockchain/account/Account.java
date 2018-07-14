@@ -13,12 +13,12 @@ public class Account implements Serializable {
 	/**
 	 * 钱包地址
 	 */
-	private String address;
+	protected String address;
 
 	/**
 	 * 账户余额
 	 */
-	private BigDecimal balance;
+	protected BigDecimal balance;
 
 	public Account() {}
 

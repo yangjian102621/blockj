@@ -7,7 +7,9 @@ import com.ppblock.blockchain.core.Block;
 import com.ppblock.blockchain.core.BlockBody;
 import com.ppblock.blockchain.core.BlockHeader;
 import com.ppblock.blockchain.core.Transaction;
+import com.ppblock.blockchain.crypto.ECKeyPair;
 import com.ppblock.blockchain.crypto.Hash;
+import com.ppblock.blockchain.crypto.Keys;
 import com.ppblock.blockchain.mine.pow.PowResult;
 import com.ppblock.blockchain.mine.pow.ProofOfWork;
 import org.junit.Test;
@@ -39,7 +41,8 @@ public class PowTest {
 
 		BlockHeader header = new BlockHeader(1, null);
 		BlockBody body = new BlockBody();
-		Account account = personal.newAccount();
+		ECKeyPair keyPair = Keys.createEcKeyPair();
+		Account account = personal.newAccount(keyPair);
 		Transaction transaction = new Transaction(null, account.getAddress(), BigDecimal.valueOf(50));
 		transaction.setData("Mining Reward");
 		//transaction.setPublicKey(account.getPublicKey());

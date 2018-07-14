@@ -17,11 +17,24 @@ public class Settings {
 	 */
 	private boolean nodeDiscover;
 
+	/**
+	 * 是否自动挖矿
+	 */
+	private boolean autoMining;
+
 	public boolean isNodeDiscover() {
 		return nodeDiscover;
 	}
 
 	public void setNodeDiscover(boolean nodeDiscover) {
 		this.nodeDiscover = nodeDiscover;
+	}
+
+	public boolean isAutoMining() {
+		return autoMining;
+	}
+
+	public void setAutoMining(boolean autoMining) {
+		this.autoMining = autoMining;
 	}
 }

@@ -29,7 +29,7 @@ public class Personal {
 	public Account newAccount(ECKeyPair keyPair) throws Exception {
 
 		Account account = new Account(keyPair.getAddress(), BigDecimal.ZERO);
-		//不存储私钥
+		//存储账户
 		dbAccess.putAccount(account);
 		//发布同步账号事件
 		ApplicationContextProvider.publishEvent(new NewAccountEvent(account));

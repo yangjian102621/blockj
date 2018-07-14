@@ -3,6 +3,7 @@ package com.ppblock.blockchain.mine.pow;
 import com.ppblock.blockchain.core.Block;
 import com.ppblock.blockchain.crypto.Hash;
 import com.ppblock.blockchain.utils.ByteUtils;
+import com.ppblock.blockchain.utils.Numeric;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
@@ -81,7 +82,9 @@ public class ProofOfWork {
     private byte[] prepareData(long nonce) {
         byte[] prevBlockHashBytes = {};
         if (StringUtils.isNotBlank(this.getBlock().getHeader().getPreviousHash())) {
-            prevBlockHashBytes = new BigInteger(this.getBlock().getHeader().getPreviousHash(), 16).toByteArray();
+            //这里要去掉 hash 值的　0x 前缀， 否则会抛出异常
+            String prevHash = Numeric.cleanHexPrefix(this.getBlock().getHeader().getPreviousHash());
+            prevBlockHashBytes = new BigInteger(prevHash, 16).toByteArray();
         }
 
         return ByteUtils.merge(

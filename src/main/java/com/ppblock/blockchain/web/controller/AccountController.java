@@ -1,18 +1,17 @@
 package com.ppblock.blockchain.web.controller;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.ppblock.blockchain.account.Account;
+import com.ppblock.blockchain.account.Personal;
 import com.ppblock.blockchain.crypto.ECKeyPair;
 import com.ppblock.blockchain.crypto.Keys;
-import com.ppblock.blockchain.utils.JsonVo;
-import com.ppblock.blockchain.account.Account;
-import com.google.common.base.Optional;
-import com.ppblock.blockchain.account.Personal;
 import com.ppblock.blockchain.db.DBAccess;
+import com.ppblock.blockchain.utils.JsonVo;
 import com.ppblock.blockchain.web.vo.AccountVo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -40,7 +39,8 @@ public class AccountController {
 
 		ECKeyPair keyPair = Keys.createEcKeyPair();
 		Account account = personal.newAccount(keyPair);
-		AccountVo vo = (AccountVo) account;
+		AccountVo vo = new AccountVo();
+		BeanUtils.copyProperties(account, vo);
 		vo.setPrivateKey(keyPair.exportPrivateKey());
 		return new JsonVo(JsonVo.CODE_SUCCESS, "New account created, please remember your Address and Private Key.",
 				vo);
@@ -51,7 +51,7 @@ public class AccountController {
 	 * @param request
 	 * @return
 	 */
-	@GetMapping("/coinbase")
+	@GetMapping("/coinbase/get")
 	public JsonVo coinbase(HttpServletRequest request) {
 
 		Optional<Account> coinBaseAccount = dbAccess.getCoinBaseAccount();
@@ -62,6 +62,18 @@ public class AccountController {
 			success.setMessage("CoinBase Account is not created");
 		}
 		return success;
+	}
+
+	/**
+	 * 设置挖矿账号
+	 * @return
+	 */
+	@PostMapping("/coinbase/set")
+	public JsonVo setCoinbase(@RequestBody String address) {
+
+		Preconditions.checkNotNull(address, "address can not be null");
+		dbAccess.putCoinBaseAddress(address);
+		return JsonVo.success();
 	}
 
 	/**
