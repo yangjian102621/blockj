@@ -9,6 +9,8 @@ import com.ppblock.blockchain.enums.TransactionStatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 /**
  * 交易执行器
  * @author yangjian
@@ -33,6 +35,10 @@ public class TransactionExecutor {
 			synchronized (this) {
 
 				Optional<Account> recipient = dbAccess.getAccount(transaction.getTo());
+				//如果收款地址账户不存在，则创建一个新账户
+				if (!recipient.isPresent()) {
+					recipient = Optional.of(new Account(transaction.getTo(), BigDecimal.ZERO));
+				}
 				//挖矿奖励
 				if (null == transaction.getFrom()) {
 					recipient.get().setBalance(recipient.get().getBalance().add(transaction.getAmount()));

@@ -7,8 +7,8 @@ rocksdb:
 # tio 网络框架配置
 tio:
   heart-timeout: 5000
-  client-group-name: aizone-block-client
-  server-group-context-name: aizone-block-server
+  client-group-name: ppblock-client
+  server-group-context-name: ppblock-server
   # 服务端监听的端口
   server-port: 6789
   # 服务端绑定的 IP
@@ -20,6 +20,3 @@ tio:
     -
       ip: 127.0.0.1
       port: 7890
-    -
-      ip: 127.0.0.1
-      port: 7891

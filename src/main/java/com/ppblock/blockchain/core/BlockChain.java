@@ -1,7 +1,7 @@
 package com.ppblock.blockchain.core;
 
 import com.google.common.base.Optional;
-import com.ppblock.blockchain.account.Account;
+import com.google.common.base.Preconditions;
 import com.ppblock.blockchain.crypto.Credentials;
 import com.ppblock.blockchain.crypto.Keys;
 import com.ppblock.blockchain.crypto.Sign;
@@ -78,19 +78,15 @@ public class BlockChain {
 	public Transaction sendTransaction(Credentials credentials, String to, BigDecimal amount, String data) throws
 			Exception {
 
-		//从数据库查询到用户的公钥
-		Optional<Account> sender = dbAccess.getAccount(credentials.getAddress());
-		Optional<Account> recipient = dbAccess.getAccount(to);
-		if (!sender.isPresent()) {
-			throw new RuntimeException("付款人地址不存在");
-		}
-		if (!recipient.isPresent()) {
-			throw new RuntimeException("收款人地址不存在");
-		}
+		//校验付款和收款地址
+		Preconditions.checkArgument(to.startsWith("0x"), "收款地址格式不正确");
+		Preconditions.checkArgument(!credentials.getAddress().equals(to), "收款地址不能和发送地址相同");
+
 		//构建交易对象
 		Transaction transaction = new Transaction(credentials.getAddress(), to, amount);
 		transaction.setPublicKey(Keys.publicKeyEncode(credentials.getEcKeyPair().getPublicKey().getEncoded()));
 		transaction.setStatus(TransactionStatusEnum.APPENDING);
+		transaction.setData(data);
 		transaction.setTxHash(transaction.hash());
 		//签名
 		String sign = Sign.sign(credentials.getEcKeyPair().getPrivateKey(), transaction.toString());

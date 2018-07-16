@@ -1,18 +1,18 @@
 package com.ppblock.blockchain.net.server;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Optional;
+import com.ppblock.blockchain.account.Account;
 import com.ppblock.blockchain.core.Block;
 import com.ppblock.blockchain.core.Transaction;
 import com.ppblock.blockchain.core.TransactionExecutor;
 import com.ppblock.blockchain.core.TransactionPool;
 import com.ppblock.blockchain.crypto.Keys;
-import com.ppblock.blockchain.db.DBAccess;
 import com.ppblock.blockchain.crypto.Sign;
-import com.ppblock.blockchain.crypto.BtcAddress;
+import com.ppblock.blockchain.crypto.WalletUtils;
+import com.ppblock.blockchain.db.DBAccess;
 import com.ppblock.blockchain.net.base.*;
 import com.ppblock.blockchain.utils.SerializeUtils;
-import com.ppblock.blockchain.account.Account;
-import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,7 +198,7 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 		MessagePacket resPacket = new MessagePacket();
 		Account account = (Account) SerializeUtils.unSerialize(body);
 		logger.info("收到新账户同步请求： {}", account);
-		if (BtcAddress.verifyAddress(account.getAddress())) {
+		if (WalletUtils.isValidAddress(account.getAddress())) {
 			dbAccess.putAccount(account);
 			responseVo.setSuccess(true);
 		} else {

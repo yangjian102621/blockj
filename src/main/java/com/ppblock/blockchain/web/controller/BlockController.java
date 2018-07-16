@@ -25,14 +25,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/chain")
 public class BlockController {
-	/**
-	 * 收款人私钥，测试数据
-	 */
-	private static final String SENDER_PRIVATE_KEY = "";
-	/**
-	 * 收款人公钥，测试数据
-	 */
-	private static final String SENDER_PUBLIC_KEY = "";
+
 	@Autowired
 	private DBAccess dbAccess;
 	@Autowired

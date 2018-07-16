@@ -42,4 +42,12 @@ public class Account implements Serializable {
 	public void setBalance(BigDecimal balance) {
 		this.balance = balance;
 	}
+
+	@Override
+	public String toString() {
+		return "Account{" +
+				"address='" + address + '\'' +
+				", balance=" + balance +
+				'}';
+	}
 }

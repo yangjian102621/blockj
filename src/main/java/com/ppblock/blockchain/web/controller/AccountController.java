@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author yangjian
@@ -69,10 +70,10 @@ public class AccountController {
 	 * @return
 	 */
 	@PostMapping("/coinbase/set")
-	public JsonVo setCoinbase(@RequestBody String address) {
+	public JsonVo setCoinbase(@RequestBody Map<String, String> params) {
 
-		Preconditions.checkNotNull(address, "address can not be null");
-		dbAccess.putCoinBaseAddress(address);
+		Preconditions.checkNotNull(params.get("address"), "address can not be null");
+		dbAccess.putCoinBaseAddress(params.get("address"));
 		return JsonVo.success();
 	}
 
