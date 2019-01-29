@@ -24,4 +24,5 @@ dist/
 nbdist/
 .nb-gradle/
 block-data
+keystore
 *.log
