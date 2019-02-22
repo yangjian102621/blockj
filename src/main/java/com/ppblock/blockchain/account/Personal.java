@@ -26,7 +26,7 @@ public class Personal {
 	 * @param keyPair
 	 * @return
 	 */
-	public Account newAccount(ECKeyPair keyPair) throws Exception {
+	public Account newAccount(ECKeyPair keyPair) {
 
 		Account account = new Account(keyPair.getAddress(), BigDecimal.ZERO);
 		//存储账户

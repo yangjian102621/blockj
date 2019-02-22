@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2018-04-21 下午4:14.
  */
 @Configuration
-@ConfigurationProperties(prefix = "rocksdb")
+@ConfigurationProperties("rocksdb")
 public class RocksDbProperties {
 
 	private String dataDir;

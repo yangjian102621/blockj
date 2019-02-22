@@ -32,7 +32,7 @@ public class AppClientAioListener implements ClientAioListener {
 
     @Override
     public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect) throws Exception {
-        if (isConnected || isReconnect) {
+        if (isConnected) {
             logger.info("连接成功：server地址为-" + channelContext.getServerNode());
             Aio.bindGroup(channelContext, tioProperties.getClientGroupName());
         } else {

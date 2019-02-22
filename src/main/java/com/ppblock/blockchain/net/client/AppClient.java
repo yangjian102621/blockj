@@ -62,7 +62,6 @@ public class AppClient {
 		List<Node> nodes = null;
 		if (nodeList.isPresent()) {
 			nodes = nodeList.get();
-
 			//初始化配置 properties 中的节点
 		} else if (null != tioProperties.getNodes()) {
 			nodes = tioProperties.getNodes();
@@ -96,13 +95,18 @@ public class AppClient {
 		if (!settings.isNodeDiscover()) {
 			return;
 		}
-
 		Node node = new Node(serverIp, port);
-		ClientChannelContext channelContext = aioClient.connect(node);
-		Aio.send(channelContext, new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE)));
-		Aio.bindGroup(channelContext, tioProperties.getClientGroupName());
-		dbAccess.addNode(node);
-		logger.info("添加节点成功, {}", node);
+		// determine if the node is already exists
+		Optional<List<Node>> nodeList = dbAccess.getNodeList();
+		if (nodeList.isPresent() && nodeList.get().contains(node)) {
+			return;
+		}
+		if (dbAccess.addNode(node)) {
+			ClientChannelContext channelContext = aioClient.connect(node);
+			Aio.send(channelContext, new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE)));
+			Aio.bindGroup(channelContext, tioProperties.getClientGroupName());
+			logger.info("添加节点成功, {}", node);
+		}
 	}
 
 	/**

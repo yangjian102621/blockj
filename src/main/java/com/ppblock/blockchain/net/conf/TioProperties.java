@@ -2,18 +2,18 @@ package com.ppblock.blockchain.net.conf;
 
 import com.ppblock.blockchain.net.base.Node;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.*;
 
 /**
  * tio 网络框架配置信息
  * @author yangjian
  * @since 18-4-18
  */
-@Configuration
-@ConfigurationProperties(prefix = "tio")
+@Component
+@ConfigurationProperties("tio")
 public class TioProperties {
 
 	/**
@@ -21,6 +21,7 @@ public class TioProperties {
 	 */
 	@NotNull
 	private int heartTimeout;
+
 	/**
 	 * 客户端分组名称
 	 */
@@ -39,9 +40,11 @@ public class TioProperties {
 	/**
 	 * 服务端绑定的 ip
 	 */
+	@NotNull
 	private String serverIp;
 
-	private List<Node> nodes;
+	@NotNull
+	private LinkedHashMap<String, Object> nodes;
 
 	public int getHeartTimeout() {
 		return heartTimeout;
@@ -84,10 +87,20 @@ public class TioProperties {
 	}
 
 	public List<Node> getNodes() {
-		return nodes;
+		if (null == nodes) {
+			return null;
+		}
+		ArrayList<Node> nodeList = new ArrayList<>();
+		Iterator<Map.Entry<String, Object>> iterator= nodes.entrySet().iterator();
+		while(iterator.hasNext()) {
+			Map.Entry entry = iterator.next();
+			Map value = (Map) entry.getValue();
+			nodeList.add(new Node(value.get("ip").toString(), Integer.valueOf(value.get("port").toString())));
+		}
+		return nodeList;
 	}
 
-	public void setNodes(List<Node> nodes) {
+	public void setNodes(LinkedHashMap<String, Object> nodes) {
 		this.nodes = nodes;
 	}
 }
