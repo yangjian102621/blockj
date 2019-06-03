@@ -1,11 +1,10 @@
 package org.rockyang.blockchain.mine.pow;
 
+import org.apache.commons.lang3.StringUtils;
 import org.rockyang.blockchain.core.Block;
 import org.rockyang.blockchain.crypto.Hash;
 import org.rockyang.blockchain.utils.ByteUtils;
 import org.rockyang.blockchain.utils.Numeric;
-import org.apache.commons.lang3.StringUtils;
-import org.rockyang.blockchain.core.Block;
 
 import java.math.BigInteger;
 
@@ -18,7 +17,7 @@ public class ProofOfWork {
     /**
      * 难度目标位, target=24 时大约 30 秒出一个区块
      */
-    public static final int TARGET_BITS = 24;
+    public static final int TARGET_BITS = 20;
 
     /**
      * 区块

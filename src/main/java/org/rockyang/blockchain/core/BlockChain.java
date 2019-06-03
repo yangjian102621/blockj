@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Iterator;
 
 /**
  * 区块链主类
@@ -42,9 +43,6 @@ public class BlockChain {
 	@Autowired
 	private TransactionPool transactionPool;
 
-	@Autowired
-	private TransactionExecutor executor;
-
 	// 是否正在同步区块
 	private boolean syncing = true;
 
@@ -56,8 +54,10 @@ public class BlockChain {
 
 		Optional<Block> lastBlock = getLastBlock();
 		Block block = miner.newBlock(lastBlock);
-		transactionPool.getTransactions().forEach(e -> block.getBody().addTransaction(e));
-		executor.run(block);
+		for (Iterator t = transactionPool.getTransactions().iterator(); t.hasNext();) {
+			block.getBody().addTransaction((Transaction) t);
+			t.remove(); // 已打包的交易移出交易池
+		}
 		//存储区块
 		dbAccess.putLastBlockIndex(block.getHeader().getIndex());
 		dbAccess.putBlock(block);
@@ -98,9 +98,6 @@ public class BlockChain {
 		if (!Sign.verify(credentials.getEcKeyPair().getPublicKey(), sign, transaction.toString())) {
 			throw new RuntimeException("私钥签名验证失败，非法的私钥");
 		}
-
-		//打包数据到交易池
-		transactionPool.addTransaction(transaction);
 
 		//触发交易事件，向全网广播交易，并等待确认
 		ApplicationContextProvider.publishEvent(new SendTransactionEvent(transaction));

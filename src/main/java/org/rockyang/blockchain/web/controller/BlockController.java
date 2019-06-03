@@ -2,7 +2,7 @@ package org.rockyang.blockchain.web.controller;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import org.rockyang.blockchain.conf.Settings;
+import org.rockyang.blockchain.conf.AppConf;
 import org.rockyang.blockchain.core.Block;
 import org.rockyang.blockchain.core.BlockChain;
 import org.rockyang.blockchain.core.Transaction;
@@ -11,9 +11,6 @@ import org.rockyang.blockchain.db.DBAccess;
 import org.rockyang.blockchain.net.base.Node;
 import org.rockyang.blockchain.utils.JsonVo;
 import org.rockyang.blockchain.web.vo.TransactionVo;
-import org.rockyang.blockchain.core.Block;
-import org.rockyang.blockchain.crypto.Credentials;
-import org.rockyang.blockchain.db.DBAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,21 +31,21 @@ public class BlockController {
 	@Autowired
 	private BlockChain blockChain;
 	@Autowired
-	private Settings settings;
+	private AppConf appConf;
 
 
-	@GetMapping({"", "/", "index"})
+	@PostMapping({"", "/", "index"})
 	public JsonVo index(HttpServletRequest request) {
 		return JsonVo.success();
 	}
 
 	/**
-	 * 挖矿
+	 * 启动挖矿
 	 * @param request
 	 * @return
 	 */
-	@GetMapping("/mine")
-	public JsonVo mine(HttpServletRequest request) throws Exception {
+	@PostMapping("/mining")
+	public JsonVo mining(HttpServletRequest request) throws Exception {
 
 		Block block = blockChain.mining();
 		JsonVo vo = new JsonVo();
@@ -63,7 +60,7 @@ public class BlockController {
 	 * @param request
 	 * @return
 	 */
-	@GetMapping("/block/view")
+	@PostMapping("/block/view")
 	public JsonVo viewChain(HttpServletRequest request) {
 
 		Optional<Block> block = dbAccess.getLastBlock();
@@ -93,7 +90,7 @@ public class BlockController {
 				txVo.getData());
 
 		//如果开启了自动挖矿，则直接自动挖矿
-		if (settings.isAutoMining()) {
+		if (appConf.isAutoMining()) {
 			blockChain.mining();
 		}
 		JsonVo success = JsonVo.success();
@@ -122,7 +119,7 @@ public class BlockController {
 	 * @param request
 	 * @return
 	 */
-	@GetMapping("node/view")
+	@PostMapping("node/view")
 	public JsonVo nodeList(HttpServletRequest request) {
 
 		Optional<List<Node>> nodeList = dbAccess.getNodeList();

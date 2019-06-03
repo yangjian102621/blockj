@@ -3,7 +3,7 @@ package org.rockyang.blockchain.db;
 import com.google.common.base.Optional;
 import org.rocksdb.*;
 import org.rockyang.blockchain.account.Account;
-import org.rockyang.blockchain.conf.RocksDbProperties;
+import org.rockyang.blockchain.conf.AppConf;
 import org.rockyang.blockchain.core.Block;
 import org.rockyang.blockchain.net.base.Node;
 import org.rockyang.blockchain.net.conf.TioProps;
@@ -31,7 +31,7 @@ public class RocksDBAccess implements DBAccess {
 	private RocksDB rocksDB;
 
 	@Autowired
-	private RocksDbProperties rocksDbProperties;
+	private AppConf appConf;
 
 	@Autowired
 	private TioProps tioProps;
@@ -48,11 +48,11 @@ public class RocksDBAccess implements DBAccess {
 
 		try {
 			//如果数据库路径不存在，则创建路径
-			File directory = new File(System.getProperty("user.dir")+"/"+rocksDbProperties.getDataDir());
+			File directory = new File(System.getProperty("user.dir")+"/"+appConf.getDataDir());
 			if (!directory.exists()) {
 				directory.mkdirs();
 			}
-			rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), rocksDbProperties.getDataDir());
+			rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), appConf.getDataDir());
 		} catch (RocksDBException e) {
 			e.printStackTrace();
 		}
@@ -158,12 +158,12 @@ public class RocksDBAccess implements DBAccess {
 		if (nodeList.isPresent()) {
 			//已经存在的节点跳过
 			if (nodeList.get().contains(node)) {
-				return true;
+				return false;
 			}
 			//跳过自身节点
 			Node self = new Node(tioProps.getServerIp(), tioProps.getServerPort());
 			if (self.equals(node)) {
-				return true;
+				return false;
 			}
 			nodeList.get().add(node);
 			return putNodeList(nodeList.get());

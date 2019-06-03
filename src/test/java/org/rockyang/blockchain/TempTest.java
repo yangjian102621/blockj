@@ -2,7 +2,9 @@ package org.rockyang.blockchain;
 
 import org.junit.Test;
 
-import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * 临时测试文件，测试各种其他测试代码
@@ -13,15 +15,35 @@ public class TempTest {
 
 	@Test
 	public void run() {
-//		BigInteger targetValue = BigInteger.valueOf(1).shiftLeft((256 - 15));
-//		BigInteger bigInteger = BigInteger.valueOf(1).shiftLeft((224));
-//		System.out.println(targetValue.divide(bigInteger));
-//		System.out.println(BigInteger.ONE);
+		List<C> list1 = new ArrayList<>();
+		List<C> list2 = new ArrayList<>();
+		list1.add(new C(1));
+		list1.add(new C(2));
+		list1.add(new C(3));
+		list1.add(new C(4));
 
-		//System.out.println("blocks_"+1);
-		BigInteger bigInteger = new BigInteger("01010", 10);
-		System.out.println(bigInteger);
+		for (Iterator i = list1.iterator(); i.hasNext();) {
+			list2.add((C) i.next());
+			i.remove();
+		}
 
+		System.out.println(list1);
+		System.out.println(list2);
+	}
+
+	private class C {
+		int value;
+
+		C(int v) {
+			this.value = v;
+		}
+
+		@Override
+		public String toString() {
+			return "C{" +
+					"value=" + value +
+					'}';
+		}
 	}
 
 

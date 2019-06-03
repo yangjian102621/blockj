@@ -4,7 +4,7 @@ import org.rockyang.blockchain.core.Transaction;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * 交易事件
+ * 发送交易事件
  * @author yangjian
  */
 public class SendTransactionEvent extends ApplicationEvent {

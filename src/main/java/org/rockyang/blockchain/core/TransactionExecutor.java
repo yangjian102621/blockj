@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Iterator;
 
 /**
  * 交易执行器
@@ -31,9 +32,10 @@ public class TransactionExecutor {
 	 */
 	public void run(Block block) throws Exception {
 
-		for (Transaction transaction : block.getBody().getTransactions()) {
-			synchronized (this) {
-
+		for (Transaction transaction : block.getBody().getTransactions())
+		{
+			synchronized (this)
+			{
 				Optional<Account> recipient = dbAccess.getAccount(transaction.getTo());
 				//如果收款地址账户不存在，则创建一个新账户
 				if (!recipient.isPresent()) {
@@ -64,6 +66,14 @@ public class TransactionExecutor {
 					continue;
 				}
 
+				// 将待打包交易池中包含此交易的记录删除，防止交易重复打包( fix bug for #IWSPJ)
+				for (Iterator i = transactionPool.getTransactions().iterator(); i.hasNext();) {
+					Transaction tx = (Transaction) i.next();
+					if (tx.getTxHash().equals(transaction.getTxHash())) {
+						i.remove();
+					}
+				}
+
 				//执行转账操作,更新账户余额
 				sender.get().setBalance(sender.get().getBalance().subtract(transaction.getAmount()));
 				recipient.get().setBalance(recipient.get().getBalance().add(transaction.getAmount()));
@@ -72,7 +82,5 @@ public class TransactionExecutor {
 			}//end synchronize
 		}// end for
 
-		//清空交易池
-		transactionPool.clearTransactions();
 	}
 }

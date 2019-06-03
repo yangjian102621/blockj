@@ -6,7 +6,6 @@ import org.rockyang.blockchain.net.base.MessagePacket;
 import org.rockyang.blockchain.net.base.MessagePacketType;
 import org.rockyang.blockchain.net.client.AppClient;
 import org.rockyang.blockchain.utils.SerializeUtils;
-import org.rockyang.blockchain.event.SendTransactionEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
