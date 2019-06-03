@@ -4,9 +4,6 @@ import org.rockyang.blockchain.net.client.AppClientAioHandler;
 import org.rockyang.blockchain.net.client.AppClientAioListener;
 import org.rockyang.blockchain.net.server.AppServerAioHandler;
 import org.rockyang.blockchain.net.server.AppServerAioListener;
-import org.rockyang.blockchain.net.client.AppClientAioListener;
-import org.rockyang.blockchain.net.server.AppServerAioHandler;
-import org.rockyang.blockchain.net.server.AppServerAioListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,10 +17,10 @@ import org.tio.server.ServerGroupContext;
  * @since 18-4-18
  */
 @Configuration
-public class GroupContextConfig {
+public class GroupContextConf {
 
 	@Autowired
-	TioProperties tioProperties;
+	TioProps tioProps;
 
 	/**
 	 * 客户端消息 handler, 包括编码、解码、消息处理
@@ -60,7 +57,7 @@ public class GroupContextConfig {
 		ReconnConf reconnConf = new ReconnConf(5000L, 20);
 		ClientGroupContext clientGroupContext = new ClientGroupContext(clientAioHandler, clientAioListener, reconnConf);
 		//设置心跳包时间间隔
-		clientGroupContext.setHeartbeatTimeout(tioProperties.getHeartTimeout());
+		clientGroupContext.setHeartbeatTimeout(tioProps.getHeartTimeout());
 		return clientGroupContext;
 	}
 
@@ -72,10 +69,10 @@ public class GroupContextConfig {
 	public ServerGroupContext serverGroupContext() {
 
 		ServerGroupContext serverGroupContext = new ServerGroupContext(
-				tioProperties.getServerGroupContextName(),
+				tioProps.getServerGroupContextName(),
 				serverAioHandler,
 				serverAioListener);
-		serverGroupContext.setHeartbeatTimeout(tioProperties.getHeartTimeout());
+		serverGroupContext.setHeartbeatTimeout(tioProps.getHeartTimeout());
 
 		return serverGroupContext;
 	}

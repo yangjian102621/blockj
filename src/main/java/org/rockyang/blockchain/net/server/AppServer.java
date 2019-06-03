@@ -1,6 +1,6 @@
 package org.rockyang.blockchain.net.server;
 
-import org.rockyang.blockchain.net.conf.TioProperties;
+import org.rockyang.blockchain.net.conf.TioProps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.tio.server.AioServer;
@@ -20,10 +20,10 @@ public class AppServer {
 	@Resource
 	private ServerGroupContext serverGroupContext;
 	@Autowired
-	private TioProperties properties;
+	private TioProps properties;
 
 	/**
-	 * 启动程序入口
+	 * 网络服务端程序入口
 	 */
 	@PostConstruct
 	public void serverStart() throws IOException {

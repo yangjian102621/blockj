@@ -1,6 +1,6 @@
 package org.rockyang.blockchain.net.client;
 
-import org.rockyang.blockchain.net.conf.TioProperties;
+import org.rockyang.blockchain.net.conf.TioProps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class AppClientAioListener implements ClientAioListener {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    TioProperties tioProperties;
+    TioProps tioProps;
 
     @Override
     public void onAfterClose(ChannelContext channelContext, Throwable throwable, String s, boolean b) throws Exception {
@@ -34,7 +34,7 @@ public class AppClientAioListener implements ClientAioListener {
     public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect) throws Exception {
         if (isConnected) {
             logger.info("连接成功：server地址为-" + channelContext.getServerNode());
-            Aio.bindGroup(channelContext, tioProperties.getClientGroupName());
+            Aio.bindGroup(channelContext, tioProps.getClientGroupName());
         } else {
             logger.info("连接失败：server地址为-" + channelContext.getServerNode());
         }

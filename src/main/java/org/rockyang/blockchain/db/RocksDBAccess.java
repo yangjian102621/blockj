@@ -6,7 +6,7 @@ import org.rockyang.blockchain.account.Account;
 import org.rockyang.blockchain.conf.RocksDbProperties;
 import org.rockyang.blockchain.core.Block;
 import org.rockyang.blockchain.net.base.Node;
-import org.rockyang.blockchain.net.conf.TioProperties;
+import org.rockyang.blockchain.net.conf.TioProps;
 import org.rockyang.blockchain.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public class RocksDBAccess implements DBAccess {
 	private RocksDbProperties rocksDbProperties;
 
 	@Autowired
-	private TioProperties tioProperties;
+	private TioProps tioProps;
 
 	public RocksDBAccess() {
 		//
@@ -161,7 +161,7 @@ public class RocksDBAccess implements DBAccess {
 				return true;
 			}
 			//跳过自身节点
-			Node self = new Node(tioProperties.getServerIp(), tioProperties.getServerPort());
+			Node self = new Node(tioProps.getServerIp(), tioProps.getServerPort());
 			if (self.equals(node)) {
 				return true;
 			}

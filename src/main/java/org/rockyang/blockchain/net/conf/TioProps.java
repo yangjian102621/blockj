@@ -1,7 +1,6 @@
 package org.rockyang.blockchain.net.conf;
 
 import org.rockyang.blockchain.net.base.Node;
-import org.rockyang.blockchain.net.base.Node;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +14,7 @@ import java.util.*;
  */
 @Component
 @ConfigurationProperties("tio")
-public class TioProperties {
+public class TioProps {
 
 	/**
 	 * 心跳包时间间隔
@@ -28,16 +27,19 @@ public class TioProperties {
 	 */
 	@NotNull
 	private String clientGroupName;
+
 	/**
 	 * 服务端分组上下文名称
 	 */
 	@NotNull
 	private String serverGroupContextName;
+
 	/**
 	 * 服务端监听端口
 	 */
 	@NotNull
 	private int serverPort;
+
 	/**
 	 * 服务端绑定的 ip
 	 */

@@ -8,15 +8,8 @@ import org.rockyang.blockchain.net.ApplicationContextProvider;
 import org.rockyang.blockchain.net.base.MessagePacket;
 import org.rockyang.blockchain.net.base.MessagePacketType;
 import org.rockyang.blockchain.net.base.Node;
-import org.rockyang.blockchain.net.conf.TioProperties;
+import org.rockyang.blockchain.net.conf.TioProps;
 import org.rockyang.blockchain.utils.SerializeUtils;
-import org.rockyang.blockchain.db.DBAccess;
-import org.rockyang.blockchain.event.FetchNextBlockEvent;
-import org.rockyang.blockchain.net.ApplicationContextProvider;
-import org.rockyang.blockchain.net.base.MessagePacket;
-import org.rockyang.blockchain.net.base.MessagePacketType;
-import org.rockyang.blockchain.net.base.Node;
-import org.rockyang.blockchain.net.conf.TioProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +36,7 @@ public class AppClient {
 	@Resource
 	private ClientGroupContext clientGroupContext;
 	@Autowired
-	private TioProperties tioProperties;
+	private TioProps tioProps;
 
 	private AioClient aioClient;
 	@Autowired
@@ -54,11 +47,12 @@ public class AppClient {
 	private static Logger logger = LoggerFactory.getLogger(AppClient.class);
 
 	/**
-	 * 启动程序入口
+	 * 网络客户端程序入口
 	 */
 	@PostConstruct
 	public void clientStart() throws Exception {
 
+		// 这里判断是否启用节点发现，如果没有则以单机节点运行，不去尝试连接种子节点
 		if (!settings.isNodeDiscover()) {
 			return;
 		}
@@ -70,8 +64,8 @@ public class AppClient {
 		if (nodeList.isPresent()) {
 			nodes = nodeList.get();
 			//初始化配置 properties 中的节点
-		} else if (null != tioProperties.getNodes()) {
-			nodes = tioProperties.getNodes();
+		} else if (null != tioProps.getNodes()) {
+			nodes = tioProps.getNodes();
 		}
 		// 添加节点
 		for (Node node : nodes) {
@@ -89,7 +83,7 @@ public class AppClient {
 			return;
 		}
 
-		Aio.sendToGroup(clientGroupContext, tioProperties.getClientGroupName(), messagePacket);
+		Aio.sendToGroup(clientGroupContext, tioProps.getClientGroupName(), messagePacket);
 	}
 
 	/**
@@ -111,7 +105,7 @@ public class AppClient {
 		if (dbAccess.addNode(node)) {
 			ClientChannelContext channelContext = aioClient.connect(node);
 			Aio.send(channelContext, new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE)));
-			Aio.bindGroup(channelContext, tioProperties.getClientGroupName());
+			Aio.bindGroup(channelContext, tioProps.getClientGroupName());
 			logger.info("添加节点成功, {}", node);
 		}
 	}
