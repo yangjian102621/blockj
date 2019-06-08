@@ -13,15 +13,6 @@ import org.rockyang.blockchain.crypto.WalletUtils;
 import org.rockyang.blockchain.db.DBAccess;
 import org.rockyang.blockchain.net.base.*;
 import org.rockyang.blockchain.utils.SerializeUtils;
-import org.rockyang.blockchain.account.Account;
-import org.rockyang.blockchain.core.Block;
-import org.rockyang.blockchain.core.TransactionExecutor;
-import org.rockyang.blockchain.core.TransactionPool;
-import org.rockyang.blockchain.crypto.Keys;
-import org.rockyang.blockchain.crypto.Sign;
-import org.rockyang.blockchain.crypto.WalletUtils;
-import org.rockyang.blockchain.db.DBAccess;
-import org.rockyang.blockchain.net.base.MessagePacketType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -233,7 +224,7 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 		MessagePacket resPacket = new MessagePacket();
 		logger.info("收到获取账户列表请求");
 		if (Objects.equal(message, MessagePacket.FETCH_ACCOUNT_LIST_SYMBOL)) {
-			List<Account> accounts = dbAccess.listAccounts();
+			List<Account> accounts = dbAccess.getAllAccounts();
 			responseVo.setSuccess(true);
 			responseVo.setItem(accounts);
 		} else {

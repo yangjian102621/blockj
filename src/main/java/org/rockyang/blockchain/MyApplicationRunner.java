@@ -1,8 +1,10 @@
 package org.rockyang.blockchain;
 
 import org.rockyang.blockchain.account.Account;
-import org.rockyang.blockchain.account.Personal;
 import org.rockyang.blockchain.conf.AppConf;
+import org.rockyang.blockchain.crypto.ECKeyPair;
+import org.rockyang.blockchain.crypto.Keys;
+import org.rockyang.blockchain.db.DBAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.math.BigDecimal;
 
 /**
  * @author yangjian
@@ -22,7 +25,7 @@ public class MyApplicationRunner implements ApplicationRunner {
 	static Logger logger = LoggerFactory.getLogger(MyApplicationRunner.class);
 
 	@Autowired
-	private Personal personal;
+	private DBAccess dbAccess;
 
 	@Autowired
 	private AppConf appConf;
@@ -32,12 +35,14 @@ public class MyApplicationRunner implements ApplicationRunner {
 	{
 
 		// 首次运行，执行一些初始化的工作
-		File lockFile = new File(System.getProperty("user.dir")+"/"+appConf.getDataDir()+"/blockchain.lock");
+		File lockFile = new File(System.getProperty("user.dir")+"/"+appConf.getDataDir()+"/node.lock");
 		if (!lockFile.exists()) {
 			lockFile.createNewFile();
 			// 创建默认钱包地址（挖矿地址）
-			Account coinBase = personal.createCoinBase();
-			logger.info("Create coinbase address : " + coinBase.getAddress());
+			ECKeyPair keyPair = Keys.createEcKeyPair();
+			Account minerAccount = new Account(keyPair.getAddress(), keyPair.exportPrivateKey(), BigDecimal.ZERO);
+			dbAccess.setMinerAccount(minerAccount);
+			logger.info("Create miner account : {}", minerAccount);
 		}
 
 	}

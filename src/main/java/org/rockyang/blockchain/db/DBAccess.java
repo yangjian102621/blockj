@@ -4,7 +4,6 @@ import com.google.common.base.Optional;
 import org.rockyang.blockchain.account.Account;
 import org.rockyang.blockchain.core.Block;
 import org.rockyang.blockchain.net.base.Node;
-import org.rockyang.blockchain.core.Block;
 
 import java.util.List;
 
@@ -23,10 +22,11 @@ public interface DBAccess {
 	 * 钱包数据存储 hash 桶前缀
 	 */
 	String WALLETS_BUCKET_PREFIX = "wallets_";
+
 	/**
 	 * 挖矿账户
 	 */
-	String COIN_BASE_ADDRESS = "coinbase_address";
+	String MINER_ACCOUNT = "miner_account";
 
 	/**
 	 * 最后一个区块的区块高度
@@ -86,43 +86,29 @@ public interface DBAccess {
 	Optional<Account> getAccount(String address);
 
 	/**
-	 * 设置挖矿账户
-	 * @param address
+	 * 获取所有账户列表
 	 * @return
 	 */
-	boolean putCoinBaseAddress(String address);
-
-	/**
-	 * 获取挖矿账户地址
-	 * @return
-	 */
-	Optional<String> getCoinBaseAddress();
+	List<Account> getAllAccounts();
 
 	/**
 	 * 获取挖矿账户
 	 * @return
 	 */
-	Optional<Account> getCoinBaseAccount();
+	Optional<Account> getMinerAccount();
 
 	/**
 	 * 设置挖矿账户
 	 * @param account
 	 * @return
 	 */
-	boolean putCoinBaseAccount(Account account);
+	boolean setMinerAccount(Account account);
 
 	/**
 	 * 获取客户端节点列表
 	 * @return
 	 */
 	Optional<List<Node>> getNodeList();
-
-	/**
-	 * 保存客户端节点列表
-	 * @param nodes
-	 * @return
-	 */
-	boolean putNodeList(List<Node> nodes);
 
 	/**
 	 * 添加一个客户端节点
@@ -164,12 +150,6 @@ public interface DBAccess {
 	 * @return
 	 */
 	<T> List<T> seekByKey(String keyPrefix);
-
-	/**
-	 * 获取账户列表
-	 * @return
-	 */
-	List<Account> listAccounts();
 
 	/**
 	 * 关闭数据库

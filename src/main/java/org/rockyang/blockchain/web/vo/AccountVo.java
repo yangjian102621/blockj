@@ -1,7 +1,6 @@
 package org.rockyang.blockchain.web.vo;
 
 import org.rockyang.blockchain.account.Account;
-import org.rockyang.blockchain.account.Account;
 
 /**
  * account VO

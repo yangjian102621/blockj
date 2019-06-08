@@ -3,8 +3,6 @@ package org.rockyang.blockchain.account;
 import org.rockyang.blockchain.crypto.ECKeyPair;
 import org.rockyang.blockchain.crypto.Keys;
 import org.rockyang.blockchain.db.DBAccess;
-import org.rockyang.blockchain.event.NewAccountEvent;
-import org.rockyang.blockchain.net.ApplicationContextProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,34 +21,23 @@ public class Personal {
 
 	/**
 	 * 创建一个默认账户
-	 * @param keyPair
 	 * @return
 	 */
-	public Account newAccount(ECKeyPair keyPair) {
-
-		Account account = new Account(keyPair.getAddress(), BigDecimal.ZERO);
-		//存储账户
-		dbAccess.putAccount(account);
-		//发布同步账号事件
-		ApplicationContextProvider.publishEvent(new NewAccountEvent(account));
-		return account;
+	public Account newAccount() throws Exception
+	{
+		ECKeyPair keyPair = Keys.createEcKeyPair();
+		return newAccount(keyPair);
 	}
 
 	/**
-	 * 创建挖矿账号
+	 * 使用指定的秘钥创建一个默认账户
+	 * @param keyPair
 	 * @return
 	 */
-	public Account createCoinBase() throws Exception
+	public Account newAccount(ECKeyPair keyPair)
 	{
-		ECKeyPair keyPair = Keys.createEcKeyPair();
-		Account account = new Account(keyPair.getAddress(), BigDecimal.ZERO);
-		// 发布同步账号事件
-		ApplicationContextProvider.publishEvent(new NewAccountEvent(account));
-
-		// 存储挖矿账号
-		account.setPriKey(keyPair.exportPrivateKey());
-		dbAccess.putCoinBaseAccount(account);
-
+		Account account = new Account(keyPair.getAddress(), keyPair.exportPrivateKey(), BigDecimal.ZERO);
+		dbAccess.putAccount(account); // 存储账户
 		return account;
 	}
 }

@@ -108,34 +108,33 @@ public class RocksDBAccess implements DBAccess {
 	}
 
 	@Override
-	public boolean putCoinBaseAddress(String address) {
-		return this.put(COIN_BASE_ADDRESS, address);
+	public List<Account> getAllAccounts()
+	{
+		List<Object> objects = seekByKey(WALLETS_BUCKET_PREFIX);
+		List<Account> accounts = new ArrayList<>();
+		for (Object o : objects) {
+			accounts.add((Account) o);
+		}
+		return accounts;
 	}
 
 	@Override
-	public Optional<String> getCoinBaseAddress() {
-		Optional<Object> object = this.get(COIN_BASE_ADDRESS);
+	public Optional<Account> getMinerAccount() {
+		Optional<Object> object = get(MINER_ACCOUNT);
 		if (object.isPresent()) {
-			return Optional.of((String) object.get());
+			return Optional.of((Account) object.get());
 		}
 		return Optional.absent();
 	}
 
 	@Override
-	public Optional<Account> getCoinBaseAccount() {
-		Optional<String> address = getCoinBaseAddress();
-		if (address.isPresent()) {
-			return getAccount(address.get());
+	public boolean setMinerAccount(Account account) {
+
+		if (null != account) {
+			return put(MINER_ACCOUNT, account);
 		} else {
-			return Optional.absent();
+			return false;
 		}
-	}
-
-	@Override
-	public boolean putCoinBaseAccount(Account account) {
-
-		putCoinBaseAddress(account.getAddress());
-		return putAccount(account);
 	}
 
 	@Override
@@ -147,13 +146,13 @@ public class RocksDBAccess implements DBAccess {
 		return Optional.absent();
 	}
 
-	@Override
 	public boolean putNodeList(List<Node> nodes) {
 		return this.put(CLIENT_NODES_LIST_KEY, nodes);
 	}
 
 	@Override
-	public synchronized boolean addNode(Node node) {
+	public synchronized boolean addNode(Node node)
+	{
 		Optional<List<Node>> nodeList = getNodeList();
 		if (nodeList.isPresent()) {
 			//已经存在的节点跳过
@@ -224,17 +223,6 @@ public class RocksDBAccess implements DBAccess {
 			ts.add((T) SerializeUtils.unSerialize(iterator.value()));
 		}
 		return ts;
-	}
-
-	@Override
-	public List<Account> listAccounts() {
-
-		List<Object> objects = seekByKey(WALLETS_BUCKET_PREFIX);
-		List<Account> accounts = new ArrayList<>();
-		for (Object o : objects) {
-			accounts.add((Account) o);
-		}
-		return accounts;
 	}
 
 	@Override

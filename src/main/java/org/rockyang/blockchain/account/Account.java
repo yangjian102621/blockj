@@ -32,6 +32,12 @@ public class Account implements Serializable {
 		this.balance = balance;
 	}
 
+	public Account(String address, String priKey, BigDecimal balance) {
+		this.address = address;
+		this.priKey = priKey;
+		this.balance = balance;
+	}
+
 	public String getAddress() {
 		return address;
 	}
