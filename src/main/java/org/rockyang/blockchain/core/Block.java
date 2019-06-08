@@ -19,6 +19,11 @@ public class Block implements Serializable {
 	 */
 	private BlockBody body;
 
+	/**
+	 * 确认数
+	 */
+	private Integer confirmNum = 0;
+
 	public Block(BlockHeader header, BlockBody body) {
 		this.header = header;
 		this.body = body;
@@ -43,11 +48,20 @@ public class Block implements Serializable {
 		this.body = body;
 	}
 
+	public Integer getConfirmNum() {
+		return confirmNum;
+	}
+
+	public void setConfirmNum(Integer confirmNum) {
+		this.confirmNum = confirmNum;
+	}
+
 	@Override
 	public String toString() {
 		return "Block{" +
 				"header=" + header +
-				", body=" + body.toString() +
+				", body=" + body +
+				", confirmNum=" + confirmNum +
 				'}';
 	}
 

@@ -1,9 +1,8 @@
 package org.rockyang.blockchain;
 
 import org.rockyang.blockchain.account.Account;
+import org.rockyang.blockchain.account.Personal;
 import org.rockyang.blockchain.conf.AppConf;
-import org.rockyang.blockchain.crypto.ECKeyPair;
-import org.rockyang.blockchain.crypto.Keys;
 import org.rockyang.blockchain.db.DBAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.math.BigDecimal;
 
 /**
  * @author yangjian
@@ -28,6 +26,9 @@ public class MyApplicationRunner implements ApplicationRunner {
 	private DBAccess dbAccess;
 
 	@Autowired
+	private Personal personal;
+
+	@Autowired
 	private AppConf appConf;
 
 	@Override
@@ -39,8 +40,7 @@ public class MyApplicationRunner implements ApplicationRunner {
 		if (!lockFile.exists()) {
 			lockFile.createNewFile();
 			// 创建默认钱包地址（挖矿地址）
-			ECKeyPair keyPair = Keys.createEcKeyPair();
-			Account minerAccount = new Account(keyPair.getAddress(), keyPair.exportPrivateKey(), BigDecimal.ZERO);
+			Account minerAccount = personal.newAccount();
 			dbAccess.setMinerAccount(minerAccount);
 			logger.info("Create miner account : {}", minerAccount);
 		}

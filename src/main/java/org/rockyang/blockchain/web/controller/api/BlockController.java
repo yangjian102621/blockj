@@ -12,10 +12,7 @@ import org.rockyang.blockchain.db.DBAccess;
 import org.rockyang.blockchain.net.base.Node;
 import org.rockyang.blockchain.utils.JsonVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -37,11 +34,10 @@ public class BlockController {
 
 	/**
 	 * 启动挖矿
-	 * @param request
 	 * @return
 	 */
-	@PostMapping("/mining")
-	public JsonVo mining(HttpServletRequest request) throws Exception
+	@GetMapping("/mining")
+	public JsonVo mining() throws Exception
 	{
 		Block block = blockChain.mining();
 		JsonVo vo = new JsonVo();

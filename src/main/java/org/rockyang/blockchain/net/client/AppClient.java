@@ -69,7 +69,7 @@ public class AppClient {
 		}
 		// 添加节点
 		for (Node node : nodes) {
-			addNode(node.getIp(), node.getPort());
+			connectNode(node);
 		}
 	}
 
@@ -77,8 +77,9 @@ public class AppClient {
 	 * 发送消息到一个group
 	 * @param messagePacket
 	 */
-	public void sendGroup(MessagePacket messagePacket) {
-
+	public void sendGroup(MessagePacket messagePacket)
+	{
+		// 关闭同步功能
 		if (!appConf.isNodeDiscover()) {
 			return;
 		}
@@ -91,8 +92,8 @@ public class AppClient {
 	 * @param serverIp
 	 * @param port
 	 */
-	public void addNode(String serverIp, int port) throws Exception {
-
+	public void addNode(String serverIp, int port) throws Exception
+	{
 		if (!appConf.isNodeDiscover()) {
 			return;
 		}
@@ -103,15 +104,25 @@ public class AppClient {
 			return;
 		}
 		if (dbAccess.addNode(node)) {
-			ClientChannelContext channelContext = aioClient.connect(node);
-			Aio.send(channelContext, new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE)));
-			Aio.bindGroup(channelContext, tioProps.getClientGroupName());
-			logger.info("添加节点成功, {}", node);
+			connectNode(node);
 		}
 	}
 
 	/**
-	 * 启动的时候自动开始区块同步
+	 * 连接节点
+	 * @param node
+	 * @throws Exception
+	 */
+	public void connectNode(Node node) throws Exception
+	{
+		ClientChannelContext channelContext = aioClient.connect(node);
+		Aio.send(channelContext, new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE)));
+		Aio.bindGroup(channelContext, tioProps.getClientGroupName());
+		logger.info("连接节点成功, {}", node);
+	}
+
+	/**
+	 * 向所有连接的节点发起同步区块请求
 	 */
 	@EventListener(ApplicationReadyEvent.class)
 	public void fetchNextBlock() {
@@ -120,20 +131,11 @@ public class AppClient {
 	}
 
 	/**
-	 * 同步账户列表
+	 * 同步节点列表
 	 */
 	@EventListener(ApplicationReadyEvent.class)
-	public void fetchAccounts() {
-
-		MessagePacket packet = new MessagePacket();
-		packet.setType(MessagePacketType.REQ_ACCOUNTS_LIST);
-		packet.setBody(SerializeUtils.serialize(MessagePacket.FETCH_ACCOUNT_LIST_SYMBOL));
-		sendGroup(packet);
-	}
-
-	@EventListener(ApplicationReadyEvent.class)
-	public void fetchNodeList() {
-
+	public void fetchNodeList()
+	{
 		logger.info("++++++++++++++++++++++++++ 开始获取在线节点 +++++++++++++++++++++++++++");
 		MessagePacket packet = new MessagePacket();
 		packet.setType(MessagePacketType.REQ_NODE_LIST);

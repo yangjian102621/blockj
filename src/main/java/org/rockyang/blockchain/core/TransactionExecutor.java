@@ -34,52 +34,49 @@ public class TransactionExecutor {
 
 		for (Transaction transaction : block.getBody().getTransactions())
 		{
-			synchronized (this)
-			{
-				Optional<Account> recipient = dbAccess.getAccount(transaction.getTo());
-				//如果收款地址账户不存在，则创建一个新账户
-				if (!recipient.isPresent()) {
-					recipient = Optional.of(new Account(transaction.getTo(), BigDecimal.ZERO));
-				}
-				//挖矿奖励
-				if (null == transaction.getFrom()) {
-					recipient.get().setBalance(recipient.get().getBalance().add(transaction.getAmount()));
-					dbAccess.putAccount(recipient.get());
-					continue;
-				}
-				//账户转账
-				Optional<Account> sender = dbAccess.getAccount(transaction.getFrom());
-				//验证签名
-				boolean verify = Sign.verify(
-						Keys.publicKeyDecode(transaction.getPublicKey()),
-						transaction.getSign(),
-						transaction.toString());
-				if (!verify) {
-					transaction.setStatus(TransactionStatusEnum.FAIL);
-					transaction.setErrorMessage("交易签名错误");
-					continue;
-				}
-				//验证账户余额
-				if (sender.get().getBalance().compareTo(transaction.getAmount()) == -1) {
-					transaction.setStatus(TransactionStatusEnum.FAIL);
-					transaction.setErrorMessage("账户余额不足");
-					continue;
-				}
-
-				// 将待打包交易池中包含此交易的记录删除，防止交易重复打包( fix bug for #IWSPJ)
-				for (Iterator i = transactionPool.getTransactions().iterator(); i.hasNext();) {
-					Transaction tx = (Transaction) i.next();
-					if (tx.getTxHash().equals(transaction.getTxHash())) {
-						i.remove();
-					}
-				}
-
-				//执行转账操作,更新账户余额
-				sender.get().setBalance(sender.get().getBalance().subtract(transaction.getAmount()));
+			Optional<Account> recipient = dbAccess.getAccount(transaction.getTo());
+			//如果收款地址账户不存在，则创建一个新账户
+			if (!recipient.isPresent()) {
+				recipient = Optional.of(new Account(transaction.getTo(), BigDecimal.ZERO));
+			}
+			//挖矿奖励
+			if (null == transaction.getFrom()) {
 				recipient.get().setBalance(recipient.get().getBalance().add(transaction.getAmount()));
-				dbAccess.putAccount(sender.get());
 				dbAccess.putAccount(recipient.get());
-			}//end synchronize
+				continue;
+			}
+			//账户转账
+			Optional<Account> sender = dbAccess.getAccount(transaction.getFrom());
+			//验证签名
+			boolean verify = Sign.verify(
+					Keys.publicKeyDecode(transaction.getPublicKey()),
+					transaction.getSign(),
+					transaction.toString());
+			if (!verify) {
+				transaction.setStatus(TransactionStatusEnum.FAIL);
+				transaction.setErrorMessage("交易签名错误");
+				continue;
+			}
+			//验证账户余额
+			if (sender.get().getBalance().compareTo(transaction.getAmount()) == -1) {
+				transaction.setStatus(TransactionStatusEnum.FAIL);
+				transaction.setErrorMessage("账户余额不足");
+				continue;
+			}
+
+			// 将待打包交易池中包含此交易的记录删除，防止交易重复打包( fix bug for #IWSPJ)
+			for (Iterator i = transactionPool.getTransactions().iterator(); i.hasNext();) {
+				Transaction tx = (Transaction) i.next();
+				if (tx.getTxHash().equals(transaction.getTxHash())) {
+					i.remove();
+				}
+			}
+
+			//执行转账操作,更新账户余额
+			sender.get().setBalance(sender.get().getBalance().subtract(transaction.getAmount()));
+			recipient.get().setBalance(recipient.get().getBalance().add(transaction.getAmount()));
+			dbAccess.putAccount(sender.get());
+			dbAccess.putAccount(recipient.get());
 		}// end for
 
 	}

@@ -55,7 +55,7 @@ public class BlockChain {
 		Optional<Block> lastBlock = getLastBlock();
 		Block block = miner.newBlock(lastBlock);
 		for (Iterator t = transactionPool.getTransactions().iterator(); t.hasNext();) {
-			block.getBody().addTransaction((Transaction) t);
+			block.getBody().addTransaction((Transaction) t.next());
 			t.remove(); // 已打包的交易移出交易池
 		}
 		//存储区块

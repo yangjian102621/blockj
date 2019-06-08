@@ -1,7 +1,6 @@
 package org.rockyang.blockchain.net.client;
 
 import com.google.common.base.Optional;
-import org.rockyang.blockchain.account.Account;
 import org.rockyang.blockchain.core.Block;
 import org.rockyang.blockchain.core.Transaction;
 import org.rockyang.blockchain.core.TransactionExecutor;
@@ -78,16 +77,6 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 					//请求生成新的区块
 				case MessagePacketType.RES_NEW_BLOCK:
 					this.newBlock(body);
-					break;
-
-					//同步最新账户
-				case MessagePacketType.RES_NEW_ACCOUNT:
-					this.newAccount(body);
-					break;
-
-					//同步所有的账号
-				case MessagePacketType.RES_ACCOUNTS_LIST:
-					this.getAccountList(body);
 					break;
 
 					// 同步节点信息
@@ -174,54 +163,22 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 		Block newBlock = (Block) responseVo.getItem();
 
 		if (responseVo.isSuccess()) {
-			if (confirmedBlocks.get(newBlock.getHeader().getHash()) == null
-					|| confirmedBlocks.get(newBlock.getHeader().getHash()) == 0) {
-				// 执行区块中的交易
-				executor.run(newBlock);
-				confirmedBlocks.put(newBlock.getHeader().getHash(), 1);
+			synchronized (this) {
+				Integer confirmedCounter = confirmedBlocks.get(newBlock.getHeader().getHash());
+				if (null == confirmedCounter) {
+					// 执行区块中的交易
+					executor.run(newBlock);
+					confirmedCounter = 0;
+				}
+				// 更新区块确认数
+				newBlock.setConfirmNum(confirmedCounter+1);
+				confirmedBlocks.put(newBlock.getHeader().getHash(), confirmedCounter+1);
+				// 更新数据库
+				dbAccess.putBlock(newBlock);
+				logger.info("区块确认成功, {}", newBlock);
 			}
-			logger.info("区块确认成功, {}", newBlock);
 		} else {
 			logger.error("区块确认失败, {}, {}", responseVo.getMessage(), newBlock);
-		}
-	}
-
-	/**
-	 * 同步新账户
-	 * @param body
-	 */
-	public void newAccount(byte[] body) {
-		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
-		Account account = (Account) responseVo.getItem();
-		if (responseVo.isSuccess()) {
-			logger.info("新账户同步账户成功， {}", account);
-		} else {
-			logger.error("新账户同步账户失败, {}", account);
-		}
-	}
-
-	/**
-	 * 更新账户列表
-	 * @param body
-	 */
-	public void getAccountList(byte[] body) {
-
-		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
-		if (!responseVo.isSuccess()) {
-			return;
-		}
-		List<Account> accounts = (List<Account>) responseVo.getItem();
-		for (Account e : accounts) {
-			Optional<Account> acc = dbAccess.getAccount(e.getAddress());
-			//已有账号跳过
-			if (acc.isPresent()) {
-				logger.info("账户已存在：{}", e);
-				continue;
-			}
-			if (dbAccess.putAccount(e)) {
-				logger.info("同步账户成功：{}", e);
-			}
-
 		}
 	}
 
@@ -246,7 +203,7 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 	}
 
 	/**
-	 * 此方法如果返回null，框架层面则不会发心跳；如果返回非null，框架层面会定时发本方法返回的消息包
+	 * 此方法如果返回 null，框架层面则不会发心跳；如果返回非null，框架层面会定时发本方法返回的消息包
 	 * @return
 	 */
 	@Override
