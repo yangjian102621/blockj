@@ -1,13 +1,15 @@
 package org.rockyang.blockchain.web.controller.api;
 
 import com.google.common.base.Optional;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.rockyang.blockchain.account.Account;
 import org.rockyang.blockchain.account.Personal;
 import org.rockyang.blockchain.crypto.ECKeyPair;
 import org.rockyang.blockchain.crypto.Keys;
 import org.rockyang.blockchain.db.DBAccess;
 import org.rockyang.blockchain.utils.JsonVo;
-import org.rockyang.blockchain.web.vo.AccountVo;
+import org.rockyang.blockchain.web.vo.res.AccountVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/account")
+@Api(tags = "Account API", description = "账户相关的 API")
 public class AccountController {
 
 	@Autowired
@@ -33,6 +36,7 @@ public class AccountController {
 	 * 创建账户
 	 * @return
 	 */
+	@ApiOperation(value="创建一个新的钱包账户")
 	@GetMapping("/new_account")
 	public JsonVo newAccount() throws Exception
 	{
@@ -40,7 +44,6 @@ public class AccountController {
 		Account account = personal.newAccount(keyPair);
 		AccountVo vo = new AccountVo();
 		BeanUtils.copyProperties(account, vo);
-		vo.setPrivateKey(keyPair.exportPrivateKey());
 		return new JsonVo(JsonVo.CODE_SUCCESS,
 				"New account created, please remember your Address and Private Key.",
 				vo);
@@ -50,6 +53,7 @@ public class AccountController {
 	 * 获取挖矿账号
 	 * @return
 	 */
+	@ApiOperation(value="获取挖矿钱包账号", notes = "获取挖矿钱包账号信息，包括地址，私钥，余额等信息")
 	@GetMapping("/get_miner_address")
 	public JsonVo getMinerAddress()
 	{
@@ -68,6 +72,7 @@ public class AccountController {
 	 * @return
 	 */
 	@GetMapping("/list")
+	@ApiOperation(value = "获取当前节点所有钱包账户")
 	public JsonVo getAllAccounts()
 	{
 		List<Account> accounts = dbAccess.getAllAccounts();

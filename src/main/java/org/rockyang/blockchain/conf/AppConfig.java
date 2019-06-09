@@ -1,6 +1,7 @@
 package org.rockyang.blockchain.conf;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -9,8 +10,9 @@ import org.springframework.context.annotation.Configuration;
  * @since 18-7-14
  */
 @Configuration
+@EnableConfigurationProperties(AppConfig.class)
 @ConfigurationProperties(prefix = "app")
-public class AppConf {
+public class AppConfig {
 
 	/**
 	 * 是否启用节点发现

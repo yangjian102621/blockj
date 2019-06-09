@@ -3,7 +3,7 @@ package org.rockyang.blockchain.db;
 import com.google.common.base.Optional;
 import org.rocksdb.*;
 import org.rockyang.blockchain.account.Account;
-import org.rockyang.blockchain.conf.AppConf;
+import org.rockyang.blockchain.conf.AppConfig;
 import org.rockyang.blockchain.core.Block;
 import org.rockyang.blockchain.net.base.Node;
 import org.rockyang.blockchain.net.conf.TioProps;
@@ -31,7 +31,7 @@ public class RocksDBAccess implements DBAccess {
 	private RocksDB rocksDB;
 
 	@Autowired
-	private AppConf appConf;
+	private AppConfig appConfig;
 
 	@Autowired
 	private TioProps tioProps;
@@ -48,11 +48,11 @@ public class RocksDBAccess implements DBAccess {
 
 		try {
 			//如果数据库路径不存在，则创建路径
-			File directory = new File(System.getProperty("user.dir")+"/"+appConf.getDataDir());
+			File directory = new File(System.getProperty("user.dir")+"/"+ appConfig.getDataDir());
 			if (!directory.exists()) {
 				directory.mkdirs();
 			}
-			rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), appConf.getDataDir());
+			rocksDB = RocksDB.open(new Options().setCreateIfMissing(true), appConfig.getDataDir());
 		} catch (RocksDBException e) {
 			e.printStackTrace();
 		}

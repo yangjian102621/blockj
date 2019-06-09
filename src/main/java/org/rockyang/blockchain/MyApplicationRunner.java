@@ -2,7 +2,7 @@ package org.rockyang.blockchain;
 
 import org.rockyang.blockchain.account.Account;
 import org.rockyang.blockchain.account.Personal;
-import org.rockyang.blockchain.conf.AppConf;
+import org.rockyang.blockchain.conf.AppConfig;
 import org.rockyang.blockchain.db.DBAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,14 +29,14 @@ public class MyApplicationRunner implements ApplicationRunner {
 	private Personal personal;
 
 	@Autowired
-	private AppConf appConf;
+	private AppConfig appConfig;
 
 	@Override
 	public void run(ApplicationArguments arguments) throws Exception
 	{
 
 		// 首次运行，执行一些初始化的工作
-		File lockFile = new File(System.getProperty("user.dir")+"/"+appConf.getDataDir()+"/node.lock");
+		File lockFile = new File(System.getProperty("user.dir")+"/"+ appConfig.getDataDir()+"/node.lock");
 		if (!lockFile.exists()) {
 			lockFile.createNewFile();
 			// 创建默认钱包地址（挖矿地址）

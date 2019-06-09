@@ -1,7 +1,7 @@
 package org.rockyang.blockchain.net.client;
 
 import com.google.common.base.Optional;
-import org.rockyang.blockchain.conf.AppConf;
+import org.rockyang.blockchain.conf.AppConfig;
 import org.rockyang.blockchain.db.DBAccess;
 import org.rockyang.blockchain.event.FetchNextBlockEvent;
 import org.rockyang.blockchain.net.ApplicationContextProvider;
@@ -42,7 +42,7 @@ public class AppClient {
 	@Autowired
 	private DBAccess dbAccess;
 	@Autowired
-	AppConf appConf;
+	AppConfig appConfig;
 
 	private static Logger logger = LoggerFactory.getLogger(AppClient.class);
 
@@ -53,7 +53,7 @@ public class AppClient {
 	public void clientStart() throws Exception {
 
 		// 这里判断是否启用节点发现，如果没有则以单机节点运行，不去尝试连接种子节点
-		if (!appConf.isNodeDiscover()) {
+		if (!appConfig.isNodeDiscover()) {
 			return;
 		}
 
@@ -80,7 +80,7 @@ public class AppClient {
 	public void sendGroup(MessagePacket messagePacket)
 	{
 		// 关闭同步功能
-		if (!appConf.isNodeDiscover()) {
+		if (!appConfig.isNodeDiscover()) {
 			return;
 		}
 
@@ -94,7 +94,7 @@ public class AppClient {
 	 */
 	public void addNode(String serverIp, int port) throws Exception
 	{
-		if (!appConf.isNodeDiscover()) {
+		if (!appConfig.isNodeDiscover()) {
 			return;
 		}
 		Node node = new Node(serverIp, port);

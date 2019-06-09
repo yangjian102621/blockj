@@ -1,9 +1,11 @@
 package org.rockyang.blockchain.web.controller.api;
 
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import org.rockyang.blockchain.conf.AppConf;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.rockyang.blockchain.conf.AppConfig;
 import org.rockyang.blockchain.core.Block;
 import org.rockyang.blockchain.core.BlockChain;
 import org.rockyang.blockchain.core.Transaction;
@@ -11,6 +13,8 @@ import org.rockyang.blockchain.crypto.Credentials;
 import org.rockyang.blockchain.db.DBAccess;
 import org.rockyang.blockchain.net.base.Node;
 import org.rockyang.blockchain.utils.JsonVo;
+import org.rockyang.blockchain.web.vo.req.NodeVo;
+import org.rockyang.blockchain.web.vo.req.TransactionVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/chain")
+@Api(tags = "Chain API", description = "区块链相关的 API")
 public class BlockController {
 
 	@Autowired
@@ -30,12 +35,13 @@ public class BlockController {
 	@Autowired
 	private BlockChain blockChain;
 	@Autowired
-	private AppConf appConf;
+	private AppConfig appConfig;
 
 	/**
 	 * 启动挖矿
 	 * @return
 	 */
+	@ApiOperation(value="启动挖矿")
 	@GetMapping("/mining")
 	public JsonVo mining() throws Exception
 	{
@@ -52,10 +58,10 @@ public class BlockController {
 	 * @param request
 	 * @return
 	 */
+	@ApiOperation(value="浏览头区块信息", notes="获取最新的区块信息")
 	@PostMapping("/block/head")
 	public JsonVo blockHead(HttpServletRequest request)
 	{
-
 		Optional<Block> block = dbAccess.getLastBlock();
 		JsonVo success = JsonVo.success();
 		if (block.isPresent()) {
@@ -70,20 +76,22 @@ public class BlockController {
 	 * @param txVo
 	 * @return
 	 */
+	@ApiOperation(value="发送交易", notes="发起一笔资金交易")
+	@ApiImplicitParam(name = "txVo", required = true, dataType = "TransactionVo")
 	@PostMapping("/send_transactions")
-	public JsonVo sendTransaction(@RequestBody JSONObject txVo) throws Exception {
-		Preconditions.checkNotNull(txVo.get("to"), "Recipient is needed.");
-		Preconditions.checkNotNull(txVo.get("amount"), "Amount is needed.");
-		Preconditions.checkNotNull(txVo.get("priKey"), "Private Key is needed.");
-		Credentials credentials = Credentials.create(txVo.getString("priKey"));
+	public JsonVo sendTransaction(@RequestBody TransactionVo txVo) throws Exception {
+		Preconditions.checkNotNull(txVo.getTo(), "Recipient is needed.");
+		Preconditions.checkNotNull(txVo.getAmount(), "Amount is needed.");
+		Preconditions.checkNotNull(txVo.getPriKey(), "Private Key is needed.");
+		Credentials credentials = Credentials.create(txVo.getPriKey());
 		Transaction transaction = blockChain.sendTransaction(
 				credentials,
-				txVo.getString("to"),
-				txVo.getBigDecimal("amount"),
-				txVo.getString("data"));
+				txVo.getTo(),
+				txVo.getAmount(),
+				txVo.getData());
 
 		//如果开启了自动挖矿，则直接自动挖矿
-		if (appConf.isAutoMining()) {
+		if (appConfig.isAutoMining()) {
 			blockChain.mining();
 		}
 		JsonVo success = JsonVo.success();
@@ -97,24 +105,26 @@ public class BlockController {
 	 * @return
 	 * @throws Exception
 	 */
+	@ApiOperation(value="添加节点", notes="添加并连接一个节点")
+	@ApiImplicitParam(name = "node", required = true, dataType = "NodeVo")
 	@PostMapping("/node/add")
-	public JsonVo addNode(@RequestBody JSONObject node) throws Exception {
+	public JsonVo addNode(@RequestBody NodeVo node) throws Exception {
 
-		Preconditions.checkNotNull(node.getString("ip"), "server ip is needed.");
-		Preconditions.checkNotNull(node.getInteger("port"), "server port is need.");
+		Preconditions.checkNotNull(node.getIp(), "server ip is needed.");
+		Preconditions.checkNotNull(node.getPort(), "server port is need.");
 
-		blockChain.addNode(node.getString("ip"), node.getInteger("port"));
+		blockChain.addNode(node.getIp(), node.getPort());
 		return JsonVo.success();
 	}
 
 	/**
 	 * 查看节点列表
-	 * @param request
 	 * @return
 	 */
+	@ApiOperation(value="获取节点列表", notes="获取当前接连相连接的所有节点")
 	@PostMapping("node/view")
-	public JsonVo nodeList(HttpServletRequest request) {
-
+	public JsonVo nodeList()
+	{
 		Optional<List<Node>> nodeList = dbAccess.getNodeList();
 		JsonVo success = JsonVo.success();
 		if (nodeList.isPresent()) {
