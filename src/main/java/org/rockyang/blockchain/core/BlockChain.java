@@ -2,13 +2,14 @@ package org.rockyang.blockchain.core;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import org.rockyang.blockchain.conf.AppConfig;
 import org.rockyang.blockchain.crypto.Credentials;
 import org.rockyang.blockchain.crypto.Keys;
 import org.rockyang.blockchain.crypto.Sign;
 import org.rockyang.blockchain.db.DBAccess;
 import org.rockyang.blockchain.enums.TransactionStatusEnum;
-import org.rockyang.blockchain.event.MineBlockEvent;
-import org.rockyang.blockchain.event.SendTransactionEvent;
+import org.rockyang.blockchain.event.NewBlockEvent;
+import org.rockyang.blockchain.event.NewTransactionEvent;
 import org.rockyang.blockchain.mine.Miner;
 import org.rockyang.blockchain.net.ApplicationContextProvider;
 import org.rockyang.blockchain.net.base.Node;
@@ -42,6 +43,10 @@ public class BlockChain {
 
 	@Autowired
 	private TransactionPool transactionPool;
+	@Autowired
+	private TransactionExecutor transactionExecutor;
+	@Autowired
+	private AppConfig appConfig;
 
 	// 是否正在同步区块
 	private boolean syncing = true;
@@ -58,13 +63,17 @@ public class BlockChain {
 			block.getBody().addTransaction((Transaction) t.next());
 			t.remove(); // 已打包的交易移出交易池
 		}
-		//存储区块
+		// 存储区块
 		dbAccess.putLastBlockIndex(block.getHeader().getIndex());
 		dbAccess.putBlock(block);
 		logger.info("Find a New Block, {}", block);
 
-		//触发挖矿事件，并等待其他节点确认区块
-		ApplicationContextProvider.publishEvent(new MineBlockEvent(block));
+		if (appConfig.isNodeDiscover()) {
+			// 触发挖矿事件，并等待其他节点确认区块
+			ApplicationContextProvider.publishEvent(new NewBlockEvent(block));
+		} else {
+			transactionExecutor.run(block);
+		}
 		return block;
 	}
 
@@ -91,16 +100,20 @@ public class BlockChain {
 		transaction.setData(data);
 		transaction.setTxHash(transaction.hash());
 		//签名
-		String sign = Sign.sign(credentials.getEcKeyPair().getPrivateKey(), transaction.toString());
+		String sign = Sign.sign(credentials.getEcKeyPair().getPrivateKey(), transaction.toSignString());
 		transaction.setSign(sign);
 
 		//先验证私钥是否正确
-		if (!Sign.verify(credentials.getEcKeyPair().getPublicKey(), sign, transaction.toString())) {
+		if (!Sign.verify(credentials.getEcKeyPair().getPublicKey(), sign, transaction.toSignString())) {
 			throw new RuntimeException("私钥签名验证失败，非法的私钥");
 		}
+		// 加入交易池，等待打包
+		transactionPool.addTransaction(transaction);
 
-		//触发交易事件，向全网广播交易，并等待确认
-		ApplicationContextProvider.publishEvent(new SendTransactionEvent(transaction));
+		if (appConfig.isNodeDiscover()) {
+			//触发交易事件，向全网广播交易，并等待确认
+			ApplicationContextProvider.publishEvent(new NewTransactionEvent(transaction));
+		}
 		return transaction;
 	}
 

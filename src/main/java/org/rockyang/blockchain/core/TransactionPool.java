@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -40,10 +41,16 @@ public class TransactionPool {
 	}
 
 	/**
-	 * 清空交易池
+	 * 将交易移除交易池
 	 */
-	public void clearTransactions() {
-		this.transactions.clear();
+	public void removeTransaction(String txHash)
+	{
+		for (Iterator i = transactions.iterator(); i.hasNext();) {
+			Transaction tx = (Transaction) i.next();
+			if (Objects.equal(tx.getTxHash(), txHash)) {
+				i.remove();
+			}
+		}
 	}
 
 }

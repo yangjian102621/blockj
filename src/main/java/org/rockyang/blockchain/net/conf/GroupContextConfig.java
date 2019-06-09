@@ -17,7 +17,7 @@ import org.tio.server.ServerGroupContext;
  * @since 18-4-18
  */
 @Configuration
-public class GroupContextConf {
+public class GroupContextConfig {
 
 	@Autowired
 	TioProps tioProps;

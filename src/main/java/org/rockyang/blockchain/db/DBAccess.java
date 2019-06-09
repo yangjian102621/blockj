@@ -3,6 +3,7 @@ package org.rockyang.blockchain.db;
 import com.google.common.base.Optional;
 import org.rockyang.blockchain.account.Account;
 import org.rockyang.blockchain.core.Block;
+import org.rockyang.blockchain.core.Transaction;
 import org.rockyang.blockchain.net.base.Node;
 
 import java.util.List;
@@ -118,11 +119,6 @@ public interface DBAccess {
 	boolean addNode(Node node);
 
 	/**
-	 * 清空所有节点
-	 */
-	void clearNodes();
-
-	/**
 	 * 往数据库添加|更新一条数据
 	 * @param key
 	 * @param value
@@ -150,6 +146,13 @@ public interface DBAccess {
 	 * @return
 	 */
 	<T> List<T> seekByKey(String keyPrefix);
+
+	/**
+	 * 根据交易哈希搜索交易
+	 * @param txHash
+	 * @return
+	 */
+	Transaction getTransactionByTxHash(String txHash);
 
 	/**
 	 * 关闭数据库

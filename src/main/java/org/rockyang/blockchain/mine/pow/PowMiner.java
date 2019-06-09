@@ -23,7 +23,7 @@ public class PowMiner implements Miner {
 	private DBAccess dbAccess;
 
 	@Override
-	public Block newBlock(Optional<Block> block) throws Exception {
+	public Block newBlock(Optional<Block> block) {
 
 		//获取挖矿账户
 		Account account;

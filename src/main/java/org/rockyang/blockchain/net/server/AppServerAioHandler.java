@@ -2,6 +2,7 @@ package org.rockyang.blockchain.net.server;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import org.rockyang.blockchain.conf.AppConfig;
 import org.rockyang.blockchain.core.Block;
 import org.rockyang.blockchain.core.Transaction;
 import org.rockyang.blockchain.core.TransactionExecutor;
@@ -9,6 +10,7 @@ import org.rockyang.blockchain.core.TransactionPool;
 import org.rockyang.blockchain.crypto.Keys;
 import org.rockyang.blockchain.crypto.Sign;
 import org.rockyang.blockchain.db.DBAccess;
+import org.rockyang.blockchain.enums.TransactionStatusEnum;
 import org.rockyang.blockchain.net.base.*;
 import org.rockyang.blockchain.utils.SerializeUtils;
 import org.slf4j.Logger;
@@ -36,6 +38,8 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 	private TransactionPool transactionPool;
 	@Autowired
 	private TransactionExecutor executor;
+	@Autowired
+	private AppConfig appConfig;
 	/**
 	 * 处理消息
 	 */
@@ -57,15 +61,17 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 						resPacket = this.stringMessage(body);
 						break;
 
+						// 确认交易
 					case MessagePacketType.REQ_CONFIRM_TRANSACTION:
 						resPacket = this.confirmTransaction(body);
 						break;
 
+						// 同步下一个区块
 					case MessagePacketType.REQ_SYNC_NEXT_BLOCK:
 						resPacket = this.fetchNextBlock(body);
 						break;
 
-					//新区快确认
+						// 新区快确认
 					case MessagePacketType.REQ_NEW_BLOCK:
 						resPacket = this.newBlock(body);
 						break;
@@ -73,6 +79,10 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 						//获取节点列表
 					case MessagePacketType.REQ_NODE_LIST:
 						resPacket = this.getNodeList(body);
+						break;
+
+					case MessagePacketType.RES_INC_CONFIRM_NUM:
+						resPacket = this.incBlockConfirmNum(body);
 						break;
 
 				} //end of switch
@@ -99,6 +109,7 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 
 		return resPacket;
 	}
+
 	/**
 	 * 去人确认交易
 	 * @param body
@@ -111,7 +122,7 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 		logger.info("收到交易确认请求， {}", tx);
 		responseVo.setItem(tx);
 		//验证交易
-		if (Sign.verify(Keys.publicKeyDecode(tx.getPublicKey()), tx.getSign(), tx.toString())) {
+		if (Sign.verify(Keys.publicKeyDecode(tx.getPublicKey()), tx.getSign(), tx.toSignString())) {
 			responseVo.setSuccess(true);
 			//将交易放入交易池
 			transactionPool.addTransaction(tx);
@@ -181,7 +192,8 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 	 * @param body
 	 * @return
 	 */
-	public MessagePacket getNodeList(byte[] body) {
+	public MessagePacket getNodeList(byte[] body)
+	{
 		String message = (String) SerializeUtils.unSerialize(body);
 		ServerResponseVo responseVo = new ServerResponseVo();
 		MessagePacket resPacket = new MessagePacket();
@@ -199,5 +211,35 @@ public class AppServerAioHandler extends BaseAioHandler implements ServerAioHand
 		resPacket.setBody(SerializeUtils.serialize(responseVo));
 
 		return  resPacket;
+	}
+
+	public MessagePacket incBlockConfirmNum(byte[] body)
+	{
+		ServerResponseVo responseVo = new ServerResponseVo();
+		MessagePacket resPacket = new MessagePacket();
+		Integer blockIndex = (Integer) SerializeUtils.unSerialize(body);
+		logger.info("收到增加区块确认数请求, 同步区块高度为， {}", blockIndex);
+		Optional<Block> blockOptional = dbAccess.getBlock(blockIndex);
+		if (blockOptional.isPresent()) {
+			Block block = blockOptional.get();
+			// 增加区块确认数
+			block.setConfirmNum(block.getConfirmNum()+1);
+
+			if (block.getConfirmNum() >= appConfig.getMinConfirmNum()) {
+				// 更改当前区块所有的交易状态
+				for (Transaction transaction : block.getBody().getTransactions()) {
+					transaction.setStatus(TransactionStatusEnum.SUCCESS);
+				}
+			}
+			dbAccess.putBlock(block); // 更新区块
+			responseVo.setSuccess(true);
+		} else {
+			responseVo.setSuccess(false);
+			responseVo.setMessage("区块高度不存在.{"+blockIndex+"}");
+		}
+		resPacket.setType(MessagePacketType.RES_INC_CONFIRM_NUM);
+		resPacket.setBody(SerializeUtils.serialize(responseVo));
+
+		return resPacket;
 	}
 }

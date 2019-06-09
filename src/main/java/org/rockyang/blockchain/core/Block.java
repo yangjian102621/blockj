@@ -22,7 +22,7 @@ public class Block implements Serializable {
 	/**
 	 * 确认数
 	 */
-	private Integer confirmNum = 0;
+	private int confirmNum = 0;
 
 	public Block(BlockHeader header, BlockBody body) {
 		this.header = header;
@@ -48,11 +48,11 @@ public class Block implements Serializable {
 		this.body = body;
 	}
 
-	public Integer getConfirmNum() {
+	public int getConfirmNum() {
 		return confirmNum;
 	}
 
-	public void setConfirmNum(Integer confirmNum) {
+	public void setConfirmNum(int confirmNum) {
 		this.confirmNum = confirmNum;
 	}
 

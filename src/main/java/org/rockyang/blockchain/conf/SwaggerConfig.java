@@ -9,6 +9,10 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.DocExpansion;
+import springfox.documentation.swagger.web.TagsSorter;
+import springfox.documentation.swagger.web.UiConfiguration;
+import springfox.documentation.swagger.web.UiConfigurationBuilder;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
@@ -31,11 +35,19 @@ public class SwaggerConfig {
 
 	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder()
-				.title("Spring Boot中使用 Swagger2 构建 RESTFUL API.")
+				.title("BlockChain-Java 项目 API 文档.")
 				.description("我的博客网站：http://r9it.com，欢迎大家访问。")
 				.contact(new Contact("RockYang", "http://ww.r9it.com", "yangjian102621@gmail.com"))
 				.version("v1.0")
 				.build();
 	}
 
+	@Bean
+	public UiConfiguration uiConfig() {
+		return UiConfigurationBuilder.builder()
+				.docExpansion(DocExpansion.LIST)
+				.showExtensions(false)
+				.tagsSorter(TagsSorter.ALPHA)
+				.build();
+	}
 }

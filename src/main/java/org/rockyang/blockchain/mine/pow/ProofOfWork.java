@@ -17,7 +17,7 @@ public class ProofOfWork {
     /**
      * 难度目标位, target=24 时大约 30 秒出一个区块
      */
-    public static final int TARGET_BITS = 20;
+    public static final int TARGET_BITS = 18;
 
     /**
      * 区块

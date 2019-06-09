@@ -24,6 +24,9 @@ public class AppConfig {
 	 */
 	private boolean autoMining;
 
+	// 最少确认数
+	private int minConfirmNum = 0;
+
 	/**
 	 * 数据存储地址
 	 */
@@ -51,5 +54,13 @@ public class AppConfig {
 
 	public void setDataDir(String dataDir) {
 		this.dataDir = dataDir;
+	}
+
+	public int getMinConfirmNum() {
+		return minConfirmNum;
+	}
+
+	public void setMinConfirmNum(int minConfirmNum) {
+		this.minConfirmNum = minConfirmNum;
 	}
 }

@@ -44,12 +44,6 @@ public class RocksDbTest {
 	}
 
 	@Test
-	public void clearNodes() {
-
-		dbAccess.clearNodes();
-	}
-
-	@Test
 	public void addNode() {
 		Node node = new Node("127.0.0.1", 6789);
 		dbAccess.addNode(node);

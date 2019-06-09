@@ -7,9 +7,9 @@ import org.springframework.context.ApplicationEvent;
  * 发送交易事件
  * @author yangjian
  */
-public class SendTransactionEvent extends ApplicationEvent {
+public class NewTransactionEvent extends ApplicationEvent {
 
-    public SendTransactionEvent(Transaction transaction) {
+    public NewTransactionEvent(Transaction transaction) {
         super(transaction);
     }
 

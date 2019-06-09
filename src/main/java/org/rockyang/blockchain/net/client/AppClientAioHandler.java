@@ -6,6 +6,7 @@ import org.rockyang.blockchain.core.Transaction;
 import org.rockyang.blockchain.core.TransactionExecutor;
 import org.rockyang.blockchain.core.TransactionPool;
 import org.rockyang.blockchain.db.DBAccess;
+import org.rockyang.blockchain.event.BlockConfirmNumEvent;
 import org.rockyang.blockchain.event.FetchNextBlockEvent;
 import org.rockyang.blockchain.net.ApplicationContextProvider;
 import org.rockyang.blockchain.net.base.*;
@@ -100,10 +101,10 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
 		Transaction tx = (Transaction) responseVo.getItem();
 		if (responseVo.isSuccess()) {
-			// 将合法交易放入交易池，等待打包
-			transactionPool.addTransaction(tx);
 			logger.info("交易确认成功， {}", tx);
 		} else {
+			// 将非法交易移除交易池
+			transactionPool.removeTransaction(tx.getTxHash());
 			logger.error("交易确认失败, {}", tx);
 		}
 	}
@@ -170,12 +171,15 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 					executor.run(newBlock);
 					confirmedCounter = 0;
 				}
-				// 更新区块确认数
+				// 更新当前区块确认数
 				newBlock.setConfirmNum(confirmedCounter+1);
 				confirmedBlocks.put(newBlock.getHeader().getHash(), confirmedCounter+1);
 				// 更新数据库
 				dbAccess.putBlock(newBlock);
 				logger.info("区块确认成功, {}", newBlock);
+
+				// 同步其他节点的区块确认数
+				ApplicationContextProvider.publishEvent(new BlockConfirmNumEvent(newBlock.getHeader().getIndex()));
 			}
 		} else {
 			logger.error("区块确认失败, {}, {}", responseVo.getMessage(), newBlock);

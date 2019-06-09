@@ -3,16 +3,13 @@ package org.rockyang.blockchain.listener;
 import com.google.common.base.Optional;
 import org.rockyang.blockchain.core.Block;
 import org.rockyang.blockchain.db.DBAccess;
+import org.rockyang.blockchain.event.BlockConfirmNumEvent;
 import org.rockyang.blockchain.event.FetchNextBlockEvent;
-import org.rockyang.blockchain.event.MineBlockEvent;
+import org.rockyang.blockchain.event.NewBlockEvent;
 import org.rockyang.blockchain.net.base.MessagePacket;
 import org.rockyang.blockchain.net.base.MessagePacketType;
 import org.rockyang.blockchain.net.client.AppClient;
 import org.rockyang.blockchain.utils.SerializeUtils;
-import org.rockyang.blockchain.core.Block;
-import org.rockyang.blockchain.db.DBAccess;
-import org.rockyang.blockchain.event.FetchNextBlockEvent;
-import org.rockyang.blockchain.event.MineBlockEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +34,8 @@ public class BlockEventListener {
 	 * 挖矿事件监听
 	 * @param event
 	 */
-	@EventListener(MineBlockEvent.class)
-	public void mineBlock(MineBlockEvent event) {
+	@EventListener(NewBlockEvent.class)
+	public void newBlock(NewBlockEvent event) {
 
 		logger.info("++++++++++++++ 开始广播新区块 +++++++++++++++++++++");
 		Block block = (Block) event.getSource();
@@ -67,6 +64,18 @@ public class BlockEventListener {
 		messagePacket.setType(MessagePacketType.REQ_SYNC_NEXT_BLOCK);
 		messagePacket.setBody(SerializeUtils.serialize(blockIndex+1));
 		//群发消息，从群组节点去获取下一个区块
+		appClient.sendGroup(messagePacket);
+	}
+
+	@EventListener(BlockConfirmNumEvent.class)
+	public void IncBlockConfirmNum(BlockConfirmNumEvent event)
+	{
+		logger.info("++++++++++++++ 增加区块确认数 ++++++++++++++++++");
+		Integer blockIndex = (Integer) event.getSource();
+		MessagePacket messagePacket = new MessagePacket();
+		messagePacket.setType(MessagePacketType.REQ_INC_CONFIRM_NUM);
+		messagePacket.setBody(SerializeUtils.serialize(blockIndex));
+		//群发消息
 		appClient.sendGroup(messagePacket);
 	}
 

@@ -51,7 +51,7 @@ public class TransactionExecutor {
 			boolean verify = Sign.verify(
 					Keys.publicKeyDecode(transaction.getPublicKey()),
 					transaction.getSign(),
-					transaction.toString());
+					transaction.toSignString());
 			if (!verify) {
 				transaction.setStatus(TransactionStatusEnum.FAIL);
 				transaction.setErrorMessage("交易签名错误");
@@ -63,6 +63,11 @@ public class TransactionExecutor {
 				transaction.setErrorMessage("账户余额不足");
 				continue;
 			}
+
+			// 更新交易区块高度
+			transaction.setBlockNumber(block.getHeader().getIndex());
+			// 缓存交易哈希对应的区块高度, 方便根据 hash 查询交易状态
+			dbAccess.put(transaction.getTxHash(), block.getHeader().getIndex());
 
 			// 将待打包交易池中包含此交易的记录删除，防止交易重复打包( fix bug for #IWSPJ)
 			for (Iterator i = transactionPool.getTransactions().iterator(); i.hasNext();) {
@@ -79,5 +84,7 @@ public class TransactionExecutor {
 			dbAccess.putAccount(recipient.get());
 		}// end for
 
+		// 更新区块信息
+		dbAccess.putBlock(block);
 	}
 }

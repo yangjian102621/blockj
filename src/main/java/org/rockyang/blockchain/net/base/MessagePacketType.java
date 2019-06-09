@@ -43,14 +43,14 @@ public interface MessagePacketType {
 	byte RES_SYNC_NEXT_BLOCK = -3;
 
 	/**
-	 * 请求同步新的账户
+	 * 请求新增区块确认数
 	 */
-	byte REQ_NEW_ACCOUNT = 4;
+	byte REQ_INC_CONFIRM_NUM = 4;
 
 	/**
-	 * 响应同步新账户
+	 * 响应新增区块确认数
 	 */
-	byte RES_NEW_ACCOUNT = -4;
+	byte RES_INC_CONFIRM_NUM = -4;
 
 	/**
 	 * 请求获取账户列表

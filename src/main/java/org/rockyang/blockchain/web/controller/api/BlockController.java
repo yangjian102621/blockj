@@ -8,13 +8,10 @@ import io.swagger.annotations.ApiOperation;
 import org.rockyang.blockchain.conf.AppConfig;
 import org.rockyang.blockchain.core.Block;
 import org.rockyang.blockchain.core.BlockChain;
-import org.rockyang.blockchain.core.Transaction;
-import org.rockyang.blockchain.crypto.Credentials;
 import org.rockyang.blockchain.db.DBAccess;
 import org.rockyang.blockchain.net.base.Node;
 import org.rockyang.blockchain.utils.JsonVo;
 import org.rockyang.blockchain.web.vo.req.NodeVo;
-import org.rockyang.blockchain.web.vo.req.TransactionVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,34 +66,6 @@ public class BlockController {
 		}
 		return success;
 
-	}
-
-	/**
-	 * 发送交易
-	 * @param txVo
-	 * @return
-	 */
-	@ApiOperation(value="发送交易", notes="发起一笔资金交易")
-	@ApiImplicitParam(name = "txVo", required = true, dataType = "TransactionVo")
-	@PostMapping("/send_transactions")
-	public JsonVo sendTransaction(@RequestBody TransactionVo txVo) throws Exception {
-		Preconditions.checkNotNull(txVo.getTo(), "Recipient is needed.");
-		Preconditions.checkNotNull(txVo.getAmount(), "Amount is needed.");
-		Preconditions.checkNotNull(txVo.getPriKey(), "Private Key is needed.");
-		Credentials credentials = Credentials.create(txVo.getPriKey());
-		Transaction transaction = blockChain.sendTransaction(
-				credentials,
-				txVo.getTo(),
-				txVo.getAmount(),
-				txVo.getData());
-
-		//如果开启了自动挖矿，则直接自动挖矿
-		if (appConfig.isAutoMining()) {
-			blockChain.mining();
-		}
-		JsonVo success = JsonVo.success();
-		success.setItem(transaction);
-		return success;
 	}
 
 	/**

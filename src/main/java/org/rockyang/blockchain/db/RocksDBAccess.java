@@ -5,6 +5,7 @@ import org.rocksdb.*;
 import org.rockyang.blockchain.account.Account;
 import org.rockyang.blockchain.conf.AppConfig;
 import org.rockyang.blockchain.core.Block;
+import org.rockyang.blockchain.core.Transaction;
 import org.rockyang.blockchain.net.base.Node;
 import org.rockyang.blockchain.net.conf.TioProps;
 import org.rockyang.blockchain.utils.SerializeUtils;
@@ -174,11 +175,6 @@ public class RocksDBAccess implements DBAccess {
 	}
 
 	@Override
-	public void clearNodes() {
-		delete(CLIENT_NODES_LIST_KEY);
-	}
-
-	@Override
 	public boolean put(String key, Object value) {
 		try {
 			rocksDB.put(key.getBytes(), SerializeUtils.serialize(value));
@@ -223,6 +219,24 @@ public class RocksDBAccess implements DBAccess {
 			ts.add((T) SerializeUtils.unSerialize(iterator.value()));
 		}
 		return ts;
+	}
+
+	@Override
+	public Transaction getTransactionByTxHash(String txHash)
+	{
+		Optional<Object> objectOptional = get(txHash);
+		if (objectOptional.isPresent()) {
+			Integer blockIndex = (Integer) objectOptional.get();
+			Optional<Block> blockOptional = getBlock(blockIndex);
+			if (blockOptional.isPresent()) {
+				for (Transaction transaction : blockOptional.get().getBody().getTransactions()) {
+					if (txHash.equals(transaction.getTxHash())) {
+						return transaction;
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override

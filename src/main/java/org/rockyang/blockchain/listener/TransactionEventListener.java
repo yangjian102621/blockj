@@ -1,7 +1,7 @@
 package org.rockyang.blockchain.listener;
 
 import org.rockyang.blockchain.core.Transaction;
-import org.rockyang.blockchain.event.SendTransactionEvent;
+import org.rockyang.blockchain.event.NewTransactionEvent;
 import org.rockyang.blockchain.net.base.MessagePacket;
 import org.rockyang.blockchain.net.base.MessagePacketType;
 import org.rockyang.blockchain.net.client.AppClient;
@@ -28,8 +28,8 @@ public class TransactionEventListener {
 	 * 向所有客户端广播交易
 	 * @param event
 	 */
-	@EventListener(SendTransactionEvent.class)
-	public void sendTransaction(SendTransactionEvent event)
+	@EventListener(NewTransactionEvent.class)
+	public void sendTransaction(NewTransactionEvent event)
 	{
 
 		logger.info("++++++++++++++ 开始广播新新的交易订单 +++++++++++++++++++++");

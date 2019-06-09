@@ -2,8 +2,6 @@ package org.rockyang.blockchain.core;
 
 import org.rockyang.blockchain.crypto.Hash;
 import org.rockyang.blockchain.enums.TransactionStatusEnum;
-import org.rockyang.blockchain.crypto.Hash;
-import org.rockyang.blockchain.enums.TransactionStatusEnum;
 
 import java.math.BigDecimal;
 
@@ -18,14 +16,17 @@ public class Transaction {
 	 * 付款人地址
 	 */
 	private String from;
+
 	/**
 	 * 付款人签名
 	 */
 	private String sign;
+
 	/**
 	 * 收款人地址
 	 */
 	private String to;
+
 	/**
 	 * 收款人公钥
 	 */
@@ -46,7 +47,7 @@ public class Transaction {
 	/**
 	 * 交易状态
 	 */
-	private TransactionStatusEnum status = TransactionStatusEnum.SUCCESS;
+	private TransactionStatusEnum status = TransactionStatusEnum.APPENDING;
 	/**
 	 * 交易错误信息
 	 */
@@ -56,6 +57,11 @@ public class Transaction {
 	 * 附加数据
 	 */
 	private String data;
+
+	/**
+	 * 当前交易所属区块高度
+	 */
+	private int blockNumber;
 
 	public Transaction(String from, String to, BigDecimal amount) {
 		this.from = from;
@@ -148,16 +154,27 @@ public class Transaction {
 		this.data = data;
 	}
 
+	public int getBlockNumber() {
+		return blockNumber;
+	}
+
+	public void setBlockNumber(int blockNumber) {
+		this.blockNumber = blockNumber;
+	}
+
 	/**
 	 * 计算交易信息的Hash值
 	 * @return
 	 */
 	public String hash() {
-		return Hash.sha3(this.toString());
+		return Hash.sha3(this.toSignString());
 	}
 
-	@Override
-	public String toString() {
+	/**
+	 * 参与签名的字符串
+	 * @return
+	 */
+	public String toSignString() {
 		return "Transaction{" +
 				"from='" + from + '\'' +
 				", to='" + to + '\'' +
@@ -165,6 +182,23 @@ public class Transaction {
 				", amount=" + amount +
 				", timestamp=" + timestamp +
 				", data='" + data + '\'' +
+				'}';
+	}
+
+	@Override
+	public String toString() {
+		return "Transaction{" +
+				"from='" + from + '\'' +
+				", sign='" + sign + '\'' +
+				", to='" + to + '\'' +
+				", publicKey='" + publicKey + '\'' +
+				", amount=" + amount +
+				", timestamp=" + timestamp +
+				", txHash='" + txHash + '\'' +
+				", status=" + status +
+				", errorMessage='" + errorMessage + '\'' +
+				", data='" + data + '\'' +
+				", blockNumber=" + blockNumber +
 				'}';
 	}
 }
