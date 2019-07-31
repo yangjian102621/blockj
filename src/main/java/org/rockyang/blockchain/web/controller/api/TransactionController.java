@@ -1,9 +1,11 @@
 package org.rockyang.blockchain.web.controller.api;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.rockyang.blockchain.account.Account;
 import org.rockyang.blockchain.conf.AppConfig;
 import org.rockyang.blockchain.core.BlockChain;
 import org.rockyang.blockchain.core.Transaction;
@@ -45,6 +47,14 @@ public class TransactionController {
 		Preconditions.checkNotNull(txVo.getAmount(), "Amount is needed.");
 		Preconditions.checkNotNull(txVo.getPriKey(), "Private Key is needed.");
 		Credentials credentials = Credentials.create(txVo.getPriKey());
+		// 验证余额
+		Optional<Account> account = dbAccess.getAccount(credentials.getAddress());
+		if (!account.isPresent()) {
+			return JsonVo.instance(JsonVo.CODE_FAIL, "账户余额不足");
+		}
+		if (account.get().getBalance().compareTo(txVo.getAmount()) < 0) {
+			return JsonVo.instance(JsonVo.CODE_FAIL, "账户余额不足");
+		}
 		Transaction transaction = blockChain.sendTransaction(
 				credentials,
 				txVo.getTo(),
