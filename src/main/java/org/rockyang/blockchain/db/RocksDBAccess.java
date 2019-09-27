@@ -123,7 +123,8 @@ public class RocksDBAccess implements DBAccess {
 	public Optional<Account> getMinerAccount() {
 		Optional<Object> object = get(MINER_ACCOUNT);
 		if (object.isPresent()) {
-			return Optional.of((Account) object.get());
+			String minerAddress = (String) object.get();
+			return getAccount(minerAddress);
 		}
 		return Optional.absent();
 	}
@@ -132,7 +133,7 @@ public class RocksDBAccess implements DBAccess {
 	public boolean setMinerAccount(Account account) {
 
 		if (null != account) {
-			return put(MINER_ACCOUNT, account);
+			return put(MINER_ACCOUNT, account.getAddress());
 		} else {
 			return false;
 		}
