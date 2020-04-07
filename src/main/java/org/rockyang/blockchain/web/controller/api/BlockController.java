@@ -5,7 +5,6 @@ import com.google.common.base.Preconditions;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.rockyang.blockchain.conf.AppConfig;
 import org.rockyang.blockchain.core.Block;
 import org.rockyang.blockchain.core.BlockChain;
 import org.rockyang.blockchain.db.DBAccess;
@@ -31,8 +30,6 @@ public class BlockController {
 	private DBAccess dbAccess;
 	@Autowired
 	private BlockChain blockChain;
-	@Autowired
-	private AppConfig appConfig;
 
 	/**
 	 * 启动挖矿
