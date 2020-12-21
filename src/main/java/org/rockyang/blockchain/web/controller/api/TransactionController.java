@@ -14,7 +14,6 @@ import org.rockyang.blockchain.crypto.Credentials;
 import org.rockyang.blockchain.db.DBAccess;
 import org.rockyang.blockchain.utils.JsonVo;
 import org.rockyang.blockchain.web.vo.req.TransactionVo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -25,14 +24,18 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "Transaction API", description = "交易相关 API")
 public class TransactionController {
 
-	@Autowired
-	private DBAccess dbAccess;
-	@Autowired
-	private BlockChain blockChain;
-	@Autowired
-	private AppConfig appConfig;
-	@Autowired
-	private TransactionPool transactionPool;
+	private final DBAccess dbAccess;
+	private final BlockChain blockChain;
+	private final AppConfig appConfig;
+	private final TransactionPool transactionPool;
+
+	public TransactionController(DBAccess dbAccess, BlockChain blockChain, AppConfig appConfig, TransactionPool transactionPool)
+	{
+		this.dbAccess = dbAccess;
+		this.blockChain = blockChain;
+		this.appConfig = appConfig;
+		this.transactionPool = transactionPool;
+	}
 
 	/**
 	 * 发送交易

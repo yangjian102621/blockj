@@ -116,9 +116,9 @@ public class AppClient {
 	public void connectNode(Node node) throws Exception
 	{
 		ClientChannelContext channelContext = aioClient.connect(node);
+		// 连接上以后发一条打招呼信息
 		Aio.send(channelContext, new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE)));
 		Aio.bindGroup(channelContext, tioProps.getClientGroupName());
-		logger.info("连接节点成功, {}", node);
 	}
 
 	/**
@@ -127,7 +127,6 @@ public class AppClient {
 	@EventListener(ApplicationReadyEvent.class)
 	public void fetchNextBlock() {
 		ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(0));
-
 	}
 
 	/**

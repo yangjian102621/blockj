@@ -11,7 +11,6 @@ import org.rockyang.blockchain.db.DBAccess;
 import org.rockyang.blockchain.net.base.Node;
 import org.rockyang.blockchain.utils.JsonVo;
 import org.rockyang.blockchain.web.vo.req.NodeVo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,10 +25,14 @@ import java.util.List;
 @Api(tags = "Chain API", description = "区块链相关的 API")
 public class BlockController {
 
-	@Autowired
-	private DBAccess dbAccess;
-	@Autowired
-	private BlockChain blockChain;
+	private final DBAccess dbAccess;
+	private final BlockChain blockChain;
+
+	public BlockController(DBAccess dbAccess, BlockChain blockChain)
+	{
+		this.dbAccess = dbAccess;
+		this.blockChain = blockChain;
+	}
 
 	/**
 	 * 启动挖矿

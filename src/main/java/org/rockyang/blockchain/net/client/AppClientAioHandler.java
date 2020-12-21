@@ -117,7 +117,7 @@ public class AppClientAioHandler extends BaseAioHandler implements ClientAioHand
 
 		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
 		if (!responseVo.isSuccess()) {
-			logger.error("区块同步失败, "+responseVo.getMessage());
+			logger.warn("区块同步失败, "+responseVo.getMessage());
 			return;
 		}
 		Block block = (Block) responseVo.getItem();

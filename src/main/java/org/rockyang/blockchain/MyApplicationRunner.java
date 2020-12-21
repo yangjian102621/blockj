@@ -6,7 +6,6 @@ import org.rockyang.blockchain.conf.AppConfig;
 import org.rockyang.blockchain.db.DBAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -22,14 +21,18 @@ public class MyApplicationRunner implements ApplicationRunner {
 
 	static Logger logger = LoggerFactory.getLogger(MyApplicationRunner.class);
 
-	@Autowired
-	private DBAccess dbAccess;
+	private final DBAccess dbAccess;
 
-	@Autowired
-	private Personal personal;
+	private final Personal personal;
 
-	@Autowired
-	private AppConfig appConfig;
+	private final AppConfig appConfig;
+
+	public MyApplicationRunner(AppConfig appConfig, DBAccess dbAccess, Personal personal)
+	{
+		this.appConfig = appConfig;
+		this.dbAccess = dbAccess;
+		this.personal = personal;
+	}
 
 	@Override
 	public void run(ApplicationArguments arguments) throws Exception
