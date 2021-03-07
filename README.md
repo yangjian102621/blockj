@@ -1,4 +1,4 @@
-# blockchain-java
+# jblock
 
 Java实现的一个简易区块链（联盟链）项目，包括加密工具，钱包，P2P 传输，区块同步，POW 共识等基础实现。
 
