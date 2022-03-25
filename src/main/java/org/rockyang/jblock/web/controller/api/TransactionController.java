@@ -1,6 +1,5 @@
 package org.rockyang.jblock.web.controller.api;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -16,12 +15,14 @@ import org.rockyang.jblock.utils.JsonVo;
 import org.rockyang.jblock.web.vo.req.TransactionVo;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 /**
  * @author yangjian
  */
 @RestController
 @RequestMapping("/api/transaction")
-@Api(tags = "Transaction API", description = "交易相关 API")
+@Api(tags = "Transaction API", value = "交易相关 API")
 public class TransactionController {
 
 	private final DBAccess dbAccess;

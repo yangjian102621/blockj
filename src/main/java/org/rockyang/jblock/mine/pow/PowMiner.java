@@ -1,6 +1,5 @@
 package org.rockyang.jblock.mine.pow;
 
-import com.google.common.base.Optional;
 import org.rockyang.jblock.account.Account;
 import org.rockyang.jblock.core.Block;
 import org.rockyang.jblock.core.BlockBody;
@@ -10,6 +9,8 @@ import org.rockyang.jblock.db.DBAccess;
 import org.rockyang.jblock.mine.Miner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 /**
  * PoW 挖矿算法实现
@@ -23,12 +24,12 @@ public class PowMiner implements Miner {
 	private DBAccess dbAccess;
 
 	@Override
-	public Block newBlock(Optional<Block> block) {
+	public Block newBlock(java.util.Optional<Block> block) {
 
 		//获取挖矿账户
 		Account account;
 		Optional<Account> minerAccount = dbAccess.getMinerAccount();
-		if (!minerAccount.isPresent()) {
+		if (minerAccount.isEmpty()) {
 			throw new RuntimeException("没有找到挖矿账户，请先创建挖矿账户.");
 		}
 		Block newBlock;

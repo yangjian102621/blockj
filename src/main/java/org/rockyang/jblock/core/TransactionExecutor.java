@@ -1,6 +1,5 @@
 package org.rockyang.jblock.core;
 
-import com.google.common.base.Optional;
 import org.rockyang.jblock.account.Account;
 import org.rockyang.jblock.crypto.Keys;
 import org.rockyang.jblock.crypto.Sign;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * 交易执行器
@@ -36,7 +36,7 @@ public class TransactionExecutor {
 		{
 			Optional<Account> recipient = dbAccess.getAccount(transaction.getTo());
 			//如果收款地址账户不存在，则创建一个新账户
-			if (!recipient.isPresent()) {
+			if (recipient.isEmpty()) {
 				recipient = Optional.of(new Account(transaction.getTo(), BigDecimal.ZERO));
 			}
 			//挖矿奖励

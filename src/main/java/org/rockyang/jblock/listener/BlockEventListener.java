@@ -1,6 +1,5 @@
 package org.rockyang.jblock.listener;
 
-import com.google.common.base.Optional;
 import org.rockyang.jblock.core.Block;
 import org.rockyang.jblock.db.DBAccess;
 import org.rockyang.jblock.event.BlockConfirmNumEvent;
@@ -15,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 /**
  * 区块事件监听器

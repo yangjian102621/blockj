@@ -1,6 +1,5 @@
 package org.rockyang.jblock.mine;
 
-import com.google.common.base.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rockyang.jblock.Application;
@@ -11,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Optional;
 
 /**
  * 区块测试
@@ -36,7 +37,7 @@ public class BlockTest {
 	@Test
 	public void newBlock() throws Exception {
 
-		Optional<Block> lastBlock = dbAccess.getLastBlock();
+		java.util.Optional<Block> lastBlock = dbAccess.getLastBlock();
 		if (lastBlock.isPresent()) {
 			logger.info("Previous block ==> {}", lastBlock.get().getHeader());
 		}
@@ -53,8 +54,6 @@ public class BlockTest {
 	@Test
 	public void getLastBlock() {
 		Optional<Block> block = dbAccess.getLastBlock();
-		if (block.isPresent()) {
-			logger.info("Block ====> {}", block.get().getHeader());
-		}
+		block.ifPresent(value -> logger.info("Block ====> {}", value.getHeader()));
 	}
 }

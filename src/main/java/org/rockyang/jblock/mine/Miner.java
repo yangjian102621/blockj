@@ -1,9 +1,9 @@
 package org.rockyang.jblock.mine;
 
-import com.google.common.base.Optional;
 import org.rockyang.jblock.core.Block;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  * 挖矿接口

@@ -1,6 +1,5 @@
 package org.rockyang.jblock.web.controller.api;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author yangjian
@@ -61,9 +61,7 @@ public class BlockController {
 	{
 		Optional<Block> block = dbAccess.getLastBlock();
 		JsonVo success = JsonVo.success();
-		if (block.isPresent()) {
-			success.setItem(block.get());
-		}
+		block.ifPresent(success::setItem);
 		return success;
 
 	}

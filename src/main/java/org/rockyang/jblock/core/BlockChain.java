@@ -1,6 +1,5 @@
 package org.rockyang.jblock.core;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import org.rockyang.jblock.conf.AppConfig;
 import org.rockyang.jblock.crypto.Credentials;
@@ -21,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * 区块链主类

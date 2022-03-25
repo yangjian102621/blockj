@@ -1,6 +1,5 @@
 package org.rockyang.jblock.net.client;
 
-import com.google.common.base.Optional;
 import org.rockyang.jblock.conf.AppConfig;
 import org.rockyang.jblock.db.DBAccess;
 import org.rockyang.jblock.event.FetchNextBlockEvent;
@@ -24,6 +23,7 @@ import org.tio.core.Tio;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 客户端启动程序

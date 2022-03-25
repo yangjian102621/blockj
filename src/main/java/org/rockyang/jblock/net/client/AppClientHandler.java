@@ -1,6 +1,5 @@
 package org.rockyang.jblock.net.client;
 
-import com.google.common.base.Optional;
 import org.rockyang.jblock.core.Block;
 import org.rockyang.jblock.core.Transaction;
 import org.rockyang.jblock.core.TransactionExecutor;
@@ -20,6 +19,7 @@ import org.tio.core.ChannelContext;
 import org.tio.core.intf.Packet;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -45,7 +45,7 @@ public class AppClientHandler extends BaseHandler implements TioClientHandler {
 	/**
 	 * 心跳包
 	 */
-	private static MessagePacket heartbeatPacket = new MessagePacket(MessagePacketType.STRING_MESSAGE);
+	private static final MessagePacket heartbeatPacket = new MessagePacket(MessagePacketType.STRING_MESSAGE);
 	/**
 	 * 处理消息
 	 */
@@ -188,7 +188,9 @@ public class AppClientHandler extends BaseHandler implements TioClientHandler {
 	/**
 	 * 获取节点列表
 	 * @param body
+	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	public void getNodeList(byte[] body) throws Exception {
 
 		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
