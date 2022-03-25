@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.core.TioConfig;
-import org.tio.core.exception.TioDecodeException;
 import org.tio.core.intf.Packet;
 import org.tio.server.intf.TioServerHandler;
 
@@ -32,9 +31,9 @@ import java.util.List;
  * @author yangjian
  */
 @Component
-public class AppServerAioHandler extends BaseAioHandler implements TioServerHandler {
+public class AppServerHandler extends BaseHandler implements TioServerHandler {
 
-	private static Logger logger = LoggerFactory.getLogger(AppServerAioHandler.class);
+	private static Logger logger = LoggerFactory.getLogger(AppServerHandler.class);
 	@Autowired
 	private DBAccess dbAccess;
 	@Autowired
@@ -43,12 +42,6 @@ public class AppServerAioHandler extends BaseAioHandler implements TioServerHand
 	private TransactionExecutor executor;
 	@Autowired
 	private AppConfig appConfig;
-
-	@Override
-	public Packet decode(ByteBuffer byteBuffer, int i, int i1, int i2, ChannelContext channelContext) throws TioDecodeException
-	{
-		return null;
-	}
 
 	@Override
 	public ByteBuffer encode(Packet packet, TioConfig tioConfig, ChannelContext channelContext)

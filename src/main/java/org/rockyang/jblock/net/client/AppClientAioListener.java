@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.tio.client.intf.TioClientListener;
-import org.tio.core.Aio;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.core.intf.Packet;
@@ -23,8 +22,7 @@ public class AppClientAioListener implements TioClientListener {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    final
-    TioProps tioProps;
+    final TioProps tioProps;
 
     private final DBAccess dbAccess;
 
@@ -34,11 +32,6 @@ public class AppClientAioListener implements TioClientListener {
         this.tioProps = tioProps;
     }
 
-    @Override
-    public void onAfterClose(ChannelContext channelContext, Throwable throwable, String s, boolean b) throws Exception {
-        logger.info("连接关闭：server地址为-" + channelContext.getServerNode());
-        Tio.unbindGroup(channelContext);
-    }
 
     @Override
     public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect) throws Exception {
@@ -53,12 +46,26 @@ public class AppClientAioListener implements TioClientListener {
     }
 
     @Override
-    public void onAfterReceived(ChannelContext channelContext, Packet packet, int i) throws Exception {
+    public void onAfterDecoded(ChannelContext channelContext, Packet packet, int i) throws Exception
+    {
 
     }
 
     @Override
+    public void onAfterReceivedBytes(ChannelContext channelContext, int i) throws Exception
+    {
+
+    }
+
+
+    @Override
     public void onAfterSent(ChannelContext channelContext, Packet packet, boolean b) throws Exception {
+
+    }
+
+    @Override
+    public void onAfterHandled(ChannelContext channelContext, Packet packet, long l) throws Exception
+    {
 
     }
 

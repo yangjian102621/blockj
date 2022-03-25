@@ -1,8 +1,5 @@
 package org.rockyang.jblock.crypto;
 
-import org.rockyang.jblock.constants.CryptoConstants;
-import org.rockyang.jblock.utils.Numeric;
-import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.crypto.ec.CustomNamedCurves;
 import org.bouncycastle.crypto.params.ECDomainParameters;
@@ -13,6 +10,8 @@ import org.bouncycastle.jce.spec.ECPrivateKeySpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.math.ec.FixedPointCombMultiplier;
+import org.rockyang.jblock.constants.CryptoConstants;
+import org.rockyang.jblock.utils.Numeric;
 
 import java.math.BigInteger;
 import java.security.*;

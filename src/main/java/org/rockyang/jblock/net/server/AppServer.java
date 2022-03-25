@@ -3,8 +3,8 @@ package org.rockyang.jblock.net.server;
 import org.rockyang.jblock.net.conf.TioProps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.tio.server.AioServer;
-import org.tio.server.ServerGroupContext;
+import org.tio.server.TioServer;
+import org.tio.server.TioServerConfig;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -18,7 +18,7 @@ import java.io.IOException;
 public class AppServer {
 
 	@Resource
-	private ServerGroupContext serverGroupContext;
+	private TioServerConfig serverConfig;
 	@Autowired
 	private TioProps properties;
 
@@ -28,8 +28,8 @@ public class AppServer {
 	@PostConstruct
 	public void serverStart() throws IOException {
 
-		AioServer aioServer = new AioServer(serverGroupContext);
+		TioServer server = new TioServer(serverConfig);
 		//本机启动服务
-		aioServer.start(properties.getServerIp(), properties.getServerPort());
+		server.start(properties.getServerIp(), properties.getServerPort());
 	}
 }

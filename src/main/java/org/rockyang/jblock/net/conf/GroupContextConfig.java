@@ -1,8 +1,8 @@
 package org.rockyang.jblock.net.conf;
 
-import org.rockyang.jblock.net.client.AppClientAioHandler;
+import org.rockyang.jblock.net.client.AppClientHandler;
 import org.rockyang.jblock.net.client.AppClientAioListener;
-import org.rockyang.jblock.net.server.AppServerAioHandler;
+import org.rockyang.jblock.net.server.AppServerHandler;
 import org.rockyang.jblock.net.server.AppServerAioListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +26,7 @@ public class GroupContextConfig {
 	 * 客户端消息 handler, 包括编码、解码、消息处理
 	 */
 	@Autowired
-	AppClientAioHandler clientHandler;
+	AppClientHandler clientHandler;
 
 	/**
 	 * 客户端事件监听器
@@ -38,7 +38,7 @@ public class GroupContextConfig {
 	 * 服务端消息 handler, 包括编码、解码、消息处理
 	 */
 	@Autowired
-	AppServerAioHandler serverHandler;
+	AppServerHandler serverHandler;
 
 	/**
 	 * 服务端事件监听器

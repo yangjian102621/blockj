@@ -77,7 +77,7 @@ public class RocksDBAccess implements DBAccess {
 	@Override
 	public Optional<Block> getBlock(Object blockIndex) {
 
-		Optional<Object> object = this.get(BLOCKS_BUCKET_PREFIX + String.valueOf(blockIndex));
+		Optional<Object> object = this.get(BLOCKS_BUCKET_PREFIX + blockIndex);
 		if (object.isPresent()) {
 			return Optional.of((Block) object.get());
 		}
@@ -140,6 +140,7 @@ public class RocksDBAccess implements DBAccess {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Optional<List<Node>> getNodeList() {
 		Optional<Object> nodes = this.get(CLIENT_NODES_LIST_KEY);
 		if (nodes.isPresent()) {
@@ -211,6 +212,7 @@ public class RocksDBAccess implements DBAccess {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <T> List<T> seekByKey(String keyPrefix) {
 
 		ArrayList<T> ts = new ArrayList<>();

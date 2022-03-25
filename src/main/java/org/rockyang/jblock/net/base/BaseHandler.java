@@ -5,8 +5,8 @@ import com.google.common.base.Optional;
 import org.rockyang.jblock.core.Block;
 import org.rockyang.jblock.db.DBAccess;
 import org.rockyang.jblock.mine.pow.ProofOfWork;
-import org.tio.client.TioClientConfig;
 import org.tio.core.ChannelContext;
+import org.tio.core.TioConfig;
 import org.tio.core.exception.TioDecodeException;
 import org.tio.core.intf.Packet;
 
@@ -17,10 +17,9 @@ import java.nio.ByteBuffer;
  * @author yangjian
  * @since 18-4-17
  */
-public abstract class BaseAioHandler {
+public abstract class BaseHandler {
 
 	public static MessagePacket heartbeatPacket = new MessagePacket(MessagePacketType.STRING_MESSAGE);
-
 	/**
 	 * 解码：把接收到的ByteBuffer，解码成应用可以识别的业务消息包
 	 * 总的消息结构：消息头 + 消息类别 + 消息体
@@ -28,9 +27,8 @@ public abstract class BaseAioHandler {
 	 * 消息类别： 1 个字节， 存储类别，S => 字符串, B => 区块, T => 交易
 	 * 消息体结构：   对象的json串的byte[]
 	 */
-	public MessagePacket decode(ByteBuffer buffer, ChannelContext channelContext) throws TioDecodeException {
+	public MessagePacket decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext channelContext) throws TioDecodeException {
 
-		int readableLength = buffer.limit() - buffer.position();
 		//收到的数据组不了业务包，则返回null以告诉框架数据不够
 		if (readableLength < MessagePacket.HEADER_LENGTH) {
 			return null;
@@ -71,7 +69,7 @@ public abstract class BaseAioHandler {
 	 * 消息类别： 1 个字节， 存储类别，S => 字符串, B => 区块, T => 交易
 	 * 消息体结构：   对象的json串的byte[]
 	 */
-	public ByteBuffer encode(Packet packet, TioClientConfig config, ChannelContext channelContext) {
+	public ByteBuffer encode(Packet packet, TioConfig config, ChannelContext channelContext) {
 
 		MessagePacket messagePacket = (MessagePacket) packet;
 		byte[] body = messagePacket.getBody();
@@ -132,7 +130,7 @@ public abstract class BaseAioHandler {
 	}
 
 
-	Packet heartbeatPacket(ChannelContext context) {
+	public Packet heartbeatPacket(ChannelContext context) {
 		return heartbeatPacket;
 	}
 

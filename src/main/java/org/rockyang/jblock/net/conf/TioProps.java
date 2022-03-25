@@ -4,7 +4,6 @@ import org.rockyang.jblock.net.base.Node;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
 import java.util.*;
 
 /**
@@ -19,34 +18,28 @@ public class TioProps {
 	/**
 	 * 心跳包时间间隔
 	 */
-	@NotNull
 	private int heartTimeout;
 
 	/**
 	 * 客户端分组名称
 	 */
-	@NotNull
 	private String clientGroupName;
 
 	/**
 	 * 服务端分组上下文名称
 	 */
-	@NotNull
 	private String serverGroupContextName;
 
 	/**
 	 * 服务端监听端口
 	 */
-	@NotNull
 	private int serverPort;
 
 	/**
 	 * 服务端绑定的 ip
 	 */
-	@NotNull
 	private String serverIp;
 
-	@NotNull
 	private LinkedHashMap<String, Object> nodes;
 
 	public int getHeartTimeout() {

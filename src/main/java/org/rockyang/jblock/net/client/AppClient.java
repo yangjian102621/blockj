@@ -16,10 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.tio.client.AioClient;
 import org.tio.client.ClientChannelContext;
-import org.tio.client.ClientGroupContext;
-import org.tio.core.Aio;
+import org.tio.client.TioClient;
+import org.tio.client.TioClientConfig;
+import org.tio.core.Tio;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -34,11 +34,11 @@ import java.util.List;
 public class AppClient {
 
 	@Resource
-	private ClientGroupContext clientGroupContext;
+	private TioClientConfig clientConfig;
 	@Autowired
 	private TioProps tioProps;
 
-	private AioClient aioClient;
+	private TioClient client;
 	@Autowired
 	private DBAccess dbAccess;
 	@Autowired
@@ -57,7 +57,7 @@ public class AppClient {
 			return;
 		}
 
-		aioClient = new AioClient(clientGroupContext);
+		client = new TioClient(clientConfig);
 		//加载数据库中的节点数据
 		Optional<List<Node>> nodeList = dbAccess.getNodeList();
 		List<Node> nodes = null;
@@ -84,7 +84,7 @@ public class AppClient {
 			return;
 		}
 
-		Aio.sendToGroup(clientGroupContext, tioProps.getClientGroupName(), messagePacket);
+		Tio.sendToGroup(clientConfig, tioProps.getClientGroupName(), messagePacket);
 	}
 
 	/**
@@ -115,10 +115,10 @@ public class AppClient {
 	 */
 	public void connectNode(Node node) throws Exception
 	{
-		ClientChannelContext channelContext = aioClient.connect(node);
+		ClientChannelContext channelContext = client.connect(node);
 		// 连接上以后发一条打招呼信息
-		Aio.send(channelContext, new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE)));
-		Aio.bindGroup(channelContext, tioProps.getClientGroupName());
+		Tio.send(channelContext, new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE)));
+		Tio.bindGroup(channelContext, tioProps.getClientGroupName());
 	}
 
 	/**

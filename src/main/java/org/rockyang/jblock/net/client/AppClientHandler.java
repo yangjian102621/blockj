@@ -17,11 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.tio.client.intf.TioClientHandler;
 import org.tio.core.ChannelContext;
-import org.tio.core.TioConfig;
-import org.tio.core.exception.TioDecodeException;
 import org.tio.core.intf.Packet;
 
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,9 +27,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author yangjian
  */
 @Component
-public class AppClientAioHandler extends BaseAioHandler implements TioClientHandler {
+public class AppClientHandler extends BaseHandler implements TioClientHandler {
 
-	private static Logger logger = LoggerFactory.getLogger(AppClientAioHandler.class);
+	private static Logger logger = LoggerFactory.getLogger(AppClientHandler.class);
 	@Autowired
 	private DBAccess dbAccess;
 	@Autowired
@@ -49,19 +46,6 @@ public class AppClientAioHandler extends BaseAioHandler implements TioClientHand
 	 * 心跳包
 	 */
 	private static MessagePacket heartbeatPacket = new MessagePacket(MessagePacketType.STRING_MESSAGE);
-
-	@Override
-	public Packet decode(ByteBuffer byteBuffer, int i, int i1, int i2, ChannelContext channelContext) throws TioDecodeException
-	{
-		return null;
-	}
-
-	@Override
-	public ByteBuffer encode(Packet packet, TioConfig tioConfig, ChannelContext channelContext)
-	{
-		return null;
-	}
-
 	/**
 	 * 处理消息
 	 */
@@ -220,4 +204,5 @@ public class AppClientAioHandler extends BaseAioHandler implements TioClientHand
 		}
 
 	}
+
 }
