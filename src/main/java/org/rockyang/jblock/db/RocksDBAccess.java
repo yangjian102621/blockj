@@ -1,6 +1,5 @@
 package org.rockyang.jblock.db;
 
-import com.google.common.base.Optional;
 import org.rocksdb.*;
 import org.rockyang.jblock.account.Account;
 import org.rockyang.jblock.conf.AppConfig;
@@ -18,6 +17,7 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * RocksDB 操作封装
@@ -78,10 +78,7 @@ public class RocksDBAccess implements DBAccess {
 	public Optional<Block> getBlock(Object blockIndex) {
 
 		Optional<Object> object = this.get(BLOCKS_BUCKET_PREFIX + blockIndex);
-		if (object.isPresent()) {
-			return Optional.of((Block) object.get());
-		}
-		return Optional.absent();
+		return object.map(o -> (Block) o);
 	}
 
 	@Override
@@ -90,7 +87,7 @@ public class RocksDBAccess implements DBAccess {
 		if (blockIndex.isPresent()) {
 			return this.getBlock(blockIndex.get().toString());
 		}
-		return Optional.absent();
+		return Optional.empty();
 	}
 
 	@Override
@@ -102,10 +99,7 @@ public class RocksDBAccess implements DBAccess {
 	public Optional<Account> getAccount(String address) {
 
 		Optional<Object> object = this.get(WALLETS_BUCKET_PREFIX + address);
-		if (object.isPresent()) {
-			return Optional.of((Account) object.get());
-		}
-		return Optional.absent();
+		return object.map(o -> (Account) o);
 	}
 
 	@Override
@@ -126,7 +120,7 @@ public class RocksDBAccess implements DBAccess {
 			String minerAddress = (String) object.get();
 			return getAccount(minerAddress);
 		}
-		return Optional.absent();
+		return Optional.empty();
 	}
 
 	@Override
@@ -143,10 +137,7 @@ public class RocksDBAccess implements DBAccess {
 	@SuppressWarnings("unchecked")
 	public Optional<List<Node>> getNodeList() {
 		Optional<Object> nodes = this.get(CLIENT_NODES_LIST_KEY);
-		if (nodes.isPresent()) {
-			return Optional.of((List<Node>) nodes.get());
-		}
-		return Optional.absent();
+		return nodes.map(o -> (List<Node>) o);
 	}
 
 	public boolean putNodeList(List<Node> nodes) {
@@ -197,7 +188,7 @@ public class RocksDBAccess implements DBAccess {
 			if (logger.isDebugEnabled()) {
 				logger.error("ERROR for RocksDB : {}", e);
 			}
-			return Optional.absent();
+			return Optional.empty();
 		}
 	}
 
@@ -244,7 +235,7 @@ public class RocksDBAccess implements DBAccess {
 
 	@Override
 	public void closeDB() {
-		if (null != rocksDB) {
+		if (rocksDB != null) {
 			rocksDB.close();
 		}
 	}

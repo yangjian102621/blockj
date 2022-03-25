@@ -1,12 +1,12 @@
 package org.rockyang.jblock.db;
 
-import com.google.common.base.Optional;
 import org.rockyang.jblock.account.Account;
 import org.rockyang.jblock.core.Block;
 import org.rockyang.jblock.core.Transaction;
 import org.rockyang.jblock.net.base.Node;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 数据库操作接口

@@ -22,13 +22,13 @@ public class AppServerAioListener implements TioServerListener {
 	}
 
 	@Override
-	public void onAfterDecoded(ChannelContext channelContext, Packet packet, int i) throws Exception
+	public void onAfterDecoded(ChannelContext channelContext, Packet packet, int i)
 	{
 
 	}
 
 	@Override
-	public void onAfterReceivedBytes(ChannelContext channelContext, int i) throws Exception
+	public void onAfterReceivedBytes(ChannelContext channelContext, int i)
 	{
 
 	}
@@ -39,7 +39,7 @@ public class AppServerAioListener implements TioServerListener {
 	}
 
 	@Override
-	public void onAfterHandled(ChannelContext channelContext, Packet packet, long l) throws Exception
+	public void onAfterHandled(ChannelContext channelContext, Packet packet, long l)
 	{
 
 	}

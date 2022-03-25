@@ -1,7 +1,6 @@
 package org.rockyang.jblock.net.server;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import org.rockyang.jblock.conf.AppConfig;
 import org.rockyang.jblock.core.Block;
 import org.rockyang.jblock.core.Transaction;
@@ -25,6 +24,7 @@ import org.tio.server.intf.TioServerHandler;
 
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 服务端 AioHandler 实现

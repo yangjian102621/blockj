@@ -1,7 +1,6 @@
 package org.rockyang.jblock.net.base;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import org.rockyang.jblock.core.Block;
 import org.rockyang.jblock.db.DBAccess;
 import org.rockyang.jblock.mine.pow.ProofOfWork;
@@ -11,6 +10,7 @@ import org.tio.core.exception.TioDecodeException;
 import org.tio.core.intf.Packet;
 
 import java.nio.ByteBuffer;
+import java.util.Optional;
 
 /**
  * 抽象的  AioHandler, 消息编码，解码的通用实现
