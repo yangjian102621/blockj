@@ -1,6 +1,6 @@
-package org.rockyang.jblock.listener;
+package org.rockyang.jblock.chain.event;
 
-import org.rockyang.jblock.core.Transaction;
+import org.rockyang.jblock.chain.Message;
 import org.rockyang.jblock.event.NewTransactionEvent;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
@@ -33,10 +33,10 @@ public class TransactionEventListener {
 	{
 
 		logger.info("++++++++++++++ 开始广播新新的交易订单 +++++++++++++++++++++");
-		Transaction transaction = (Transaction) event.getSource();
+		Message message = (Message) event.getSource();
 		MessagePacket messagePacket = new MessagePacket();
 		messagePacket.setType(MessagePacketType.REQ_CONFIRM_TRANSACTION);
-		messagePacket.setBody(SerializeUtils.serialize(transaction));
+		messagePacket.setBody(SerializeUtils.serialize(message));
 		appClient.sendGroup(messagePacket);
 	}
 

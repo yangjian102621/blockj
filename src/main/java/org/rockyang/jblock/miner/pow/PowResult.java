@@ -1,4 +1,4 @@
-package org.rockyang.jblock.mine.pow;
+package org.rockyang.jblock.miner.pow;
 
 import java.math.BigInteger;
 

@@ -1,6 +1,6 @@
 package org.rockyang.jblock.event;
 
-import org.rockyang.jblock.core.Block;
+import org.rockyang.jblock.chain.Block;
 import org.springframework.context.ApplicationEvent;
 
 /**

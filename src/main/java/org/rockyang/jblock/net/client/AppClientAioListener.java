@@ -1,14 +1,12 @@
 package org.rockyang.jblock.net.client;
 
-import org.rockyang.jblock.db.DBAccess;
-import org.rockyang.jblock.net.base.Node;
+import org.rockyang.jblock.db.Datastore;
 import org.rockyang.jblock.net.conf.TioProps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.tio.client.intf.TioClientListener;
 import org.tio.core.ChannelContext;
-import org.tio.core.Tio;
 import org.tio.core.intf.Packet;
 
 /**
@@ -24,25 +22,25 @@ public class AppClientAioListener implements TioClientListener {
 
     final TioProps tioProps;
 
-    private final DBAccess dbAccess;
+    private final Datastore dataStore;
 
-    public AppClientAioListener(DBAccess dbAccess, TioProps tioProps)
+    public AppClientAioListener(Datastore dataStore, TioProps tioProps)
     {
-        this.dbAccess = dbAccess;
+        this.dataStore = dataStore;
         this.tioProps = tioProps;
     }
 
 
     @Override
     public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect) throws Exception {
-        if (isConnected) {
-            logger.info("连接成功：server地址为-" + channelContext.getServerNode());
-            Node node = new Node(channelContext.getServerNode().getIp(), channelContext.getServerNode().getPort());
-            dbAccess.addNode(node);
-            Tio.bindGroup(channelContext, tioProps.getClientGroupName());
-        } else {
-            logger.info("连接失败：server地址为-" + channelContext.getServerNode());
-        }
+//        if (isConnected) {
+//            logger.info("连接成功：server地址为-" + channelContext.getServerNode());
+//            Node node = new Node(channelContext.getServerNode().getIp(), channelContext.getServerNode().getPort());
+//            dataStore.addNode(node);
+//            Tio.bindGroup(channelContext, tioProps.getClientGroupName());
+//        } else {
+//            logger.info("连接失败：server地址为-" + channelContext.getServerNode());
+//        }
     }
 
     @Override

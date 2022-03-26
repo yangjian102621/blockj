@@ -1,6 +1,6 @@
-package org.rockyang.jblock.mine;
+package org.rockyang.jblock.miner;
 
-import org.rockyang.jblock.core.Block;
+import org.rockyang.jblock.chain.Block;
 
 import java.math.BigDecimal;
 import java.util.Optional;

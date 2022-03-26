@@ -1,15 +1,14 @@
-package org.rockyang.jblock.core;
+package org.rockyang.jblock.chain;
 
 import com.google.common.base.Preconditions;
 import org.rockyang.jblock.conf.AppConfig;
 import org.rockyang.jblock.crypto.Credentials;
-import org.rockyang.jblock.crypto.Keys;
 import org.rockyang.jblock.crypto.Sign;
-import org.rockyang.jblock.db.DBAccess;
-import org.rockyang.jblock.enums.TransactionStatusEnum;
+import org.rockyang.jblock.db.Datastore;
+import org.rockyang.jblock.enums.MessageStatus;
 import org.rockyang.jblock.event.NewBlockEvent;
 import org.rockyang.jblock.event.NewTransactionEvent;
-import org.rockyang.jblock.mine.Miner;
+import org.rockyang.jblock.miner.Miner;
 import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.rockyang.jblock.net.base.Node;
 import org.rockyang.jblock.net.client.AppClient;
@@ -28,12 +27,12 @@ import java.util.Optional;
  * @since 18-4-6
  */
 @Component
-public class BlockChain {
+public class Chain {
 
-	private static Logger logger = LoggerFactory.getLogger(BlockChain.class);
+	private static Logger logger = LoggerFactory.getLogger(Chain.class);
 
 	@Autowired
-	private DBAccess dbAccess;
+	private Datastore dataStore;
 
 	@Autowired
 	private AppClient appClient;
@@ -42,9 +41,9 @@ public class BlockChain {
 	private Miner miner;
 
 	@Autowired
-	private TransactionPool transactionPool;
+	private MessagePool messagePool;
 	@Autowired
-	private TransactionExecutor transactionExecutor;
+	private MessageExecutor messageExecutor;
 	@Autowired
 	private AppConfig appConfig;
 
@@ -59,20 +58,20 @@ public class BlockChain {
 
 		Optional<Block> lastBlock = getLastBlock();
 		Block block = miner.newBlock(lastBlock);
-		for (Iterator t = transactionPool.getTransactions().iterator(); t.hasNext();) {
-			block.getBody().addTransaction((Transaction) t.next());
+		for (Iterator t = messagePool.getTransactions().iterator(); t.hasNext();) {
+			block.addMessage((Message) t.next());
 			t.remove(); // 已打包的交易移出交易池
 		}
 		// 存储区块
-		dbAccess.putLastBlockIndex(block.getHeader().getIndex());
-		dbAccess.putBlock(block);
+		//dataStore.putLastBlockIndex(block.getHeader().getIndex());
+		dataStore.putBlock(block);
 		logger.info("Find a New Block, {}", block);
 
 		if (appConfig.isNodeDiscover()) {
 			// 触发挖矿事件，并等待其他节点确认区块
 			ApplicationContextProvider.publishEvent(new NewBlockEvent(block));
 		} else {
-			transactionExecutor.run(block);
+			messageExecutor.run(block);
 		}
 		return block;
 	}
@@ -86,7 +85,7 @@ public class BlockChain {
 	 * @return
 	 * @throws Exception
 	 */
-	public Transaction sendTransaction(Credentials credentials, String to, BigDecimal amount, String data) throws
+	public Message sendTransaction(Credentials credentials, String to, BigDecimal amount, String data) throws
 			Exception {
 
 		//校验付款和收款地址
@@ -94,27 +93,26 @@ public class BlockChain {
 		Preconditions.checkArgument(!credentials.getAddress().equals(to), "收款地址不能和发送地址相同");
 
 		//构建交易对象
-		Transaction transaction = new Transaction(credentials.getAddress(), to, amount);
-		transaction.setPublicKey(Keys.publicKeyEncode(credentials.getEcKeyPair().getPublicKey().getEncoded()));
-		transaction.setStatus(TransactionStatusEnum.APPENDING);
-		transaction.setData(data);
-		transaction.setTxHash(transaction.hash());
+		Message message = new Message(credentials.getAddress(), to, amount);
+		message.setStatus(MessageStatus.APPENDING);
+		message.setParams(data);
+		message.setCid(message.genMsgCid());
 		//签名
-		String sign = Sign.sign(credentials.getEcKeyPair().getPrivateKey(), transaction.toSignString());
-		transaction.setSign(sign);
+		String sign = Sign.sign(credentials.getEcKeyPair().getPrivateKey(), message.toSigned());
+		message.setSign(sign);
 
 		//先验证私钥是否正确
-		if (!Sign.verify(credentials.getEcKeyPair().getPublicKey(), sign, transaction.toSignString())) {
+		if (!Sign.verify(credentials.getEcKeyPair().getPublicKey(), sign, message.toSigned())) {
 			throw new RuntimeException("私钥签名验证失败，非法的私钥");
 		}
 		// 加入交易池，等待打包
-		transactionPool.addTransaction(transaction);
+		messagePool.pendingMessage(message);
 
 		if (appConfig.isNodeDiscover()) {
 			//触发交易事件，向全网广播交易，并等待确认
-			ApplicationContextProvider.publishEvent(new NewTransactionEvent(transaction));
+			ApplicationContextProvider.publishEvent(new NewTransactionEvent(message));
 		}
-		return transaction;
+		return message;
 	}
 
 	/**
@@ -122,7 +120,8 @@ public class BlockChain {
 	 * @return
 	 */
 	public Optional<Block> getLastBlock() {
-		return dbAccess.getLastBlock();
+//		return dataStore.getLastBlock();
+		return Optional.empty();
 	}
 
 	/**
@@ -135,6 +134,6 @@ public class BlockChain {
 
 		appClient.addNode(ip, port);
 		Node node = new Node(ip, port);
-		dbAccess.addNode(node);
+//		dataStore.addNode(node);
 	}
 }

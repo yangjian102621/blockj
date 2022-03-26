@@ -1,4 +1,4 @@
-package org.rockyang.jblock.account;
+package org.rockyang.jblock.chain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

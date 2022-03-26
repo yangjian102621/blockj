@@ -1,6 +1,6 @@
 package org.rockyang.jblock.web.vo.res;
 
-import org.rockyang.jblock.account.Account;
+import org.rockyang.jblock.chain.Account;
 
 /**
  * account VO

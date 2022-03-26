@@ -5,19 +5,20 @@ package org.rockyang.jblock.enums;
  * @author yangjian
  * @since 18-4-16
  */
-public enum  TransactionStatusEnum {
+public enum MessageStatus {
 
 	// 交易已确认，交易成功
-	SUCCESS("Success", 1),
+	SUCCESS("Success", 0),
 	// 交易待确认
-	APPENDING("Appending", 0),
+	APPENDING("Appending", 1),
+	INVALID_SIGN("Invalid signature", 2),
 	// 交易确认失败
-	FAIL("Fail", -1);
+	FAIL("Invalid Message", -1);
 
-	private String key;
-	private int value;
+	private final String key;
+	private final int value;
 
-	TransactionStatusEnum(String key, int value) {
+	MessageStatus(String key, int value) {
 		this.key = key;
 		this.value = value;
 	}
@@ -26,15 +27,8 @@ public enum  TransactionStatusEnum {
 		return key;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
-	}
-
 	public int getValue() {
 		return value;
 	}
 
-	public void setValue(int value) {
-		this.value = value;
-	}
 }

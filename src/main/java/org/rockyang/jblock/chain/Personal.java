@@ -1,8 +1,8 @@
-package org.rockyang.jblock.account;
+package org.rockyang.jblock.chain;
 
 import org.rockyang.jblock.crypto.ECKeyPair;
 import org.rockyang.jblock.crypto.Keys;
-import org.rockyang.jblock.db.DBAccess;
+import org.rockyang.jblock.db.Datastore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 public class Personal {
 
 	@Autowired
-	private DBAccess dbAccess;
+	private Datastore dataStore;
 
 	/**
 	 * 创建一个默认账户
@@ -37,7 +37,7 @@ public class Personal {
 	public Account newAccount(ECKeyPair keyPair)
 	{
 		Account account = new Account(keyPair.getAddress(), keyPair.exportPrivateKey(), BigDecimal.ZERO);
-		dbAccess.putAccount(account); // 存储账户
+//		dataStore.putAccount(account); // 存储账户
 		return account;
 	}
 }

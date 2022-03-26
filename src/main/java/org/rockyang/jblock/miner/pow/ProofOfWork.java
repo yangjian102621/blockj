@@ -1,7 +1,7 @@
-package org.rockyang.jblock.mine.pow;
+package org.rockyang.jblock.miner.pow;
 
 import org.apache.commons.lang3.StringUtils;
-import org.rockyang.jblock.core.Block;
+import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.crypto.Hash;
 import org.rockyang.jblock.utils.ByteUtils;
 import org.rockyang.jblock.utils.Numeric;

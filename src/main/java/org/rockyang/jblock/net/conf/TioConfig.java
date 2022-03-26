@@ -17,7 +17,7 @@ import org.tio.server.TioServerConfig;
  * @since 18-4-18
  */
 @Configuration
-public class GroupContextConfig {
+public class TioConfig {
 
 	@Autowired
 	TioProps tioProps;
@@ -51,7 +51,7 @@ public class GroupContextConfig {
 	 * @return
 	 */
 	@Bean
-	public TioClientConfig clientGroupContext() {
+	public TioClientConfig clientConfig() {
 
 		//断链后自动连接
 		ReconnConf reconnConf = new ReconnConf(5000L, 20);
@@ -66,7 +66,7 @@ public class GroupContextConfig {
 	 * @return
 	 */
 	@Bean
-	public TioServerConfig serverGroupContext() {
+	public TioServerConfig serverConfig() {
 
 		TioServerConfig serverGroupContext = new TioServerConfig(
 				tioProps.getServerGroupContextName(),

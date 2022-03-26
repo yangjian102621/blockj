@@ -1,6 +1,6 @@
 package org.rockyang.jblock.event;
 
-import org.rockyang.jblock.core.Transaction;
+import org.rockyang.jblock.chain.Message;
 import org.springframework.context.ApplicationEvent;
 
 /**
@@ -9,8 +9,8 @@ import org.springframework.context.ApplicationEvent;
  */
 public class NewTransactionEvent extends ApplicationEvent {
 
-    public NewTransactionEvent(Transaction transaction) {
-        super(transaction);
+    public NewTransactionEvent(Message message) {
+        super(message);
     }
 
 }

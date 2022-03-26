@@ -1,7 +1,7 @@
 package org.rockyang.jblock.net.client;
 
 import org.rockyang.jblock.conf.AppConfig;
-import org.rockyang.jblock.db.DBAccess;
+import org.rockyang.jblock.db.Datastore;
 import org.rockyang.jblock.event.FetchNextBlockEvent;
 import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.rockyang.jblock.net.base.MessagePacket;
@@ -20,10 +20,7 @@ import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
 import org.tio.core.Tio;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * 客户端启动程序
@@ -40,7 +37,7 @@ public class AppClient {
 
 	private TioClient client;
 	@Autowired
-	private DBAccess dbAccess;
+	private Datastore dataStore;
 	@Autowired
 	AppConfig appConfig;
 
@@ -49,28 +46,28 @@ public class AppClient {
 	/**
 	 * 网络客户端程序入口
 	 */
-	@PostConstruct
+	//@PostConstruct
 	public void clientStart() throws Exception {
 
-		// 这里判断是否启用节点发现，如果没有则以单机节点运行，不去尝试连接种子节点
-		if (!appConfig.isNodeDiscover()) {
-			return;
-		}
-
-		client = new TioClient(clientConfig);
-		//加载数据库中的节点数据
-		Optional<List<Node>> nodeList = dbAccess.getNodeList();
-		List<Node> nodes = null;
-		if (nodeList.isPresent()) {
-			nodes = nodeList.get();
-			//初始化配置 properties 中的节点
-		} else if (null != tioProps.getNodes()) {
-			nodes = tioProps.getNodes();
-		}
-		// 添加节点
-		for (Node node : nodes) {
-			connectNode(node);
-		}
+//		// 这里判断是否启用节点发现，如果没有则以单机节点运行，不去尝试连接种子节点
+//		if (!appConfig.isNodeDiscover()) {
+//			return;
+//		}
+//
+//		client = new TioClient(clientConfig);
+//		//加载数据库中的节点数据
+//		Optional<List<Node>> nodeList = dataStore.getNodeList();
+//		List<Node> nodes = null;
+//		if (nodeList.isPresent()) {
+//			nodes = nodeList.get();
+//			//初始化配置 properties 中的节点
+//		} else if (null != tioProps.getNodes()) {
+//			nodes = tioProps.getNodes();
+//		}
+//		// 添加节点
+//		for (Node node : nodes) {
+//			connectNode(node);
+//		}
 	}
 
 	/**
@@ -94,18 +91,18 @@ public class AppClient {
 	 */
 	public void addNode(String serverIp, int port) throws Exception
 	{
-		if (!appConfig.isNodeDiscover()) {
-			return;
-		}
-		Node node = new Node(serverIp, port);
-		// determine if the node is already exists
-		Optional<List<Node>> nodeList = dbAccess.getNodeList();
-		if (nodeList.isPresent() && nodeList.get().contains(node)) {
-			return;
-		}
-		if (dbAccess.addNode(node)) {
-			connectNode(node);
-		}
+//		if (!appConfig.isNodeDiscover()) {
+//			return;
+//		}
+//		Node node = new Node(serverIp, port);
+//		// determine if the node is already exists
+//		Optional<List<Node>> nodeList = dataStore.getNodeList();
+//		if (nodeList.isPresent() && nodeList.get().contains(node)) {
+//			return;
+//		}
+//		if (dataStore.addNode(node)) {
+//			connectNode(node);
+//		}
 	}
 
 	/**

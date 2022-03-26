@@ -2,11 +2,11 @@ package org.rockyang.jblock.web.controller.api;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.rockyang.jblock.account.Account;
-import org.rockyang.jblock.account.Personal;
+import org.rockyang.jblock.chain.Account;
+import org.rockyang.jblock.chain.Personal;
 import org.rockyang.jblock.crypto.ECKeyPair;
 import org.rockyang.jblock.crypto.Keys;
-import org.rockyang.jblock.db.DBAccess;
+import org.rockyang.jblock.db.Datastore;
 import org.rockyang.jblock.utils.JsonVo;
 import org.rockyang.jblock.web.vo.res.AccountVo;
 import org.springframework.beans.BeanUtils;
@@ -14,9 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * @author yangjian
@@ -30,7 +27,7 @@ public class AccountController {
 	@Autowired
 	private Personal personal;
 	@Autowired
-	private DBAccess dbAccess;
+	private Datastore dataStore;
 
 	/**
 	 * 创建账户
@@ -57,14 +54,14 @@ public class AccountController {
 	@GetMapping("/get_miner_address")
 	public JsonVo getMinerAddress()
 	{
-		Optional<Account> minerAccount = dbAccess.getMinerAccount();
-		JsonVo success = JsonVo.success();
-		if (minerAccount.isPresent()) {
-			success.setItem(minerAccount.get());
-		} else {
-			success.setMessage("Miner account is not created");
-		}
-		return success;
+//		Optional<Account> minerAccount = dataStore.getMinerAccount();
+//		JsonVo success = JsonVo.success();
+//		if (minerAccount.isPresent()) {
+//			success.setItem(minerAccount.get());
+//		} else {
+//			success.setMessage("Miner account is not created");
+//		}
+		return JsonVo.success();
 	}
 
 	/**
@@ -75,9 +72,9 @@ public class AccountController {
 	@ApiOperation(value = "获取当前节点所有钱包账户")
 	public JsonVo getAllAccounts()
 	{
-		List<Account> accounts = dbAccess.getAllAccounts();
-		JsonVo success = JsonVo.success();
-		success.setItem(accounts);
-		return success;
+//		List<Account> accounts = dataStore.getAllAccounts();
+//		JsonVo success = JsonVo.success();
+//		success.setItem(accounts);
+		return JsonVo.success();
 	}
 }

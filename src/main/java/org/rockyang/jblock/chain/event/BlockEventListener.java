@@ -1,7 +1,7 @@
-package org.rockyang.jblock.listener;
+package org.rockyang.jblock.chain.event;
 
-import org.rockyang.jblock.core.Block;
-import org.rockyang.jblock.db.DBAccess;
+import org.rockyang.jblock.chain.Block;
+import org.rockyang.jblock.db.Datastore;
 import org.rockyang.jblock.event.BlockConfirmNumEvent;
 import org.rockyang.jblock.event.FetchNextBlockEvent;
 import org.rockyang.jblock.event.NewBlockEvent;
@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 /**
  * 区块事件监听器
  * @author yangjian
@@ -28,7 +26,7 @@ public class BlockEventListener {
 	@Autowired
 	private AppClient appClient;
 	@Autowired
-	private DBAccess dbAccess;
+	private Datastore dataStore;
 	private static Logger logger = LoggerFactory.getLogger(BlockEventListener.class);
 
 	/**
@@ -53,19 +51,19 @@ public class BlockEventListener {
 	@EventListener(FetchNextBlockEvent.class)
 	public void fetchNextBlock(FetchNextBlockEvent event) {
 
-		logger.info("++++++++++++++++++++++++++++++ 开始群发信息获取 next Block +++++++++++++++++++++++++++++++++");
-		Integer blockIndex = (Integer) event.getSource();
-		if (blockIndex == 0) {
-			Optional<Object> lastBlockIndex = dbAccess.getLastBlockIndex();
-			if (lastBlockIndex.isPresent()) {
-				blockIndex = (Integer) lastBlockIndex.get();
-			}
-		}
-		MessagePacket messagePacket = new MessagePacket();
-		messagePacket.setType(MessagePacketType.REQ_SYNC_NEXT_BLOCK);
-		messagePacket.setBody(SerializeUtils.serialize(blockIndex+1));
-		//群发消息，从群组节点去获取下一个区块
-		appClient.sendGroup(messagePacket);
+//		logger.info("++++++++++++++++++++++++++++++ 开始群发信息获取 next Block +++++++++++++++++++++++++++++++++");
+//		Integer blockIndex = (Integer) event.getSource();
+//		if (blockIndex == 0) {
+//			Optional<Object> lastBlockIndex = dataStore.getLastBlockIndex();
+//			if (lastBlockIndex.isPresent()) {
+//				blockIndex = (Integer) lastBlockIndex.get();
+//			}
+//		}
+//		MessagePacket messagePacket = new MessagePacket();
+//		messagePacket.setType(MessagePacketType.REQ_SYNC_NEXT_BLOCK);
+//		messagePacket.setBody(SerializeUtils.serialize(blockIndex+1));
+//		//群发消息，从群组节点去获取下一个区块
+//		appClient.sendGroup(messagePacket);
 	}
 
 	@EventListener(BlockConfirmNumEvent.class)
