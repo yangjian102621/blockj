@@ -69,8 +69,8 @@ public class ProofOfWork {
      * @return
      */
     public boolean validate() {
-        byte[] data = this.prepareData(this.getBlock().getHeader().getNonce());
-        return new BigInteger(Hash.sha3String(data), 16).compareTo(this.target) == -1;
+        byte[] data = this.prepareData(this.getBlock().getNonce());
+        return new BigInteger(Hash.sha3String(data), 16).compareTo(this.target) < 0;
     }
 
     /**
@@ -82,20 +82,19 @@ public class ProofOfWork {
      */
     private byte[] prepareData(long nonce) {
         byte[] prevBlockHashBytes = {};
-        if (StringUtils.isNotBlank(this.getBlock().getHeader().getPreviousHash())) {
+        if (StringUtils.isNotBlank(this.getBlock().getPreviousHash())) {
             //这里要去掉 hash 值的　0x 前缀， 否则会抛出异常
-            String prevHash = Numeric.cleanHexPrefix(this.getBlock().getHeader().getPreviousHash());
+            String prevHash = Numeric.cleanHexPrefix(this.getBlock().getPreviousHash());
             prevBlockHashBytes = new BigInteger(prevHash, 16).toByteArray();
         }
 
         return ByteUtils.merge(
                 prevBlockHashBytes,
-                ByteUtils.toBytes(this.getBlock().getHeader().getTimestamp()),
+                ByteUtils.toBytes(this.getBlock().getTimestamp()),
                 ByteUtils.toBytes(TARGET_BITS),
                 ByteUtils.toBytes(nonce)
         );
     }
-
 
     public Block getBlock() {
         return block;

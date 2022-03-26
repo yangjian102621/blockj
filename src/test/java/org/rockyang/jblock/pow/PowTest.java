@@ -3,7 +3,7 @@ package org.rockyang.jblock.pow;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rockyang.jblock.Application;
-import org.rockyang.jblock.chain.Personal;
+import org.rockyang.jblock.chain.Wallet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class PowTest {
 	static Logger logger = LoggerFactory.getLogger(PowTest.class);
 
 	@Autowired
-	private Personal personal;
+	private Wallet wallet;
 
 	@Test
 	public void run() throws Exception {

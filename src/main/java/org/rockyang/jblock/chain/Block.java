@@ -19,8 +19,10 @@ public class Block implements Serializable {
 	// PoW 问题的答案
 	private Long nonce;
 	private Long timestamp;
-	private String cid;
-	private String parentCid;
+	// current block hash value
+	private String hash;
+	//  previous block hash value
+	private String previousHash;
 	// block message
 	private List<Message> messages;
 	// signature for current block
@@ -32,6 +34,7 @@ public class Block implements Serializable {
 
 	public Block() {
 		this.messages = new ArrayList<>();
+		timestamp = System.currentTimeMillis();
 	}
 
 	public List<Message> getMessages() {
@@ -82,24 +85,24 @@ public class Block implements Serializable {
 		this.timestamp = timestamp;
 	}
 
-	public String getCid()
+	public String getHash()
 	{
-		return cid;
+		return hash;
 	}
 
-	public void setCid(String cid)
+	public void setHash(String hash)
 	{
-		this.cid = cid;
+		this.hash = hash;
 	}
 
-	public String getParentCid()
+	public String getPreviousHash()
 	{
-		return parentCid;
+		return previousHash;
 	}
 
-	public void setParentCid(String parentCid)
+	public void setPreviousHash(String previousHash)
 	{
-		this.parentCid = parentCid;
+		this.previousHash = previousHash;
 	}
 
 	public void setMessages(List<Message> messages)
@@ -124,8 +127,8 @@ public class Block implements Serializable {
 				", difficulty=" + difficulty +
 				", nonce=" + nonce +
 				", timestamp=" + timestamp +
-				", cid='" + cid + '\'' +
-				", parentCid='" + parentCid + '\'' +
+				", hash='" + hash + '\'' +
+				", previousHash='" + previousHash + '\'' +
 				", messages=" + buildMessageSign() +
 				'}';
 	}
@@ -139,9 +142,16 @@ public class Block implements Serializable {
 		return builder.toString();
 	}
 
-	// generate block CID
-	public String genBlockCid()
+	// generate block hash
+	public String genBlockHash()
 	{
-		return Hash.sha3(this.toSigned());
+		return Hash.sha3("BlockBody{" +
+				"height=" + height +
+				", difficulty=" + difficulty +
+				", nonce=" + nonce +
+				", timestamp=" + timestamp +
+				", previousHash='" + previousHash + '\'' +
+				", messages=" + buildMessageSign() +
+				'}');
 	}
 }

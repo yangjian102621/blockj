@@ -101,17 +101,17 @@ public class RocksDatastore implements Datastore {
 	public void putBlock(Block block)
 	{
 		// save block
-		put(block.getCid(), block);
+		put(block.getHash(), block);
 		// save all messages in block
 		block.getMessages().forEach(message -> {
-			put(MESSAGE_KEY_PREFIX + message.getCid(), block.getCid());
+			put(MESSAGE_KEY_PREFIX + message.getCid(), block.getHash());
 		});
 	}
 
 	@Override
-	public Block getBlock(String blockCid)
+	public Block getBlock(String blockHash)
 	{
-		Optional<Object> o = get(blockCid);
+		Optional<Object> o = get(blockHash);
 		return (Block) o.orElse(null);
 	}
 
@@ -120,7 +120,7 @@ public class RocksDatastore implements Datastore {
 	{
 		String key = String.format("blocks/%d",height);
 		Optional<Object> o = get(key);
-		return o.map(cid -> getBlock(String.valueOf(cid))).orElse(null);
+		return o.map(blockHash -> getBlock(String.valueOf(blockHash))).orElse(null);
 	}
 
 	@Override

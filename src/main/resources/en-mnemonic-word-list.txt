@@ -10,7 +10,7 @@ absurd
 abuse
 access
 accident
-account
+wallet
 accuse
 achieve
 acid

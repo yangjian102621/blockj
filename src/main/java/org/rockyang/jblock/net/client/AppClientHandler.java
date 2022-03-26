@@ -163,21 +163,21 @@ public class AppClientHandler extends BaseHandler implements TioClientHandler {
 
 		if (responseVo.isSuccess()) {
 			synchronized (this) {
-				Integer confirmedCounter = confirmedBlocks.get(newBlock.getCid());
+				Integer confirmedCounter = confirmedBlocks.get(newBlock.getHash());
 				if (null == confirmedCounter) {
 					// 执行区块中的交易
 					executor.run(newBlock);
 					confirmedCounter = 0;
 				}
 				// 更新当前区块确认数
-				newBlock.setConfirmNum(confirmedCounter+1);
-				confirmedBlocks.put(newBlock.getHeader().getHash(), confirmedCounter+1);
+//				newBlock.setConfirmNum(confirmedCounter+1);
+				confirmedBlocks.put(newBlock.getHash(), confirmedCounter+1);
 				// 更新数据库
 				dataStore.putBlock(newBlock);
 				logger.info("区块确认成功, {}", newBlock);
 
 				// 同步其他节点的区块确认数
-				ApplicationContextProvider.publishEvent(new BlockConfirmNumEvent(newBlock.getHeader().getIndex()));
+				ApplicationContextProvider.publishEvent(new BlockConfirmNumEvent(newBlock.getHeight()));
 			}
 		} else {
 			logger.error("区块确认失败, {}, {}", responseVo.getMessage(), newBlock);

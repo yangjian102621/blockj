@@ -32,9 +32,9 @@ __这个很简单, 直接像运行普通的 SpringBoot 项目一样运行就好�
  
  API名称 | 请求方式 | URL 
  --------|---------|------
- 生成钱包 | POST | /api/account/new_account
- 查看钱包列表 | GET | /api/account/list
- 获取挖矿账号 | GET | /api/account/get_miner_address
+ 生成钱包 | POST | /api/wallet/new_account
+ 查看钱包列表 | GET | /api/wallet/list
+ 获取挖矿账号 | GET | /api/wallet/get_miner_address
  启动挖矿 | GET | /api/chain/mining
  发送交易 | POST | /api/chain/send_transactions
  查看最后一个区块 | GET | /api/chain/block/head

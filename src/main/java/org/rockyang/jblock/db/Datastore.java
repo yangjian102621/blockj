@@ -16,11 +16,11 @@ public interface Datastore {
 	// get chain head block
 	String chainHead();
 
-	void setChainHead(String blockCid);
+	void setChainHead(String blockHash);
 
 	void putBlock(Block block);
 
-	Block getBlock(String blockCid);
+	Block getBlock(String blockHash);
 	Block getBlockByHeight(int height);
 
 	Message getMessage(String Cid);

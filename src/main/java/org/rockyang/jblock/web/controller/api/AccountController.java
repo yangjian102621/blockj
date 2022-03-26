@@ -2,14 +2,8 @@ package org.rockyang.jblock.web.controller.api;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.rockyang.jblock.chain.Account;
-import org.rockyang.jblock.chain.Personal;
-import org.rockyang.jblock.crypto.ECKeyPair;
-import org.rockyang.jblock.crypto.Keys;
 import org.rockyang.jblock.db.Datastore;
 import org.rockyang.jblock.utils.JsonVo;
-import org.rockyang.jblock.web.vo.res.AccountVo;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccountController {
 
 	@Autowired
-	private Personal personal;
-	@Autowired
 	private Datastore dataStore;
 
 	/**
@@ -37,13 +29,14 @@ public class AccountController {
 	@GetMapping("/new_account")
 	public JsonVo newAccount() throws Exception
 	{
-		ECKeyPair keyPair = Keys.createEcKeyPair();
-		Account account = personal.newAccount(keyPair);
-		AccountVo vo = new AccountVo();
-		BeanUtils.copyProperties(account, vo);
-		return new JsonVo(JsonVo.CODE_SUCCESS,
-				"New account created, please remember your Address and Private Key.",
-				vo);
+//		ECKeyPair keyPair = Keys.createEcKeyPair();
+//		Wallet wallet = this.wallet.newAccount(keyPair);
+//		WalletVo vo = new WalletVo();
+//		BeanUtils.copyProperties(wallet, vo);
+//		return new JsonVo(JsonVo.CODE_SUCCESS,
+//				"New account created, please remember your Address and Private Key.",
+//				vo);
+		return JsonVo.success();
 	}
 
 	/**

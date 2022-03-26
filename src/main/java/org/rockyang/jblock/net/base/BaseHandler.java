@@ -107,8 +107,8 @@ public abstract class BaseHandler {
 	public boolean checkBlock(Block block, Datastore dataStore) {
 
 		//创世区块
-		if (block.getHeader().getIndex() == 1) {
-			return Objects.equal(block.getHeader().getHash(), block.getHeader().hash());
+		if (block.getHeight() == 1) {
+			return Objects.equal(block.getHash(), block.genBlockHash());
 		}
 
 		boolean blockValidate = false;

@@ -1,7 +1,6 @@
 package org.rockyang.jblock.miner.pow;
 
 import org.rockyang.jblock.chain.Block;
-import org.rockyang.jblock.chain.BlockHeader;
 import org.rockyang.jblock.db.Datastore;
 import org.rockyang.jblock.miner.Miner;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,12 +68,11 @@ public class PowMiner implements Miner {
 	 */
 	private Block createGenesisBlock() {
 
-		BlockHeader header = new BlockHeader(1, null);
-		header.setNonce(PowMiner.GENESIS_BLOCK_NONCE);
-		header.setDifficulty(ProofOfWork.getTarget());
-		header.setHash(header.hash());
-		Block body = new Block();
-		return new Block(header, body);
+		Block block = new Block();
+		block.setNonce(PowMiner.GENESIS_BLOCK_NONCE);
+		block.setDifficulty(ProofOfWork.getTarget());
+		block.setHash(block.genBlockHash());
+		return block;
 	}
 
 	@Override
