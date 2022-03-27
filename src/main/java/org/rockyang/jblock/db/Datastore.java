@@ -25,6 +25,7 @@ public interface Datastore {
 	Block getBlockByHeight(int height);
 
 	Wallet getWallet(String address);
+	void putWallet(Wallet wallet);
 
 	Message getMessage(String Cid);
 

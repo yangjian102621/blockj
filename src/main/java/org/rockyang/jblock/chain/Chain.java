@@ -5,7 +5,6 @@ import org.rockyang.jblock.crypto.Credentials;
 import org.rockyang.jblock.crypto.Sign;
 import org.rockyang.jblock.db.Datastore;
 import org.rockyang.jblock.enums.MessageStatus;
-import org.rockyang.jblock.event.NewBlockEvent;
 import org.rockyang.jblock.event.NewTransactionEvent;
 import org.rockyang.jblock.miner.Miner;
 import org.rockyang.jblock.net.ApplicationContextProvider;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
 import java.util.Optional;
 
 /**
@@ -38,20 +36,19 @@ public class Chain {
 		this.messageExecutor = messageExecutor;
 	}
 
-	public Block mineOne() throws Exception {
+	public void mineOne() throws Exception {
 
-		Optional<Block> lastBlock = getLastBlock();
-		Block block = miner.mineOne(lastBlock);
-		for (Iterator t = messagePool.getTransactions().iterator(); t.hasNext();) {
-			block.addMessage((Message) t.next());
-			t.remove(); // 已打包的交易移出交易池
-		}
-//		// 存储区块
-//		datastore.chainHead(block.getHeader().getIndex());
-//		datastore.putBlock(block);
-		logger.info("Find a New Block, {}", block);
-		ApplicationContextProvider.publishEvent(new NewBlockEvent(block));
-		return block;
+//		Block block = miner.mineOne();
+//		for (Iterator t = messagePool.getTransactions().iterator(); t.hasNext();) {
+//			block.addMessage((Message) t.next());
+//			t.remove(); // 已打包的交易移出交易池
+//		}
+////		// 存储区块
+////		datastore.chainHead(block.getHeader().getIndex());
+////		datastore.putBlock(block);
+//		logger.info("Find a New Block, {}", block);
+//		ApplicationContextProvider.publishEvent(new NewBlockEvent(block));
+//		return block;
 	}
 
 	/**

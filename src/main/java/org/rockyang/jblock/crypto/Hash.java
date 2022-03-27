@@ -28,7 +28,7 @@ public class Hash {
         return Numeric.toHexString(result);
     }
 
-    public static String sha3String(byte[] input) {
+    public static String sha256Hex(byte[] input) {
 
         return DigestUtils.sha256Hex(input);
     }

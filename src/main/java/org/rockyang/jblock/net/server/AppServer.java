@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.tio.server.TioServer;
 import org.tio.server.TioServerConfig;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 /**
@@ -14,12 +15,19 @@ import java.io.IOException;
 @Component
 public class AppServer {
 
+	private TioServerConfig serverConfig;
 	@Value("${tio.server.address}")
 	private String address;
 	@Value("${tio.server.port}")
 	private int port;
 
-	public AppServer(TioServerConfig serverConfig) throws IOException
+	public AppServer(TioServerConfig serverConfig)
+	{
+		this.serverConfig = serverConfig;
+	}
+
+	@PostConstruct
+	public void start() throws IOException
 	{
 		TioServer server = new TioServer(serverConfig);
 		server.start(address, port);

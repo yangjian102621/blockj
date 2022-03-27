@@ -211,7 +211,7 @@ public final class Numeric {
     }
 
     public static String toHexString(byte[] input) {
-        return toHexString(input, 0, input.length, true);
+        return toHexString(input, 0, input.length, false);
     }
 
     public static byte asByte(int m, int n) {

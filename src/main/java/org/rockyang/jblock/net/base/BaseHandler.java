@@ -1,9 +1,7 @@
 package org.rockyang.jblock.net.base;
 
-import com.google.common.base.Objects;
 import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.db.Datastore;
-import org.rockyang.jblock.miner.pow.ProofOfWork;
 import org.tio.core.ChannelContext;
 import org.tio.core.TioConfig;
 import org.tio.core.exception.TioDecodeException;
@@ -107,25 +105,26 @@ public abstract class BaseHandler {
 	public boolean checkBlock(Block block, Datastore dataStore) {
 
 		//创世区块
-		if (block.getHeight() == 1) {
-			return Objects.equal(block.getHash(), block.genBlockHash());
-		}
-
-		boolean blockValidate = false;
-//		if (block.getHeader().getIndex() > 1) {
-//			Optional<Block> prevBlock = dataStore.getBlock(block.getHeader().getIndex()-1);
-//			if (prevBlock.isPresent()
-//					&& prevBlock.get().getHeader().getHash().equals(block.getHeader().getPreviousHash())) {
-//				blockValidate = true;
-//			}
+//		if (block.getHeight() == 1) {
+//			return Objects.equal(block.getHash(), block.genBlockHash());
 //		}
-		//检查是否符合工作量证明
-		ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block);
-		if (!proofOfWork.validate()) {
-			blockValidate = false;
-		}
-
-		return blockValidate;
+//
+//		boolean blockValidate = false;
+////		if (block.getHeader().getIndex() > 1) {
+////			Optional<Block> prevBlock = dataStore.getBlock(block.getHeader().getIndex()-1);
+////			if (prevBlock.isPresent()
+////					&& prevBlock.get().getHeader().getHash().equals(block.getHeader().getPreviousHash())) {
+////				blockValidate = true;
+////			}
+////		}
+//		//检查是否符合工作量证明
+//		ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block);
+//		if (!proofOfWork.validate()) {
+//			blockValidate = false;
+//		}
+//
+//		return blockValidate;
+		return true;
 	}
 
 

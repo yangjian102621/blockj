@@ -1,6 +1,7 @@
 package org.rockyang.jblock.db;
 
 import org.junit.Test;
+import org.rockyang.jblock.conf.MinerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,7 @@ public class RocksDbTest {
 	static Logger logger = LoggerFactory.getLogger(RocksDbTest.class);
 
 	static final String KEY = "test-data";
-	private static final Datastore datastore = new RocksDatastore();
+	private static final Datastore datastore = new RocksDatastore(new MinerConfig());
 
 	@Test
 	public void put()

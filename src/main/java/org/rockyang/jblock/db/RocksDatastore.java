@@ -6,6 +6,7 @@ import org.rocksdb.RocksDBException;
 import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.Message;
 import org.rockyang.jblock.chain.Wallet;
+import org.rockyang.jblock.conf.MinerConfig;
 import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,18 +29,17 @@ public class RocksDatastore implements Datastore {
 	public final static String MESSAGE_KEY_PREFIX = "message/";
 
 	private RocksDB datastore;
+	private MinerConfig minerConfig;
 
-	public RocksDatastore() {
+	public RocksDatastore(MinerConfig config) {
+		this.minerConfig = config;
 		// load base dir from
-		String dataPath = System.getProperty("JBLOCK_PATH");
-		if (dataPath == null) {
-			dataPath = System.getProperty("user.home")+"/.jblock/datastore";
-		}
+		String dataPath = String.format("%s/datastore", minerConfig.getRepo());
 		try {
 			File directory = new File(dataPath);
 			if (!directory.exists()) {
 				if (!directory.mkdirs()) {
-					throw new FileNotFoundException("");
+					throw new FileNotFoundException(dataPath);
 				}
 			}
 			datastore = RocksDB.open(new Options().setCreateIfMissing(true), dataPath);
@@ -52,7 +52,7 @@ public class RocksDatastore implements Datastore {
 	public String chainHead()
 	{
 		Optional<Object> o = get(CHAIN_HEAD_KEY);
-		return String.valueOf(o);
+		return String.valueOf(o.get());
 	}
 
 	@Override
@@ -93,19 +93,19 @@ public class RocksDatastore implements Datastore {
 	}
 
 	@Override
-	public void setChainHead(String blockCid)
+	public void setChainHead(String blockHash)
 	{
-		put(CHAIN_HEAD_KEY, blockCid);
+		put(CHAIN_HEAD_KEY, blockHash);
 	}
 
 	@Override
 	public void putBlock(Block block)
 	{
 		// save block
-		put(block.getHash(), block);
+		put(block.getHeader().getHash(), block);
 		// save all messages in block
 		block.getMessages().forEach(message -> {
-			put(MESSAGE_KEY_PREFIX + message.getCid(), block.getHash());
+			put(MESSAGE_KEY_PREFIX + message.getCid(), block.getHeader().getHash());
 		});
 	}
 
@@ -130,6 +130,13 @@ public class RocksDatastore implements Datastore {
 		String key = String.format("wallets/%s",address);
 		Optional<Object> o = get(key);
 		return (Wallet) o.orElse(null);
+	}
+
+	@Override
+	public void putWallet(Wallet wallet)
+	{
+		String key = String.format("wallets/%s",wallet.getAddress());
+		put(key, wallet);
 	}
 
 	@Override
