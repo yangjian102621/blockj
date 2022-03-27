@@ -1,71 +1,66 @@
 package org.rockyang.jblock.miner.pow;
 
 import org.rockyang.jblock.chain.Block;
+import org.rockyang.jblock.chain.Message;
+import org.rockyang.jblock.chain.Wallet;
 import org.rockyang.jblock.db.Datastore;
 import org.rockyang.jblock.miner.Miner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 /**
- * PoW 挖矿算法实现
+ * The PoW algorithm implements
  * @author yangjian
- * @since 18-4-13
  */
 @Component
 public class PowMiner implements Miner {
 
-	@Autowired
-	private Datastore dataStore;
+	// the genesis block nonce value
+	public static final Long GENESIS_BLOCK_NONCE = 100000L;
+	private Datastore datastore;
 
-	@Override
-	public Block newBlock(java.util.Optional<Block> block) {
-
-		//获取挖矿账户
-//		Account account;
-//		Optional<Account> minerAccount = dataStore.getMinerAccount();
-//		if (minerAccount.isEmpty()) {
-//			throw new RuntimeException("没有找到挖矿账户，请先创建挖矿账户.");
-//		}
-//		Block newBlock;
-//		if (block.isPresent()) {
-//			Block prev = block.get();
-//			BlockHeader header = new BlockHeader(prev.getHeader().getIndex()+1, prev.getHeader().getHash());
-//			BlockBody body = new BlockBody();
-//			newBlock = new Block(header, body);
-//		} else {
-//			//创建创世区块
-//			newBlock = createGenesisBlock();
-//		}
-//		//创建挖矿奖励交易
-//		Message message = new Message();
-//
-//		account = minerAccount.get();
-//		message.setTo(account.getAddress());
-//		message.setData("Miner Reward.");
-//		message.setTxHash(message.hash());
-//		message.setAmount(Miner.MINING_REWARD);
-//
-//		//如果不是创世区块，则使用工作量证明挖矿
-//		if (block.isPresent()) {
-//			ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(newBlock);
-//			PowResult result = proofOfWork.run();
-//			newBlock.getHeader().setDifficulty(result.getTarget());
-//			newBlock.getHeader().setNonce(result.getNonce());
-//			newBlock.getHeader().setHash(result.getHash());
-//		}
-//		newBlock.getBody().addTransaction(message);
-//
-//		//更新最后一个区块索引
-//		dataStore.putLastBlockIndex(newBlock.getHeader().getIndex());
-//		return newBlock;
-
-		return new Block();
+	public PowMiner(Datastore datastore)
+	{
+		this.datastore = datastore;
 	}
 
-	/**
-	 * 创建创世区块
-	 * @return
-	 */
+	@Override
+	public Block mineOne(Optional<Block> preBlock) {
+
+		// fetch the miner key
+		Optional<Object> minerAddr = datastore.get(MINER_ADDR_KEY);
+		if (minerAddr.isEmpty()) {
+			throw new RuntimeException("No miner address set.");
+		}
+		Wallet minerKey = datastore.getWallet(minerAddr.get().toString());
+		if (minerKey == null) {
+			throw new RuntimeException("No miner address set.");
+		}
+
+		Block newBlock = preBlock.map(block -> new Block(block.getHeight(), block.getHash())).orElseGet(this::createGenesisBlock);
+		// create a message for miner reward
+		Message message = new Message();
+		message.setFrom(Miner.REWARD_ADDR);
+		message.setTo(minerKey.getAddress());
+		message.setParams("Miner Reward.");
+		message.setCid(message.getCid());
+		message.setValue(Miner.MINING_REWARD);
+
+		// run the proof of work, and get the result
+		if (preBlock.isPresent()) {
+			ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(newBlock);
+			PowResult result = proofOfWork.run();
+			newBlock.setDifficulty(result.getTarget());
+			newBlock.setNonce(result.getNonce());
+			newBlock.setHash(result.getHash());
+		}
+		newBlock.addMessage(message);
+
+		return newBlock;
+	}
+
+	// create the genesis block
 	private Block createGenesisBlock() {
 
 		Block block = new Block();

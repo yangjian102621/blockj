@@ -7,7 +7,6 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.stereotype.Component;
 
 /**
- * 应用程序上下文管理器
  * @author yangjian
  */
 @Component

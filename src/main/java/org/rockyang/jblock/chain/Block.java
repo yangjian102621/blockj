@@ -18,7 +18,7 @@ public class Block implements Serializable {
 	private BigInteger difficulty;
 	// PoW 问题的答案
 	private Long nonce;
-	private Long timestamp;
+	private Long timestamp = System.currentTimeMillis();
 	// current block hash value
 	private String hash;
 	//  previous block hash value
@@ -31,10 +31,13 @@ public class Block implements Serializable {
 	public Block(List<Message> messages) {
 		this.messages = messages;
 	}
-
+	public Block(int height, String previousHash)
+	{
+		this.height = height;
+		this.previousHash = previousHash;
+	}
 	public Block() {
 		this.messages = new ArrayList<>();
-		timestamp = System.currentTimeMillis();
 	}
 
 	public List<Message> getMessages() {

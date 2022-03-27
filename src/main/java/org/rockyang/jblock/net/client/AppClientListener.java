@@ -1,12 +1,14 @@
 package org.rockyang.jblock.net.client;
 
 import org.rockyang.jblock.db.Datastore;
-import org.rockyang.jblock.net.conf.TioProps;
+import org.rockyang.jblock.net.conf.TioConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.tio.client.intf.TioClientListener;
 import org.tio.core.ChannelContext;
+import org.tio.core.Node;
+import org.tio.core.Tio;
 import org.tio.core.intf.Packet;
 
 /**
@@ -16,31 +18,29 @@ import org.tio.core.intf.Packet;
  * @author yangjian
  */
 @Component
-public class AppClientAioListener implements TioClientListener {
+public class AppClientListener implements TioClientListener {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(AppClientListener.class);
 
-    final TioProps tioProps;
 
-    private final Datastore dataStore;
+    private Datastore datastore;
 
-    public AppClientAioListener(Datastore dataStore, TioProps tioProps)
+    public AppClientListener(Datastore datastore)
     {
-        this.dataStore = dataStore;
-        this.tioProps = tioProps;
+        this.datastore = datastore;
     }
 
 
     @Override
     public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect) throws Exception {
-//        if (isConnected) {
-//            logger.info("连接成功：server地址为-" + channelContext.getServerNode());
-//            Node node = new Node(channelContext.getServerNode().getIp(), channelContext.getServerNode().getPort());
-//            dataStore.addNode(node);
-//            Tio.bindGroup(channelContext, tioProps.getClientGroupName());
-//        } else {
-//            logger.info("连接失败：server地址为-" + channelContext.getServerNode());
-//        }
+        if (isConnected) {
+            logger.info("New node connected: {}", channelContext.getServerNode());
+            Node node = new Node(channelContext.getServerNode().getIp(), channelContext.getServerNode().getPort());
+            //datastore.addNode(node);
+            Tio.bindGroup(channelContext, TioConfig.CLIENT_GROUP_NAME);
+        } else {
+            logger.warn("New node connected failed: {}", channelContext.getServerNode());
+        }
     }
 
     @Override

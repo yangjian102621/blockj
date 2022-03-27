@@ -5,6 +5,7 @@ import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.Message;
+import org.rockyang.jblock.chain.Wallet;
 import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,6 +122,14 @@ public class RocksDatastore implements Datastore {
 		String key = String.format("blocks/%d",height);
 		Optional<Object> o = get(key);
 		return o.map(blockHash -> getBlock(String.valueOf(blockHash))).orElse(null);
+	}
+
+	@Override
+	public Wallet getWallet(String address)
+	{
+		String key = String.format("wallets/%s",address);
+		Optional<Object> o = get(key);
+		return (Wallet) o.orElse(null);
 	}
 
 	@Override

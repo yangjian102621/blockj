@@ -12,9 +12,9 @@ import org.tio.server.intf.TioServerListener;
  * @author yangjian
  */
 @Component
-public class AppServerAioListener implements TioServerListener {
+public class AppServerListener implements TioServerListener {
 
-	private static Logger log = LoggerFactory.getLogger(AppServerAioListener.class);
+	private static Logger log = LoggerFactory.getLogger(AppServerListener.class);
 
 	@Override
 	public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect) {

@@ -6,35 +6,18 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 /**
- * 挖矿接口
+ * Miner interface
  * @author yangjian
- * @since 2018-04-07 下午8:13.
  */
 public interface Miner {
 
-	/**
-	 * 挖矿奖励
-	 */
 	BigDecimal MINING_REWARD = BigDecimal.valueOf(50);
+	String MINER_ADDR_KEY= "miner/address";
+	String REWARD_ADDR = "B099";
 
-	/**
-	 * 创世区块难度值
-	 */
-	Long GENESIS_BLOCK_NONCE = 100000L;
-
-	/**
-	 * 挖出一个新的区块
-	 * @param block
-	 * @return
-	 * @throws Exception
-	 */
-	Block newBlock(Optional<Block> block) throws Exception;
-
-	/**
-	 * 检验一个区块
-	 * @param block
-	 * @return
-	 */
+	// mined a new block
+	Block mineOne(Optional<Block> base);
+	// 检验一个区块
 	boolean validateBlock(Block block);
 
 }

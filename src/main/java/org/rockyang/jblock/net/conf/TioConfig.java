@@ -1,10 +1,9 @@
 package org.rockyang.jblock.net.conf;
 
 import org.rockyang.jblock.net.client.AppClientHandler;
-import org.rockyang.jblock.net.client.AppClientAioListener;
+import org.rockyang.jblock.net.client.AppClientListener;
 import org.rockyang.jblock.net.server.AppServerHandler;
-import org.rockyang.jblock.net.server.AppServerAioListener;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.rockyang.jblock.net.server.AppServerListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.tio.client.ReconnConf;
@@ -19,62 +18,43 @@ import org.tio.server.TioServerConfig;
 @Configuration
 public class TioConfig {
 
-	@Autowired
-	TioProps tioProps;
+	public static final String SERVER_GROUP_NAME = "jblock-server";
+	public static final String CLIENT_GROUP_NAME = "jblock-client";
+	public static final int HEART_TIMEOUT = 5000;
 
-	/**
-	 * 客户端消息 handler, 包括编码、解码、消息处理
-	 */
-	@Autowired
+	// massage handler for client
 	AppClientHandler clientHandler;
-
-	/**
-	 * 客户端事件监听器
-	 */
-	@Autowired
-	AppClientAioListener clientListener;
-
-	/**
-	 * 服务端消息 handler, 包括编码、解码、消息处理
-	 */
-	@Autowired
+	// client message listener
+	AppClientListener clientListener;
+	// message handler for server
 	AppServerHandler serverHandler;
+	// server message listener
+	AppServerListener serverListener;
 
-	/**
-	 * 服务端事件监听器
-	 */
-	@Autowired
-	AppServerAioListener serverListener;
+	public TioConfig(AppClientHandler clientHandler, AppClientListener clientListener, AppServerHandler serverHandler, AppServerListener serverListener)
+	{
+		this.clientHandler = clientHandler;
+		this.clientListener = clientListener;
+		this.serverHandler = serverHandler;
+		this.serverListener = serverListener;
+	}
 
-	/**
-	 * 客户端一组连接共用的上下文对象
-	 * @return
-	 */
 	@Bean
-	public TioClientConfig clientConfig() {
-
-		//断链后自动连接
+	public TioClientConfig clientConfig()
+	{
+		// set the auto reconnect
 		ReconnConf reconnConf = new ReconnConf(5000L, 20);
 		TioClientConfig clientConfig = new TioClientConfig(clientHandler, clientListener, reconnConf);
-		//设置心跳包时间间隔
-		clientConfig.setHeartbeatTimeout(tioProps.getHeartTimeout());
+		clientConfig.setHeartbeatTimeout(HEART_TIMEOUT);
 		return clientConfig;
 	}
 
-	/**
-	 * 服务端一组连接共用的上下文对象
-	 * @return
-	 */
 	@Bean
-	public TioServerConfig serverConfig() {
-
-		TioServerConfig serverGroupContext = new TioServerConfig(
-				tioProps.getServerGroupContextName(),
-				serverHandler,
-				serverListener);
-		serverGroupContext.setHeartbeatTimeout(tioProps.getHeartTimeout());
-
-		return serverGroupContext;
+	public TioServerConfig serverConfig()
+	{
+		TioServerConfig serverConfig = new TioServerConfig(SERVER_GROUP_NAME,serverHandler,serverListener);
+		serverConfig.setHeartbeatTimeout(HEART_TIMEOUT);
+		return serverConfig;
 	}
 
 }

@@ -1,6 +1,6 @@
 package org.rockyang.jblock.crypto;
 
-import org.rockyang.jblock.constants.CryptoConstants;
+import org.rockyang.jblock.constants.CryptoAlgorithms;
 import org.rockyang.jblock.utils.Numeric;
 import org.rockyang.jblock.utils.Strings;
 import org.bouncycastle.jce.ECNamedCurveTable;
@@ -48,11 +48,11 @@ public class Keys {
         Security.addProvider(new BouncyCastleProvider());
         // 创建椭圆曲线算法的密钥对生成器
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(
-                CryptoConstants.KEY_GEN_ALGORITHM,
+                CryptoAlgorithms.KEY_GEN_ALGORITHM,
                 BouncyCastleProvider
                 .PROVIDER_NAME);
         // 椭圆曲线（EC）域参数设定
-        ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(CryptoConstants.EC_PARAM_SPEC);
+        ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(CryptoAlgorithms.EC_PARAM_SPEC);
         keyPairGenerator.initialize(ecSpec, new SecureRandom());
         return keyPairGenerator.generateKeyPair();
     }

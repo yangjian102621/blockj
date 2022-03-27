@@ -10,7 +10,7 @@ import org.bouncycastle.jce.spec.ECPrivateKeySpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.math.ec.FixedPointCombMultiplier;
-import org.rockyang.jblock.constants.CryptoConstants;
+import org.rockyang.jblock.constants.CryptoAlgorithms;
 import org.rockyang.jblock.utils.Numeric;
 
 import java.math.BigInteger;
@@ -26,7 +26,7 @@ import java.security.spec.X509EncodedKeySpec;
  */
 public class Sign {
 
-	private static final X9ECParameters CURVE_PARAMS = CustomNamedCurves.getByName(CryptoConstants.EC_PARAM_SPEC);
+	private static final X9ECParameters CURVE_PARAMS = CustomNamedCurves.getByName(CryptoAlgorithms.EC_PARAM_SPEC);
 	static final ECDomainParameters CURVE = new ECDomainParameters(
 			CURVE_PARAMS.getCurve(), CURVE_PARAMS.getG(), CURVE_PARAMS.getN(), CURVE_PARAMS.getH());
 
@@ -50,9 +50,9 @@ public class Sign {
 
 		PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());
 		Security.addProvider(new BouncyCastleProvider());
-		KeyFactory keyFactory = KeyFactory.getInstance(CryptoConstants.KEY_GEN_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
+		KeyFactory keyFactory = KeyFactory.getInstance(CryptoAlgorithms.KEY_GEN_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
 		PrivateKey pkcs8PrivateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
-		Signature signature = Signature.getInstance(CryptoConstants.SIGN_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
+		Signature signature = Signature.getInstance(CryptoAlgorithms.SIGN_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
 		signature.initSign(pkcs8PrivateKey);
 		signature.update(data.getBytes());
 		byte[] res = signature.sign();
@@ -80,9 +80,9 @@ public class Sign {
 
 		X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(publicKey.getEncoded());
 		Security.addProvider(new BouncyCastleProvider());
-		KeyFactory keyFactory = KeyFactory.getInstance(CryptoConstants.KEY_GEN_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
+		KeyFactory keyFactory = KeyFactory.getInstance(CryptoAlgorithms.KEY_GEN_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
 		PublicKey x509PublicKey = keyFactory.generatePublic(x509EncodedKeySpec);
-		Signature signature = Signature.getInstance(CryptoConstants.SIGN_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
+		Signature signature = Signature.getInstance(CryptoAlgorithms.SIGN_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
 		signature.initVerify(x509PublicKey);
 		signature.update(data.getBytes());
 		return signature.verify(HexBin.decode(sign));
@@ -96,10 +96,10 @@ public class Sign {
 	 */
 	public static PrivateKey privateKeyFromBigInteger(BigInteger privateKeyValue) throws Exception {
 
-		ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(CryptoConstants.EC_PARAM_SPEC);
+		ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(CryptoAlgorithms.EC_PARAM_SPEC);
 		ECPrivateKeySpec keySpec = new ECPrivateKeySpec(privateKeyValue, ecSpec);
 		Security.addProvider(new BouncyCastleProvider());
-		KeyFactory keyFactory = KeyFactory.getInstance(CryptoConstants.KEY_GEN_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
+		KeyFactory keyFactory = KeyFactory.getInstance(CryptoAlgorithms.KEY_GEN_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
 		return keyFactory.generatePrivate(keySpec);
 	}
 
@@ -120,11 +120,11 @@ public class Sign {
 	 */
 	public static PublicKey publicKeyFromPrivate(BigInteger privateKeyValue) throws Exception {
 
-		ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(CryptoConstants.EC_PARAM_SPEC);
+		ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(CryptoAlgorithms.EC_PARAM_SPEC);
 		ECPoint point = publicPointFromPrivate(privateKeyValue);
 		ECPublicKeySpec keySpec = new ECPublicKeySpec(point, ecSpec);
 		Security.addProvider(new BouncyCastleProvider());
-		KeyFactory keyFactory = KeyFactory.getInstance(CryptoConstants.KEY_GEN_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
+		KeyFactory keyFactory = KeyFactory.getInstance(CryptoAlgorithms.KEY_GEN_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
 		return keyFactory.generatePublic(keySpec);
 	}
 
@@ -137,7 +137,7 @@ public class Sign {
 
 		X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(publicKey);
 		Security.addProvider(new BouncyCastleProvider());
-		KeyFactory keyFactory = KeyFactory.getInstance(CryptoConstants.KEY_GEN_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
+		KeyFactory keyFactory = KeyFactory.getInstance(CryptoAlgorithms.KEY_GEN_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
 		ECPublicKey pubKey = (ECPublicKey) keyFactory.generatePublic(x509KeySpec);
 		return pubKey;
 	}

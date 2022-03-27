@@ -5,13 +5,14 @@ import org.rockyang.jblock.db.Datastore;
 import org.rockyang.jblock.event.BlockConfirmNumEvent;
 import org.rockyang.jblock.event.FetchNextBlockEvent;
 import org.rockyang.jblock.event.NewBlockEvent;
+import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.net.client.AppClient;
 import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +24,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class BlockEventListener {
 
-	@Autowired
-	private AppClient appClient;
-	@Autowired
-	private Datastore dataStore;
-	private static Logger logger = LoggerFactory.getLogger(BlockEventListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(BlockEventListener.class);
 
+	private AppClient appClient;
+	private Datastore datastore;
+
+	public BlockEventListener(AppClient appClient, Datastore datastore)
+	{
+		this.appClient = appClient;
+		this.datastore = datastore;
+	}
 	/**
 	 * 挖矿事件监听
 	 * @param event
@@ -45,11 +50,21 @@ public class BlockEventListener {
 	}
 
 	/**
+	 * 向所有连接的节点发起同步区块请求
+	 */
+	@EventListener(ApplicationReadyEvent.class)
+	public void fetchNextBlock()
+	{
+		ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(0));
+	}
+
+	/**
 	 * 同步下一个区块
 	 * @param event
 	 */
 	@EventListener(FetchNextBlockEvent.class)
-	public void fetchNextBlock(FetchNextBlockEvent event) {
+	public void fetchNextBlock(FetchNextBlockEvent event)
+	{
 
 //		logger.info("++++++++++++++++++++++++++++++ 开始群发信息获取 next Block +++++++++++++++++++++++++++++++++");
 //		Integer blockIndex = (Integer) event.getSource();

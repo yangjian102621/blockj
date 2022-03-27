@@ -1,7 +1,6 @@
 package org.rockyang.jblock.chain;
 
 import com.google.common.base.Preconditions;
-import org.rockyang.jblock.conf.AppConfig;
 import org.rockyang.jblock.crypto.Credentials;
 import org.rockyang.jblock.crypto.Sign;
 import org.rockyang.jblock.db.Datastore;
@@ -10,11 +9,8 @@ import org.rockyang.jblock.event.NewBlockEvent;
 import org.rockyang.jblock.event.NewTransactionEvent;
 import org.rockyang.jblock.miner.Miner;
 import org.rockyang.jblock.net.ApplicationContextProvider;
-import org.rockyang.jblock.net.base.Node;
-import org.rockyang.jblock.net.client.AppClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -22,57 +18,39 @@ import java.util.Iterator;
 import java.util.Optional;
 
 /**
- * 区块链主类
  * @author yangjian
- * @since 18-4-6
  */
 @Component
 public class Chain {
 
-	private static Logger logger = LoggerFactory.getLogger(Chain.class);
+	private static final Logger logger = LoggerFactory.getLogger(Chain.class);
 
-	@Autowired
-	private Datastore dataStore;
-
-	@Autowired
-	private AppClient appClient;
-
-	@Autowired
+	private Datastore datastore;
 	private Miner miner;
-
-	@Autowired
 	private MessagePool messagePool;
-	@Autowired
 	private MessageExecutor messageExecutor;
-	@Autowired
-	private AppConfig appConfig;
 
-	// 是否正在同步区块
-	private boolean syncing = true;
+	public Chain(Datastore datastore, Miner miner, MessagePool messagePool, MessageExecutor messageExecutor)
+	{
+		this.datastore = datastore;
+		this.miner = miner;
+		this.messagePool = messagePool;
+		this.messageExecutor = messageExecutor;
+	}
 
-	/**
-	 * 挖取一个区块
-	 * @return
-	 */
-	public Block mining() throws Exception {
+	public Block mineOne() throws Exception {
 
 		Optional<Block> lastBlock = getLastBlock();
-		Block block = miner.newBlock(lastBlock);
+		Block block = miner.mineOne(lastBlock);
 		for (Iterator t = messagePool.getTransactions().iterator(); t.hasNext();) {
 			block.addMessage((Message) t.next());
 			t.remove(); // 已打包的交易移出交易池
 		}
-		// 存储区块
-		//dataStore.putLastBlockIndex(block.getHeader().getIndex());
-		dataStore.putBlock(block);
+//		// 存储区块
+//		datastore.chainHead(block.getHeader().getIndex());
+//		datastore.putBlock(block);
 		logger.info("Find a New Block, {}", block);
-
-		if (appConfig.isNodeDiscover()) {
-			// 触发挖矿事件，并等待其他节点确认区块
-			ApplicationContextProvider.publishEvent(new NewBlockEvent(block));
-		} else {
-			messageExecutor.run(block);
-		}
+		ApplicationContextProvider.publishEvent(new NewBlockEvent(block));
 		return block;
 	}
 
@@ -108,10 +86,7 @@ public class Chain {
 		// 加入交易池，等待打包
 		messagePool.pendingMessage(message);
 
-		if (appConfig.isNodeDiscover()) {
-			//触发交易事件，向全网广播交易，并等待确认
-			ApplicationContextProvider.publishEvent(new NewTransactionEvent(message));
-		}
+		ApplicationContextProvider.publishEvent(new NewTransactionEvent(message));
 		return message;
 	}
 
@@ -132,8 +107,8 @@ public class Chain {
 	 */
 	public void addNode(String ip, int port) throws Exception {
 
-		appClient.addNode(ip, port);
-		Node node = new Node(ip, port);
+//		appClient.addNode(ip, port);
+//		Node node = new Node(ip, port);
 //		dataStore.addNode(node);
 	}
 }

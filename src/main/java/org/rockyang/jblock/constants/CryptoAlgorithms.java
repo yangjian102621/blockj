@@ -3,9 +3,8 @@ package org.rockyang.jblock.constants;
 /**
  * 加密算法用到的常量
  * @author yangjian
- * @since 18-4-8
  */
-public interface CryptoConstants {
+public interface CryptoAlgorithms {
 	/**
 	 * 椭圆曲线密钥生成算法，ECDSA
 	 */

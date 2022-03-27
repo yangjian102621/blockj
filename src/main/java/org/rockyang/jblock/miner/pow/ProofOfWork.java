@@ -64,22 +64,14 @@ public class ProofOfWork {
         return new PowResult(nonce, shaHex, this.target);
     }
 
-    /**
-     * 验证区块是否有效
-     * @return
-     */
+    // validate the pow result
     public boolean validate() {
         byte[] data = this.prepareData(this.getBlock().getNonce());
         return new BigInteger(Hash.sha3String(data), 16).compareTo(this.target) < 0;
     }
 
-    /**
-     * 准备数据
-     * <p>
-     * 注意：在准备区块数据时，一定要从原始数据类型转化为byte[]，不能直接从字符串进行转换
-     * @param nonce
-     * @return
-     */
+    // 准备数据
+    // 注意：在准备区块数据时，一定要从原始数据类型转化为byte[]，不能直接从字符串进行转换
     private byte[] prepareData(long nonce) {
         byte[] prevBlockHashBytes = {};
         if (StringUtils.isNotBlank(this.getBlock().getPreviousHash())) {

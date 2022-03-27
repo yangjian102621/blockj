@@ -8,18 +8,12 @@ import java.math.BigInteger;
  */
 public class PowResult {
 
-    /**
-     * 计数器
-     */
-    private Long nonce;
-    /**
-     * 新区快的哈希值
-     */
-    private String hash;
-    /**
-     * 目标难度值
-     */
-    private BigInteger target;
+    // pow value
+    private final Long nonce;
+    // hash of the new block
+    private final String hash;
+    // pow target
+    private final BigInteger target;
 
     public PowResult(long nonce, String hash, BigInteger target) {
         this.nonce = nonce;
@@ -31,24 +25,12 @@ public class PowResult {
         return nonce;
     }
 
-    public void setNonce(Long nonce) {
-        this.nonce = nonce;
-    }
-
     public String getHash() {
         return hash;
     }
 
-    public void setHash(String hash) {
-        this.hash = hash;
-    }
-
     public BigInteger getTarget() {
         return target;
-    }
-
-    public void setTarget(BigInteger target) {
-        this.target = target;
     }
 
     @Override
