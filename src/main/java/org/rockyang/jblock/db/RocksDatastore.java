@@ -5,8 +5,6 @@ import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 import org.rockyang.jblock.conf.MinerConfig;
 import org.rockyang.jblock.utils.SerializeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -20,8 +18,6 @@ import java.util.Optional;
  */
 @Component
 public class RocksDatastore implements Datastore {
-
-	private final static Logger logger = LoggerFactory.getLogger(RocksDatastore.class);
 
 	private RocksDB datastore;
 
@@ -37,7 +33,7 @@ public class RocksDatastore implements Datastore {
 			}
 			datastore = RocksDB.open(new Options().setCreateIfMissing(true), dataPath);
 		} catch (RocksDBException | FileNotFoundException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 
@@ -47,7 +43,7 @@ public class RocksDatastore implements Datastore {
 			datastore.put(key.getBytes(), SerializeUtils.serialize(value));
 			return true;
 		} catch (Exception e) {
-			logger.error("failed to save object: {}", e.toString());
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -57,7 +53,7 @@ public class RocksDatastore implements Datastore {
 		try {
 			return Optional.of(SerializeUtils.unSerialize(datastore.get(key.getBytes())));
 		} catch (Exception e) {
-			logger.error("failed to get object: {}", e.toString());
+			//e.printStackTrace();
 			return Optional.empty();
 		}
 	}
@@ -68,6 +64,7 @@ public class RocksDatastore implements Datastore {
 			datastore.delete(key.getBytes());
 			return true;
 		} catch (Exception e) {
+			//e.printStackTrace();
 			return false;
 		}
 	}

@@ -49,6 +49,7 @@ public class ChainServiceImpl implements ChainService {
 		block.getMessages().forEach(message -> {
 			datastore.put(MESSAGE_PREFIX + message.getCid(), message);
 		});
+
 	}
 
 	@Override

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class MessageExecutor {
 
 	@Autowired
-	private Datastore dataStore;
+	private Datastore datastore;
 
 	@Autowired
 	private MessagePool messagePool;
@@ -76,6 +76,6 @@ public class MessageExecutor {
 //		}// end for
 
 		// 更新区块信息
-		dataStore.putBlock(block);
+		//dataStore.putBlock(block);
 	}
 }

@@ -71,8 +71,8 @@ public class Block implements Serializable {
 		return builder.toString();
 	}
 
-	// generate block content hash
-	public String genBlockHash()
+	// generate block content id
+	public String genCid()
 	{
 		return Hash.sha3("Block{" +
 				"header=" + header.toString()  +
@@ -85,7 +85,7 @@ public class Block implements Serializable {
 	{
 		return "Block{" +
 				"header=" + header +
-				", messages=" + buildMessages() +
+				", messages=" + messages +
 				", blockSign='" + blockSign + '\'' +
 				'}';
 	}

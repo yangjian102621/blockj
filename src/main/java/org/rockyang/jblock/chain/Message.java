@@ -167,4 +167,21 @@ public class Message {
 		return Hash.sha3(this.toSigned());
 	}
 
+	@Override
+	public String toString()
+	{
+		return "Message{" +
+				"version=" + version +
+				", from='" + from + '\'' +
+				", to='" + to + '\'' +
+				", value=" + value +
+				", timestamp=" + timestamp +
+				", cid='" + cid + '\'' +
+				", status=" + status +
+				", nonce=" + nonce +
+				", params='" + params + '\'' +
+				", height=" + height +
+				", sign='" + sign + '\'' +
+				'}';
+	}
 }

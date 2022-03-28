@@ -62,4 +62,11 @@ public class WalletServiceImpl implements WalletService {
 		}
 		return getWallet(String.valueOf(o.get()));
 	}
+
+	@Override
+	public void setMinerWallet(Wallet wallet)
+	{
+		addWallet(wallet);
+		datastore.put(MINER_ADDR_KEY, wallet.getAddress());
+	}
 }

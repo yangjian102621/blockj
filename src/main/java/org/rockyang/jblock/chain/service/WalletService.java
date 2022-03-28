@@ -13,4 +13,5 @@ public interface WalletService {
 	List<Wallet> getWalletList();
 	Wallet getWallet(String address);
 	Wallet getMinerWallet();
+	void setMinerWallet(Wallet wallet);
 }

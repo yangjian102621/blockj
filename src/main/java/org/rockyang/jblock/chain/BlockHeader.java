@@ -1,5 +1,7 @@
 package org.rockyang.jblock.chain;
 
+import org.rockyang.jblock.crypto.Hash;
+
 import java.io.Serializable;
 import java.math.BigInteger;
 
@@ -99,5 +101,15 @@ public class BlockHeader implements Serializable {
 				", hash='" + hash + '\'' +
 				", previousHash='" + previousHash + '\'' +
 				'}';
+	}
+
+	public String genHash() {
+		return Hash.sha3("BlockHeader{" +
+				"height=" + height +
+				", difficulty=" + difficulty +
+				", nonce=" + nonce +
+				", timestamp=" + timestamp +
+				", previousHash='" + previousHash + '\'' +
+				'}');
 	}
 }

@@ -6,6 +6,7 @@ import org.rockyang.jblock.db.Datastore;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  * @author yangjian
@@ -24,12 +25,13 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public BigDecimal getBalance(String address)
 	{
-		return null;
+		Optional<Object> o = datastore.get(ACCOUNT_PREFIX + address);
+		return o.map(a -> ((Account) a).getBalance()).orElse(BigDecimal.ZERO);
 	}
 
 	@Override
 	public void setAccount(Account account)
 	{
-
+		datastore.put(ACCOUNT_PREFIX + account.getAddress(), account);
 	}
 }

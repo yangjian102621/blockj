@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.*;
 
 /**
  * The PoW algorithm implements
@@ -39,35 +38,38 @@ public class PowMiner implements Miner {
 	{
 		new Thread(() -> {
 			while (true) {
-				// get the last block
+				// get the chain head
 				Object chainHead = chainService.chainHead();
 				if (chainHead == null ) {
-					throw new RuntimeException("No chain head found");
+					niceSleep(5);
+					continue;
 				}
-				logger.info("chainHead {}", chainHead);
 				Block preBlock = chainService.getBlock(chainHead);
 				if (preBlock == null) {
-					throw new RuntimeException("No base block found");
+					niceSleep(5);
+					continue;
 				}
 				BlockHeader preBlockHeader = preBlock.getHeader();
-				// check if it's the time for new round
+				// check if it's the time for a new round
 				if (System.currentTimeMillis() - preBlockHeader.getTimestamp() <= Miner.BLOCK_DELAY_SECS*1000L) {
 					niceSleep(5);
 					continue;
 				}
-				final ExecutorService executor = Executors.newFixedThreadPool(1);
-				Callable<Block> callable = () -> mineOne(preBlock);
-				Future<Block> future = executor.submit(callable);
-				try {
-					future.get(Miner.BLOCK_DELAY_SECS, TimeUnit.SECONDS);
-					Block block = callable.call();
-					logger.info("Mined a new block: {}", block);
 
-					// @TODO: broadcast the block
+				try {
+					Block block = mineOne(preBlock);
+
+					logger.info("Mined a new block, Height: {}, Cid: {}", block.getHeader().getHeight(),
+							block.genCid());
 					// @TODO: package the messages in the message pool
+					// @TODO: broadcast the block
+					chainService.addBlock(block);
+					chainService.setChainHead(block.getHeader().getHeight());
 				} catch (Exception e) {
-					logger.warn("Failed to mined a block {}", e.toString());
+					niceSleep(5);
+					e.printStackTrace();
 				}
+
 			}
 		}).start();
 	}
@@ -108,7 +110,7 @@ public class PowMiner implements Miner {
 		message.setFrom(Miner.REWARD_ADDR);
 		message.setTo(minerKey.getAddress());
 		message.setParams("Miner Reward.");
-		message.setCid(message.getCid());
+		message.setCid(message.genMsgCid());
 		message.setValue(Miner.MINING_REWARD);
 
 		// sign the message
@@ -117,7 +119,7 @@ public class PowMiner implements Miner {
 		newBlock.addMessage(message);
 
 		// sign the block
-		String blockSig = Sign.sign(minerKey.getPriKey(), newBlock.genBlockHash());
+		String blockSig = Sign.sign(minerKey.getPriKey(), newBlock.genCid());
 		newBlock.setBlockSign(blockSig);
 
 		return newBlock;
@@ -129,10 +131,9 @@ public class PowMiner implements Miner {
 		BlockHeader header = new BlockHeader(1, null);
 		header.setNonce(PowMiner.GENESIS_BLOCK_NONCE);
 		header.setDifficulty(ProofOfWork.getTarget());
+		header.setHash(header.genHash());
 
-		Block block = new Block(header);
-		header.setHash(block.genBlockHash());
-		return block;
+		return new Block(header);
 	}
 
 	@Override

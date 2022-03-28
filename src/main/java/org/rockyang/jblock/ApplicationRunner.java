@@ -1,16 +1,17 @@
 package org.rockyang.jblock;
 
+import org.rockyang.jblock.chain.Account;
 import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.Wallet;
+import org.rockyang.jblock.chain.service.AccountService;
+import org.rockyang.jblock.chain.service.ChainService;
+import org.rockyang.jblock.chain.service.WalletService;
 import org.rockyang.jblock.conf.MinerConfig;
-import org.rockyang.jblock.db.Datastore;
 import org.rockyang.jblock.miner.Miner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 /**
  * @author yangjian
@@ -18,18 +19,26 @@ import javax.annotation.Resource;
  */
 @Component
 public class ApplicationRunner implements org.springframework.boot.ApplicationRunner {
-	@Resource
-	private ApplicationArguments arguments;
 
 	static final Logger logger = LoggerFactory.getLogger(ApplicationRunner.class);
+	private final ApplicationArguments arguments;
 
-	private final Datastore datastore;
+	private final WalletService walletService;
+	private final AccountService accountService;
+	private final ChainService chainService;
 	private final MinerConfig minerConfig;
 	private final Miner miner;
 
-	public ApplicationRunner(Datastore datastore, MinerConfig minerConfig, Miner miner)
+	public ApplicationRunner(ApplicationArguments arguments, WalletService walletService,
+	                         AccountService accountService,
+	                         ChainService chainService,
+	                         MinerConfig minerConfig,
+	                         Miner miner)
 	{
-		this.datastore = datastore;
+		this.arguments = arguments;
+		this.walletService = walletService;
+		this.accountService = accountService;
+		this.chainService = chainService;
 		this.minerConfig = minerConfig;
 		this.miner = miner;
 	}
@@ -42,13 +51,15 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 			logger.info("Try to init the miner repo in {}", minerConfig.getRepo());
 			// create the default wallet
 			Wallet wallet = new Wallet();
-			datastore.put(Miner.MINER_ADDR_KEY, wallet.getAddress());
-			datastore.putWallet(wallet);
+			walletService.setMinerWallet(wallet);
+			// create the genesis account
+			Account account = new Account(wallet.getAddress(), Miner.GENESIS_ACCOUNT_BALANCE);
+			accountService.setAccount(account);
 			logger.info("Initialize miner successfully, miner address: {}", wallet.getAddress());
 			// generate genesis block
 			Block block = miner.createGenesisBlock();
-			datastore.putBlock(block);
-			datastore.setChainHead(block.getHeader().getHash());
+			chainService.addBlock(block);
+			chainService.setChainHead(block.getHeader().getHeight());
 			System.exit(0);
 		}
 
