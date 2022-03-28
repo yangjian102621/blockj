@@ -13,7 +13,6 @@ public interface Miner {
 	BigDecimal MINING_REWARD = BigDecimal.valueOf(50);
 	// mining a new block every 30s
 	int BLOCK_DELAY_SECS = 30;
-	String MINER_ADDR_KEY= "miner/address";
 	String REWARD_ADDR = "B099";
 
 	// mined a new block

@@ -1,9 +1,5 @@
 package org.rockyang.jblock.db;
 
-import org.rockyang.jblock.chain.Block;
-import org.rockyang.jblock.chain.Message;
-import org.rockyang.jblock.chain.Wallet;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -14,28 +10,14 @@ import java.util.Optional;
  */
 public interface Datastore {
 
-	// get chain head block hash
-	String chainHead();
-	// set chain head block hash
-	void setChainHead(String blockHash);
-	// put the block on the main chain
-	void putBlock(Block block);
-	// get block with the specified block hash
-	Block getBlock(String blockHash);
-	Block getBlockByHeight(int height);
-
-	Wallet getWallet(String address);
-	void putWallet(Wallet wallet);
-
-	Message getMessage(String Cid);
-
+	// save an item into database
 	boolean put(String key, Object value);
+	// get an item from database with the specified key
 	Optional<Object> get(String key);
+	// delete an item from database with the specified key
 	boolean delete(String key);
-
 	// search in database with key prefix
 	List<Object> search(String keyPrefix);
-
 	// close the database
 	void close();
 }

@@ -4,15 +4,15 @@ import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.BlockHeader;
 import org.rockyang.jblock.chain.Message;
 import org.rockyang.jblock.chain.Wallet;
+import org.rockyang.jblock.chain.service.ChainService;
+import org.rockyang.jblock.chain.service.WalletService;
 import org.rockyang.jblock.crypto.Sign;
-import org.rockyang.jblock.db.Datastore;
 import org.rockyang.jblock.miner.Miner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.Optional;
 import java.util.concurrent.*;
 
 /**
@@ -25,11 +25,13 @@ public class PowMiner implements Miner {
 	private final static Logger logger = LoggerFactory.getLogger(PowMiner.class);
 	// the genesis block nonce value
 	public static final Long GENESIS_BLOCK_NONCE = 100000L;
-	private final Datastore datastore;
+	private final ChainService chainService;
+	private final WalletService walletService;
 
-	public PowMiner(Datastore datastore)
+	public PowMiner(ChainService chainService, WalletService walletService)
 	{
-		this.datastore = datastore;
+		this.chainService = chainService;
+		this.walletService = walletService;
 	}
 
 	@PostConstruct
@@ -38,12 +40,12 @@ public class PowMiner implements Miner {
 		new Thread(() -> {
 			while (true) {
 				// get the last block
-				String chainHead = datastore.chainHead();
+				Object chainHead = chainService.chainHead();
 				if (chainHead == null ) {
 					throw new RuntimeException("No chain head found");
 				}
 				logger.info("chainHead {}", chainHead);
-				Block preBlock = datastore.getBlock(chainHead);
+				Block preBlock = chainService.getBlock(chainHead);
 				if (preBlock == null) {
 					throw new RuntimeException("No base block found");
 				}
@@ -83,11 +85,7 @@ public class PowMiner implements Miner {
 	public Block mineOne(Block preBlock) throws Exception
 	{
 		// fetch the miner key
-		Optional<Object> minerAddr = datastore.get(Miner.MINER_ADDR_KEY);
-		if (minerAddr.isEmpty()) {
-			throw new RuntimeException("No miner address set.");
-		}
-		Wallet minerKey = datastore.getWallet(minerAddr.get().toString());
+		Wallet minerKey = walletService.getMinerWallet();
 		if (minerKey == null) {
 			throw new RuntimeException("No miner address set.");
 		}
