@@ -17,6 +17,7 @@ public class Message {
 	private String to;
 	private BigDecimal value;
 	private Long timestamp;
+	private String publicKey;
 	// message CID
 	private String cid;
 	// massage status
@@ -89,6 +90,16 @@ public class Message {
 		this.timestamp = timestamp;
 	}
 
+	public String getPublicKey()
+	{
+		return publicKey;
+	}
+
+	public void setPublicKey(String publicKey)
+	{
+		this.publicKey = publicKey;
+	}
+
 	public String getCid()
 	{
 		return cid;
@@ -156,6 +167,7 @@ public class Message {
 				", to='" + to + '\'' +
 				", value=" + value +
 				", timestamp=" + timestamp +
+				", publicKey='" + publicKey + '\'' +
 				", cid='" + cid + '\'' +
 				", status=" + status +
 				", nonce=" + nonce +
@@ -176,6 +188,7 @@ public class Message {
 				", to='" + to + '\'' +
 				", value=" + value +
 				", timestamp=" + timestamp +
+				", publicKey='" + publicKey + '\'' +
 				", cid='" + cid + '\'' +
 				", status=" + status +
 				", nonce=" + nonce +

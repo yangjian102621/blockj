@@ -1,7 +1,7 @@
-package org.rockyang.jblock.chain.event;
+package org.rockyang.jblock.chain.listener;
 
 import org.rockyang.jblock.chain.Message;
-import org.rockyang.jblock.event.NewTransactionEvent;
+import org.rockyang.jblock.chain.event.NewMessageEvent;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.net.client.AppClient;
@@ -18,18 +18,18 @@ import org.springframework.stereotype.Component;
  * @since 18-4-19
  */
 @Component
-public class TransactionEventListener {
+public class MessageEventListener {
 
 	@Autowired
 	private AppClient appClient;
-	private static Logger logger = LoggerFactory.getLogger(TransactionEventListener.class);
+	private static Logger logger = LoggerFactory.getLogger(MessageEventListener.class);
 
 	/**
 	 * 向所有客户端广播交易
 	 * @param event
 	 */
-	@EventListener(NewTransactionEvent.class)
-	public void sendTransaction(NewTransactionEvent event)
+	@EventListener(NewMessageEvent.class)
+	public void sendTransaction(NewMessageEvent event)
 	{
 
 		logger.info("++++++++++++++ 开始广播新新的交易订单 +++++++++++++++++++++");

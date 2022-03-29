@@ -11,6 +11,7 @@ public class Account implements Serializable {
 
 	private String address;
 	private BigDecimal balance;
+	private String publicKey;
 
 	public Account(String address, BigDecimal balance)
 	{
@@ -38,5 +39,15 @@ public class Account implements Serializable {
 	public void setBalance(BigDecimal balance)
 	{
 		this.balance = balance;
+	}
+
+	public String getPublicKey()
+	{
+		return publicKey;
+	}
+
+	public void setPublicKey(String publicKey)
+	{
+		this.publicKey = publicKey;
 	}
 }

@@ -1,4 +1,4 @@
-package org.rockyang.jblock.event;
+package org.rockyang.jblock.chain.event;
 
 import org.rockyang.jblock.chain.Block;
 import org.springframework.context.ApplicationEvent;

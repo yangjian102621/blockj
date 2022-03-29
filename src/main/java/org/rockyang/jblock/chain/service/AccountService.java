@@ -10,4 +10,5 @@ import java.math.BigDecimal;
 public interface AccountService {
 	BigDecimal getBalance(String address);
 	void setAccount(Account account);
+	Account getAccount(String address);
 }

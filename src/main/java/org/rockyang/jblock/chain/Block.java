@@ -3,8 +3,8 @@ package org.rockyang.jblock.chain;
 import org.rockyang.jblock.crypto.Hash;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Block
@@ -25,7 +25,7 @@ public class Block implements Serializable {
 	public Block(BlockHeader blockHeader)
 	{
 		this.header = blockHeader;
-		this.messages = new ArrayList<>();
+		this.messages = new CopyOnWriteArrayList<>();
 	}
 	public Block() {}
 

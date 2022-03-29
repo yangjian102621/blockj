@@ -12,7 +12,7 @@ public enum MessageStatus {
 	// 交易待确认
 	APPENDING("Appending", 1),
 	INVALID_SIGN("Invalid signature", 2),
-	// 交易确认失败
+	INSUFFICIENT_BALANCE("Insufficient balance", 2),
 	FAIL("Invalid Message", -1);
 
 	private final String key;

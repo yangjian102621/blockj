@@ -44,4 +44,13 @@ public class AccountServiceImpl implements AccountService {
 		datastore.put(ACCOUNT_PREFIX + account.getAddress(), account);
 		writeLock.unlock();
 	}
+
+	@Override
+	public Account getAccount(String address)
+	{
+		readLock.lock();
+		Optional<Object> o = datastore.get(ACCOUNT_PREFIX + address);
+		readLock.unlock();
+		return (Account) o.orElse(null);
+	}
 }
