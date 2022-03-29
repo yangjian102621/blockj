@@ -15,16 +15,20 @@ public class TempTest {
 	@Test
 	public void run() {
 
-		List<User> list = new ArrayList<>();
-		list.add(new User("zhangsan"));
-		list.add(new User("lisi"));
-		list.add(new User("wangmazi"));
+		try {
+			List<User> list = new ArrayList<>();
+			list.add(new User("zhangsan"));
+			list.add(new User("lisi"));
+			list.add(new User("wangmazi"));
 
-		for (User user : list) {
-			user.setName("rock");
+			for (User user : list) {
+				user.setName("rock");
+			}
+			System.out.println(list);
+			return;
+		} finally {
+			System.out.println("Finally");
 		}
-
-		System.out.println(list);
 
 	}
 

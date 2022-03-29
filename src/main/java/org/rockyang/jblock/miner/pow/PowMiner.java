@@ -62,6 +62,7 @@ public class PowMiner implements Miner {
 					logger.info("Mined a new block, Height: {}, Cid: {}", block.getHeader().getHeight(),
 							block.genCid());
 					// @TODO: package the messages in the message pool
+
 					// @TODO: broadcast the block
 					chainService.addBlock(block);
 					chainService.setChainHead(block.getHeader().getHeight());

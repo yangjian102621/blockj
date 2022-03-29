@@ -3,9 +3,8 @@ package org.rockyang.jblock.chain;
 import com.google.common.base.Objects;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * message pool
@@ -14,7 +13,7 @@ import java.util.List;
 @Component
 public class MessagePool {
 
-	private final List<Message> messages = new ArrayList<>();
+	private final List<Message> messages = new CopyOnWriteArrayList<>();
 
 	public void pendingMessage(Message message) {
 
@@ -27,19 +26,14 @@ public class MessagePool {
 		this.messages.add(message);
 	}
 
-	public List<Message> getTransactions() {
+	public List<Message> getMessages() {
 		return messages;
 	}
 
 	// remove message from the message pool
-	public void removeTransaction(String cid)
+	public void removeMessage(String cid)
 	{
-		for (Iterator iterator = messages.iterator(); iterator.hasNext();) {
-			Message msg = (Message) iterator.next();
-			if (Objects.equal(msg.getCid(), cid)) {
-				iterator.remove();
-			}
-		}
+		messages.removeIf(message -> Objects.equal(message.getCid(), cid));
 	}
 
 }
