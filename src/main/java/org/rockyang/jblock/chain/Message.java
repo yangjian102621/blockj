@@ -6,18 +6,17 @@ import org.rockyang.jblock.enums.MessageStatus;
 import java.math.BigDecimal;
 
 /**
- * 交易对象
+ * block message
  * @author yangjian
- * @since 18-4-6
  */
 public class Message {
-
+	public static final int MSG_VERSION = 1;
 	private int version;
 	private String from;
 	private String to;
 	private BigDecimal value;
 	private Long timestamp;
-	private String publicKey;
+	private String pubKey;
 	// message CID
 	private String cid;
 	// massage status
@@ -29,11 +28,13 @@ public class Message {
 	private int height;
 	private String sign;
 
-	public Message(String from, String to, BigDecimal value) {
+	public Message(String from, String to, BigDecimal value, int nonce) {
 		this.from = from;
 		this.to = to;
 		this.value = value;
 		this.timestamp = System.currentTimeMillis();
+		this.version = MSG_VERSION;
+		this.nonce = nonce;
 	}
 
 	public Message() {
@@ -90,14 +91,14 @@ public class Message {
 		this.timestamp = timestamp;
 	}
 
-	public String getPublicKey()
+	public String getPubKey()
 	{
-		return publicKey;
+		return pubKey;
 	}
 
-	public void setPublicKey(String publicKey)
+	public void setPubKey(String pubKey)
 	{
-		this.publicKey = publicKey;
+		this.pubKey = pubKey;
 	}
 
 	public String getCid()
@@ -167,7 +168,7 @@ public class Message {
 				", to='" + to + '\'' +
 				", value=" + value +
 				", timestamp=" + timestamp +
-				", publicKey='" + publicKey + '\'' +
+				", pubKey='" + pubKey + '\'' +
 				", cid='" + cid + '\'' +
 				", status=" + status +
 				", nonce=" + nonce +
@@ -188,7 +189,7 @@ public class Message {
 				", to='" + to + '\'' +
 				", value=" + value +
 				", timestamp=" + timestamp +
-				", publicKey='" + publicKey + '\'' +
+				", pubKey='" + pubKey + '\'' +
 				", cid='" + cid + '\'' +
 				", status=" + status +
 				", nonce=" + nonce +

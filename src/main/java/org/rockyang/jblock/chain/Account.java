@@ -11,9 +11,10 @@ public class Account implements Serializable {
 
 	private String address;
 	private BigDecimal balance;
-	private String publicKey;
+	private String pubKey;
+	private int messageNonce;
 
-	public Account(String address, BigDecimal balance)
+	public Account(String address, BigDecimal balance, String pubKey, int messageNonce)
 	{
 		this.address = address;
 		this.balance = balance;
@@ -41,13 +42,23 @@ public class Account implements Serializable {
 		this.balance = balance;
 	}
 
-	public String getPublicKey()
+	public String getPubKey()
 	{
-		return publicKey;
+		return pubKey;
 	}
 
-	public void setPublicKey(String publicKey)
+	public void setPubKey(String pubKey)
 	{
-		this.publicKey = publicKey;
+		this.pubKey = pubKey;
+	}
+
+	public int getMessageNonce()
+	{
+		return messageNonce;
+	}
+
+	public void setMessageNonce(int messageNonce)
+	{
+		this.messageNonce = messageNonce;
 	}
 }

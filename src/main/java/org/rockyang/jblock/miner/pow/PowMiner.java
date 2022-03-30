@@ -53,7 +53,7 @@ public class PowMiner implements Miner {
 		message.setTo(minerKey.getAddress());
 		message.setParams("Miner Reward.");
 		message.setCid(message.genMsgCid());
-		message.setPublicKey(minerKey.getPubKey());
+		message.setPubKey(minerKey.getPubKey());
 		message.setValue(Miner.MINING_REWARD);
 
 		// sign the message

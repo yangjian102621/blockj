@@ -53,7 +53,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 			Wallet wallet = new Wallet();
 			walletService.setMinerWallet(wallet);
 			// create the genesis account
-			Account account = new Account(wallet.getAddress(), Miner.GENESIS_ACCOUNT_BALANCE);
+			Account account = new Account(wallet.getAddress(), Miner.GENESIS_ACCOUNT_BALANCE, wallet.getPubKey(), 0);
 			accountService.setAccount(account);
 			logger.info("Initialize miner successfully, miner address: {}", wallet.getAddress());
 			// generate genesis block
