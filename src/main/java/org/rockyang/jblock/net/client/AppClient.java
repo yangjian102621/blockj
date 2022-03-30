@@ -2,7 +2,7 @@ package org.rockyang.jblock.net.client;
 
 import org.rockyang.jblock.db.Datastore;
 import org.rockyang.jblock.net.base.MessagePacket;
-import org.rockyang.jblock.net.base.Node;
+import org.rockyang.jblock.net.base.Peer;
 import org.rockyang.jblock.net.conf.TioConfig;
 import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
@@ -40,9 +40,9 @@ public class AppClient {
 	}
 
 	// connect a new node
-	public void connect(Node node) throws Exception
+	public void connect(Peer peer) throws Exception
 	{
-		ClientChannelContext channelContext = client.connect(node);
+		ClientChannelContext channelContext = client.connect(peer);
 		// send a hello message after connected
 		MessagePacket packet = new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE));
 		if (Tio.send(channelContext, packet)) {

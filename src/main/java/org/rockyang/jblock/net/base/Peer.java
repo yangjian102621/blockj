@@ -1,18 +1,19 @@
 package org.rockyang.jblock.net.base;
 
+import org.tio.core.Node;
+
 import java.io.Serializable;
 
 /**
  * @author yangjian
- * @since 18-4-18
  */
-public class Node extends org.tio.core.Node implements Serializable {
+public class Peer extends Node implements Serializable {
 
-	public Node(String ip, int port) {
+	public Peer(String ip, int port) {
 		super(ip, port);
 	}
 
-	public Node() {
+	public Peer() {
 		super(null, 0);
 	}
 }

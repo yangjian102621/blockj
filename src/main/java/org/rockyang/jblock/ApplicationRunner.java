@@ -15,13 +15,11 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author yangjian
- * @since 2019-06-03 下午5:18.
  */
 @Component
 public class ApplicationRunner implements org.springframework.boot.ApplicationRunner {
 
 	static final Logger logger = LoggerFactory.getLogger(ApplicationRunner.class);
-	private final ApplicationArguments arguments;
 
 	private final WalletService walletService;
 	private final AccountService accountService;
@@ -29,13 +27,12 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 	private final MinerConfig minerConfig;
 	private final Miner miner;
 
-	public ApplicationRunner(ApplicationArguments arguments, WalletService walletService,
+	public ApplicationRunner(WalletService walletService,
 	                         AccountService accountService,
 	                         ChainService chainService,
 	                         MinerConfig minerConfig,
 	                         Miner miner)
 	{
-		this.arguments = arguments;
 		this.walletService = walletService;
 		this.accountService = accountService;
 		this.chainService = chainService;

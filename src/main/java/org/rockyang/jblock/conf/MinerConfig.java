@@ -1,5 +1,6 @@
 package org.rockyang.jblock.conf;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MinerConfig {
 
+	@Value("${jblock.repo}")
 	private String repo;
 
 	public String getRepo()

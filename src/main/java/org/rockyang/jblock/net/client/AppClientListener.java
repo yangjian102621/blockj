@@ -38,6 +38,8 @@ public class AppClientListener implements TioClientListener {
             Node node = new Node(channelContext.getServerNode().getIp(), channelContext.getServerNode().getPort());
             //datastore.addNode(node);
             Tio.bindGroup(channelContext, TioConfig.CLIENT_GROUP_NAME);
+            // start sync the block
+
         } else {
             logger.warn("New node connected failed: {}", channelContext.getServerNode());
         }

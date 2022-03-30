@@ -38,8 +38,8 @@ __这个很简单, 直接像运行普通的 SpringBoot 项目一样运行就好�
  启动挖矿 | GET | /api/chain/mining
  发送交易 | POST | /api/chain/send_transactions
  查看最后一个区块 | GET | /api/chain/block/head
- 添加节点 | POST | /api/chain/node/add
- 查看节点 | GET | /api/chain/node/view
+ 添加节点 | POST | /api/chain/peer/add
+ 查看节点 | GET | /api/chain/peer/view
  
  > 注意：凡是 POST 请求都是使用 RequestBody 的方式传参的， 不是用表单的 form-data 形式， 比如发送交易的参数形式如下：
  

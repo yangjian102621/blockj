@@ -1,10 +1,9 @@
 package org.rockyang.jblock.chain.listener;
 
 import org.rockyang.jblock.chain.Block;
-import org.rockyang.jblock.db.Datastore;
-import org.rockyang.jblock.chain.event.BlockConfirmNumEvent;
-import org.rockyang.jblock.chain.event.FetchNextBlockEvent;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
+import org.rockyang.jblock.chain.event.SyncBlockEvent;
+import org.rockyang.jblock.chain.service.ChainService;
 import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
@@ -27,13 +26,14 @@ public class BlockEventListener {
 	private static final Logger logger = LoggerFactory.getLogger(BlockEventListener.class);
 
 	private AppClient appClient;
-	private Datastore datastore;
+	private ChainService chainService;
 
-	public BlockEventListener(AppClient appClient, Datastore datastore)
+	public BlockEventListener(AppClient appClient, ChainService chainService)
 	{
 		this.appClient = appClient;
-		this.datastore = datastore;
+		this.chainService = chainService;
 	}
+
 	/**
 	 * 挖矿事件监听
 	 * @param event
@@ -49,24 +49,26 @@ public class BlockEventListener {
 		appClient.sendGroup(messagePacket);
 	}
 
-	/**
-	 * 向所有连接的节点发起同步区块请求
-	 */
+	// start sync blocks when the application is ready
 	@EventListener(ApplicationReadyEvent.class)
-	public void fetchNextBlock()
+	public void appReady()
 	{
-		ApplicationContextProvider.publishEvent(new FetchNextBlockEvent(0));
+		// get the chain head
+		Object o = chainService.chainHead();
+		int head = 0;
+		if (o != null) {
+			head = Integer.parseInt(o.toString());
+		}
+		ApplicationContextProvider.publishEvent(new SyncBlockEvent(head+1));
 	}
 
-	/**
-	 * 同步下一个区块
-	 * @param event
-	 */
-	@EventListener(FetchNextBlockEvent.class)
-	public void fetchNextBlock(FetchNextBlockEvent event)
+	// sync the specified height block
+	@EventListener(SyncBlockEvent.class)
+	public void syncBlock(SyncBlockEvent event)
 	{
 
-//		logger.info("++++++++++++++++++++++++++++++ 开始群发信息获取 next Block +++++++++++++++++++++++++++++++++");
+
+		logger.info("++++++++++++++++++++++++++++++ start to sync block {} +++++++++++++++++++++++++++++++++", event.getSource());
 //		Integer blockIndex = (Integer) event.getSource();
 //		if (blockIndex == 0) {
 //			Optional<Object> lastBlockIndex = dataStore.getLastBlockIndex();
@@ -81,16 +83,5 @@ public class BlockEventListener {
 //		appClient.sendGroup(messagePacket);
 	}
 
-	@EventListener(BlockConfirmNumEvent.class)
-	public void IncBlockConfirmNum(BlockConfirmNumEvent event)
-	{
-		logger.info("++++++++++++++ 增加区块确认数 ++++++++++++++++++");
-		Integer blockIndex = (Integer) event.getSource();
-		MessagePacket messagePacket = new MessagePacket();
-		messagePacket.setType(MessagePacketType.REQ_INC_CONFIRM_NUM);
-		messagePacket.setBody(SerializeUtils.serialize(blockIndex));
-		//群发消息
-		appClient.sendGroup(messagePacket);
-	}
 
 }
