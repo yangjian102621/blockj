@@ -57,6 +57,8 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 			Block block = miner.createGenesisBlock();
 			chainService.addBlock(block);
 			chainService.setChainHead(block.getHeader().getHeight());
+
+			// @TODO generate the genesis block file
 			System.exit(0);
 		}
 

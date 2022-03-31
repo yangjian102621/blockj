@@ -2,7 +2,7 @@ package org.rockyang.jblock.client.test;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
-import org.rockyang.jblock.client.rpc.Filecoin;
+import org.rockyang.jblock.client.rpc.JBlockServiceWrapper;
 
 /**
  * @author yangjian
@@ -10,11 +10,11 @@ import org.rockyang.jblock.client.rpc.Filecoin;
 public abstract class BaseTester {
 
 	protected static Logger logger = Logger.getLogger(BaseTester.class);
-	protected Filecoin filecoin;
+	protected JBlockServiceWrapper JBlockServiceWrapper;
 
 	@Before
 	public void init()
 	{
-		filecoin = new Filecoin("http://127.0.0.1:3453", true);
+		JBlockServiceWrapper = new JBlockServiceWrapper("http://127.0.0.1:3453", true);
 	}
 }

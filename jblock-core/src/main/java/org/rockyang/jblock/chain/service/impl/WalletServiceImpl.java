@@ -3,7 +3,7 @@ package org.rockyang.jblock.chain.service.impl;
 import org.apache.commons.lang3.StringUtils;
 import org.rockyang.jblock.chain.Wallet;
 import org.rockyang.jblock.chain.service.WalletService;
-import org.rockyang.jblock.db.Datastore;
+import org.rockyang.jblock.store.Datastore;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

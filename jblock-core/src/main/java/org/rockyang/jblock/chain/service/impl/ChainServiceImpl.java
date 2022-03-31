@@ -9,7 +9,7 @@ import org.rockyang.jblock.chain.service.ChainService;
 import org.rockyang.jblock.chain.service.WalletService;
 import org.rockyang.jblock.crypto.Keys;
 import org.rockyang.jblock.crypto.Sign;
-import org.rockyang.jblock.db.Datastore;
+import org.rockyang.jblock.store.Datastore;
 import org.rockyang.jblock.enums.MessageStatus;
 import org.rockyang.jblock.miner.Miner;
 import org.rockyang.jblock.net.ApplicationContextProvider;

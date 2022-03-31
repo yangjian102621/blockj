@@ -13,7 +13,6 @@ import java.security.PublicKey;
 /**
  * 签名测试
  * @author yangjian
- * @since 18-4-9
  */
 public class SignTest {
 

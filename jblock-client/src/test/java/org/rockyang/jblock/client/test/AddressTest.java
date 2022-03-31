@@ -14,7 +14,7 @@ public class AddressTest extends BaseTester {
 	@Test
 	public void  newAddress()
 	{
-		String address = filecoin.newAddress();
+		String address = JBlockServiceWrapper.newAddress();
 		Assert.assertNotNull(address);
 		logger.info("Address: " + address);
 	}
@@ -22,7 +22,7 @@ public class AddressTest extends BaseTester {
 	@Test
 	public void getAddressList()
 	{
-		List<String> addresses = filecoin.getAddressList();
+		List<String> addresses = JBlockServiceWrapper.getAddressList();
 		Assert.assertNotNull(addresses);
 		Assert.assertTrue(addresses.size() > 0);
 		for (String address : addresses) {
@@ -33,7 +33,7 @@ public class AddressTest extends BaseTester {
 	@Test
 	public void getDefaultAddress()
 	{
-		String address = filecoin.getDefaultAddress();
+		String address = JBlockServiceWrapper.getDefaultAddress();
 		Assert.assertNotNull(address);
 		logger.info("Default Address: " + address);
 	}

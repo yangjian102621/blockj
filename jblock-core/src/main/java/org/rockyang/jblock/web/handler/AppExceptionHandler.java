@@ -1,6 +1,7 @@
 package org.rockyang.jblock.web.handler;
 
-import org.rockyang.jblock.utils.JsonVo;
+import org.rockyang.jblock.web.vo.CodeEnum;
+import org.rockyang.jblock.web.vo.JsonVo;
 import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 /**
- * 全局异常捕获处理类
+ * global exception catch handler
  * @author yangjian
  */
 @ControllerAdvice
@@ -21,9 +22,9 @@ public class AppExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
-    public JsonVo handle(HttpServletRequest request, HttpServletResponse response, Exception e) {
-
-        logger.error("ERROR ======> {}", e);
-        return JsonVo.instance(JsonVo.CODE_SUCCESS, e.getMessage());
+    public JsonVo handle(HttpServletRequest request, HttpServletResponse response, Exception e)
+    {
+        logger.error("Something is wrong, ", e);
+        return new JsonVo(CodeEnum.FAIL, e.getMessage());
     }
 }

@@ -12,7 +12,7 @@ public class ConfigTest extends BaseTester {
 	public void configGet()
 	{
 		String key = "wallet.defaultAddress";
-		String address = (String) filecoin.config(key);
+		String address = (String) JBlockServiceWrapper.config(key);
 		logger.info("Address : " + address);
 	}
 
@@ -21,9 +21,9 @@ public class ConfigTest extends BaseTester {
 	{
 		String key = "heartbeat.nickname";
 		String value = "RockYang";
-		filecoin.config(key, value);
+		JBlockServiceWrapper.config(key, value);
 
-		Object testAddress = filecoin.config(key);
+		Object testAddress = JBlockServiceWrapper.config(key);
 		Assert.assertNotNull(testAddress);
 		logger.info(testAddress);
 	}

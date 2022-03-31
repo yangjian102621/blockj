@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * @author yangjian
  */
-public class Filecoin {
+public class JBlockServiceWrapper {
 
 	private static final OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
@@ -29,9 +29,9 @@ public class Filecoin {
 
 	private static Retrofit retrofit;
 
-	private static FilecoinRpcService rpcService;
+	private static JBlockService rpcService;
 
-	public Filecoin(String baseUrl, boolean logDebug)
+	public JBlockServiceWrapper(String baseUrl, boolean logDebug)
 	{
 		// open debug log model
 		if (logDebug) {
@@ -44,7 +44,7 @@ public class Filecoin {
 		builder.client(httpClient.build());
 		builder.addConverterFactory(JacksonConverterFactory.create());
 		retrofit = builder.build();
-		rpcService =  retrofit.create(FilecoinRpcService.class);
+		rpcService =  retrofit.create(JBlockService.class);
 	}
 
 	/**

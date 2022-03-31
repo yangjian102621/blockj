@@ -16,7 +16,7 @@ import java.util.Map;
  * Filecoin 钱包 RPC 服务接口
  * @author yangjian
  */
-public interface FilecoinRpcService {
+public interface JBlockService {
 
 	/**
 	 * create a new wallet

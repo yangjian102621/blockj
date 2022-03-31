@@ -11,7 +11,7 @@ public class ChainTest extends BaseTester {
 	@Test
 	public void chainHead()
 	{
-		String cid = filecoin.chainHead();
+		String cid = JBlockServiceWrapper.chainHead();
 		System.out.println(cid);
 		Assert.assertNotNull(cid);
 	}

@@ -2,7 +2,7 @@ package org.rockyang.jblock.chain.service.impl;
 
 import org.rockyang.jblock.chain.Account;
 import org.rockyang.jblock.chain.service.AccountService;
-import org.rockyang.jblock.db.Datastore;
+import org.rockyang.jblock.store.Datastore;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

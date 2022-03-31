@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 /**
  * 凭证测试
  * @author yangjian
- * @since 18-7-14
  */
 public class CredentialTest {
 

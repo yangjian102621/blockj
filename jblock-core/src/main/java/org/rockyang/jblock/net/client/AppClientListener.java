@@ -1,6 +1,6 @@
 package org.rockyang.jblock.net.client;
 
-import org.rockyang.jblock.db.Datastore;
+import org.rockyang.jblock.store.Datastore;
 import org.rockyang.jblock.net.conf.TioConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

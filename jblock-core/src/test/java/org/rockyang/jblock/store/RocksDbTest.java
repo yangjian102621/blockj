@@ -1,4 +1,4 @@
-package org.rockyang.jblock.db;
+package org.rockyang.jblock.store;
 
 import org.junit.Test;
 import org.rockyang.jblock.conf.MinerConfig;
@@ -10,7 +10,6 @@ import java.util.UUID;
 
 /**
  * @author yangjian
- * @since 18-4-10
  */
 public class RocksDbTest {
 

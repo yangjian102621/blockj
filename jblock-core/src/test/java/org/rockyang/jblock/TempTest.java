@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 临时测试文件，测试各种其他测试代码
  * @author yangjian
- * @since 2018-04-07 下午8:38.
  */
 public class TempTest {
 
@@ -25,14 +23,13 @@ public class TempTest {
 				user.setName("rock");
 			}
 			System.out.println(list);
-			return;
 		} finally {
 			System.out.println("Finally");
 		}
 
 	}
 
-	private class User {
+	private static class User {
 
 		private String name;
 

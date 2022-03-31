@@ -16,7 +16,7 @@ public class WalletTest extends BaseTester {
 	public void walletExport()
 	{
 		String address = "t1b3keswmeuk4tipp5egjbk3aoag56g5zd3cle2va";
-		KeyInfo keyInfo = filecoin.walletExport(address);
+		KeyInfo keyInfo = JBlockServiceWrapper.walletExport(address);
 		logger.info(keyInfo);
 	}
 
@@ -24,7 +24,7 @@ public class WalletTest extends BaseTester {
 	public void walletImport()
 	{
 		String privateKey = "pdHwTOrJXnAGvQ0861k66xRsiT7N3Ms8IGte3nT837E=";
-		String address = filecoin.walletImport(privateKey);
+		String address = JBlockServiceWrapper.walletImport(privateKey);
 		Assert.assertNotNull(address);
 		if (address != null) {
 			logger.info("wallet import successfully, Address : " + address);
@@ -37,7 +37,7 @@ public class WalletTest extends BaseTester {
 	public void  getBalance()
 	{
 		String address = "t1esjjrygs7adcfbjnodbpdjzulzobznnln4tmsxq";
-		BigDecimal balance = filecoin.getBalance(address);
+		BigDecimal balance = JBlockServiceWrapper.getBalance(address);
 		logger.info(balance);
 	}
 

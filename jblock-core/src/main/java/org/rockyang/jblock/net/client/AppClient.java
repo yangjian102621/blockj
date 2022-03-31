@@ -1,6 +1,6 @@
 package org.rockyang.jblock.net.client;
 
-import org.rockyang.jblock.db.Datastore;
+import org.rockyang.jblock.store.Datastore;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.Peer;
 import org.rockyang.jblock.net.conf.TioConfig;

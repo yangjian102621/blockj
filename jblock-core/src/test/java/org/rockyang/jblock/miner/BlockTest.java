@@ -3,7 +3,7 @@ package org.rockyang.jblock.miner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rockyang.jblock.Application;
-import org.rockyang.jblock.db.Datastore;
+import org.rockyang.jblock.store.Datastore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * 区块测试
  * @author yangjian
- * @since 18-4-13
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)

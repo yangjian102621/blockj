@@ -19,7 +19,7 @@ public class MessageTest extends BaseTester {
 		BigDecimal value = BigDecimal.valueOf(123.456);
 		BigDecimal gasPrice = BigDecimal.valueOf(0.001);
 		Integer gasLimit = 300;
-		String cid = filecoin.sendTransaction(from, to, value, gasPrice, gasLimit);
+		String cid = JBlockServiceWrapper.sendTransaction(from, to, value, gasPrice, gasLimit);
 		Assert.assertNotNull(cid);
 		logger.info("CID: " + cid);
 	}
@@ -31,7 +31,7 @@ public class MessageTest extends BaseTester {
 	public void getTransactionStatus()
 	{
 		String cid = "zDPWYqFD4mNgMtQ8GebcxHnie8YhAHYK3GVAAYfqe2VtmbstLZog";
-		MessageStatusRes.Message message = filecoin.getTransaction(cid);
+		MessageStatusRes.Message message = JBlockServiceWrapper.getTransaction(cid);
 		logger.info("message： " + message);
 		if (message.isSuccess()) {
 			logger.info("Success.");

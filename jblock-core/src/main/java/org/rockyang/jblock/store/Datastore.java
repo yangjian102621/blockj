@@ -1,4 +1,4 @@
-package org.rockyang.jblock.db;
+package org.rockyang.jblock.store;
 
 import java.util.List;
 import java.util.Optional;
