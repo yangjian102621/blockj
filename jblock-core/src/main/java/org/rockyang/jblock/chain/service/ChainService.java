@@ -14,7 +14,7 @@ public interface ChainService {
 	Object chainHead();
 	// set chain head block index
 	void setChainHead(Object blockIndex);
-	// put the block on the main chain
+	// store the block
 	void addBlock(Block block);
 	// get block with the specified block hash
 	Block getBlockByHash(String blockHash);

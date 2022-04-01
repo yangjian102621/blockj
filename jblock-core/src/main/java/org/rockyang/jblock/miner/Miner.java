@@ -21,6 +21,6 @@ public interface Miner {
 	// check if a block is valid
 	boolean validateBlock(Block block);
 
-	Block createGenesisBlock();
+	Block createGenesisBlock() throws Exception;
 
 }

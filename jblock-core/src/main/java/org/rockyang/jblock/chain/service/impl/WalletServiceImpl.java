@@ -19,7 +19,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class WalletServiceImpl implements WalletService {
 
 	private final String WALLET_PREFIX = "/wallets/list";
-	public final String MINER_ADDR_KEY= "/wallets/miner";
+	private final String MINER_ADDR_KEY = "/wallets/miner";
+	private final String DEFAULT_ADDR_KEY = "/wallets/default";
 	private final Datastore datastore;
 
 	private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
@@ -57,7 +58,7 @@ public class WalletServiceImpl implements WalletService {
 		readLock.lock();
 		Wallet wallet = null;
 		List<Wallet> wallets = getWalletList();
-		for (Wallet w: wallets) {
+		for (Wallet w : wallets) {
 			if (StringUtils.equals(address, w.getAddress())) {
 				wallet = w;
 			}
@@ -84,5 +85,18 @@ public class WalletServiceImpl implements WalletService {
 		addWallet(wallet);
 		datastore.put(MINER_ADDR_KEY, wallet.getAddress());
 		writeLock.unlock();
+	}
+
+	@Override
+	public String getDefaultWallet()
+	{
+		Optional<Object> o = datastore.get(DEFAULT_ADDR_KEY);
+		return (String) o.orElse(null);
+	}
+
+	@Override
+	public void setDefaultWallet(String address)
+	{
+		datastore.put(DEFAULT_ADDR_KEY, address);
 	}
 }

@@ -27,7 +27,6 @@ public class CredentialTest {
 		String privateKey = "bc3da6fa7ab05c21a1087e93206ce7635bc4be0a23340211174662441862217e";
 		Credentials credentials = Credentials.create(privateKey);
 		logger.info("ether address: "+ credentials.getAddress());
-		logger.info("btc address: "+ credentials.getBtcAddress());
 		logger.info("privateKey: "+ credentials.getEcKeyPair().exportPrivateKey());
 	}
 
@@ -41,7 +40,6 @@ public class CredentialTest {
 		ECKeyPair keyPair = Keys.createEcKeyPair();
 		Credentials credentials = Credentials.create(keyPair);
 		logger.info("ether address: "+ credentials.getAddress());
-		logger.info("btc address: "+ credentials.getBtcAddress());
 		logger.info("privateKey: "+ credentials.getEcKeyPair().exportPrivateKey());
 	}
 
@@ -55,7 +53,6 @@ public class CredentialTest {
 				"--0x74704f8be564c681e042e37f33efb12fc631b87c.json";
 		Credentials credentials = WalletUtils.loadCredentials(WalletTest.WALLET_PASS, walletFile);
 		logger.info("ether address: "+ credentials.getAddress());
-		logger.info("btc address: "+ credentials.getBtcAddress());
 		logger.info("privateKey: "+ credentials.getEcKeyPair().exportPrivateKey());
 	}
 
@@ -69,7 +66,6 @@ public class CredentialTest {
 		String memorizingWords = "educate bread attract theme obey squirrel busy food finish segment sell audit";
 		Credentials credentials = WalletUtils.loadBip39Credentials(memorizingWords);
 		logger.info("ether address: "+ credentials.getAddress());
-		logger.info("btc address: "+ credentials.getBtcAddress());
 		logger.info("privateKey: "+ credentials.getEcKeyPair().exportPrivateKey());
 	}
 
@@ -92,7 +88,6 @@ public class CredentialTest {
 
 		Credentials credentials = WalletUtils.loadBip39Credentials(password, words);
 		logger.info("ether address: "+ credentials.getAddress());
-		logger.info("btc address: "+ credentials.getBtcAddress());
 		logger.info("privateKey: "+ credentials.getEcKeyPair().exportPrivateKey());
 	}
 }

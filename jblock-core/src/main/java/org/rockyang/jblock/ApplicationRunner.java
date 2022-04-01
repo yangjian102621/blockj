@@ -1,11 +1,7 @@
 package org.rockyang.jblock;
 
-import org.rockyang.jblock.chain.Account;
 import org.rockyang.jblock.chain.Block;
-import org.rockyang.jblock.chain.Wallet;
-import org.rockyang.jblock.chain.service.AccountService;
 import org.rockyang.jblock.chain.service.ChainService;
-import org.rockyang.jblock.chain.service.WalletService;
 import org.rockyang.jblock.conf.MinerConfig;
 import org.rockyang.jblock.miner.Miner;
 import org.slf4j.Logger;
@@ -21,20 +17,14 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 
 	static final Logger logger = LoggerFactory.getLogger(ApplicationRunner.class);
 
-	private final WalletService walletService;
-	private final AccountService accountService;
 	private final ChainService chainService;
 	private final MinerConfig minerConfig;
 	private final Miner miner;
 
-	public ApplicationRunner(WalletService walletService,
-	                         AccountService accountService,
-	                         ChainService chainService,
+	public ApplicationRunner(ChainService chainService,
 	                         MinerConfig minerConfig,
 	                         Miner miner)
 	{
-		this.walletService = walletService;
-		this.accountService = accountService;
 		this.chainService = chainService;
 		this.minerConfig = minerConfig;
 		this.miner = miner;
@@ -44,20 +34,13 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 	public void run(ApplicationArguments arguments) throws Exception
 	{
 		String[] args = arguments.getSourceArgs();
-		if (args.length > 0 && args[0].equals("init")) {
-			logger.info("Try to init the miner repo in {}", minerConfig.getRepo());
-			// create the default wallet
-			Wallet wallet = new Wallet();
-			walletService.setMinerWallet(wallet);
-			// create the genesis account
-			Account account = new Account(wallet.getAddress(), Miner.GENESIS_ACCOUNT_BALANCE, wallet.getPubKey(), 0);
-			accountService.setAccount(account);
-			logger.info("Initialize miner successfully, miner address: {}", wallet.getAddress());
+		if (args.length > 0 && args[0].equals("genesis")) {
+			logger.info("Try to create a genesis miner in {}", minerConfig.getRepo());
 			// generate genesis block
 			Block block = miner.createGenesisBlock();
-			chainService.addBlock(block);
+			chainService.saveBlock(block);
 			chainService.setChainHead(block.getHeader().getHeight());
-
+			logger.info("Initialize miner successfully, genesis block hash: {}", block.genCid());
 			// @TODO generate the genesis block file
 			System.exit(0);
 		}

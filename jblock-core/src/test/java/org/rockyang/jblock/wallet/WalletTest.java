@@ -48,17 +48,6 @@ public class WalletTest {
 	}
 
 	/**
-	 * 使用助记词生成一个钱包
-	 */
-	@Test
-	public void generateBip39Wallet() throws Exception {
-
-		Bip39Wallet wallet = WalletUtils.generateBip39Wallet();
-		logger.info("memorizing word: "+ wallet.getMnemonic());
-		logger.info("address: " + wallet.getKeyPair().getAddress());
-	}
-
-	/**
 	 * 使用 (密码+助记词) 生成一个钱包文件, 在恢复钱包的时候可以使用两种方法
 	 * 1. 助记词 + 密码
 	 * 2. keystore file + 密码

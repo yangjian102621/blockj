@@ -1,6 +1,5 @@
 package org.rockyang.jblock.utils;
 
-import org.rockyang.jblock.crypto.BtcAddress;
 import org.rockyang.jblock.crypto.ECKeyPair;
 import org.rockyang.jblock.crypto.Keys;
 import org.rockyang.jblock.crypto.Sign;
@@ -22,11 +21,9 @@ public class SignTest {
 	public void sign() throws Exception {
 
 		ECKeyPair ecKeyPair = Keys.createEcKeyPair();
-		String btcAddress = BtcAddress.getAddress(ecKeyPair.getPublicKey().getEncoded());
 		String ethAddress = ecKeyPair.getAddress();
 		String data = "ppblock";
 		String sign = Sign.sign(ecKeyPair.getPrivateKey(), data);
-		logger.info("btc address: "+ btcAddress);
 		logger.info("ether address: "+ ethAddress);
 		logger.info("private key: "+ ecKeyPair.exportPrivateKey());
 		logger.info("public key: "+ ecKeyPair.getPublicKey());
@@ -39,7 +36,6 @@ public class SignTest {
 
 		//从私钥恢复地址
 		PublicKey publicKey = Sign.publicKeyFromPrivate(ecKeyPair.getPrivateKeyValue());
-		logger.info("address: "+ BtcAddress.getAddress(publicKey.getEncoded()));
 	}
 
 }

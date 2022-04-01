@@ -14,4 +14,6 @@ public interface WalletService {
 	Wallet getWallet(String address);
 	Wallet getMinerWallet();
 	void setMinerWallet(Wallet wallet);
+	String getDefaultWallet();
+	void setDefaultWallet(String address);
 }

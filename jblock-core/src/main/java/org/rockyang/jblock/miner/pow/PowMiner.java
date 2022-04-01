@@ -1,9 +1,7 @@
 package org.rockyang.jblock.miner.pow;
 
-import org.rockyang.jblock.chain.Block;
-import org.rockyang.jblock.chain.BlockHeader;
-import org.rockyang.jblock.chain.Message;
-import org.rockyang.jblock.chain.Wallet;
+import org.rockyang.jblock.chain.*;
+import org.rockyang.jblock.chain.service.AccountService;
 import org.rockyang.jblock.chain.service.WalletService;
 import org.rockyang.jblock.crypto.Sign;
 import org.rockyang.jblock.miner.Miner;
@@ -19,10 +17,12 @@ public class PowMiner implements Miner {
 	// the genesis block nonce value
 	public static final Long GENESIS_BLOCK_NONCE = 100000L;
 	private final WalletService walletService;
+	private final AccountService accountService;
 
-	public PowMiner(WalletService walletService)
+	public PowMiner(WalletService walletService, AccountService accountService)
 	{
 		this.walletService = walletService;
+		this.accountService = accountService;
 	}
 
 	@Override
@@ -69,18 +69,37 @@ public class PowMiner implements Miner {
 	}
 
 	// create the genesis block
-	public Block createGenesisBlock()
+	public Block createGenesisBlock() throws Exception
 	{
-		BlockHeader header = new BlockHeader(1, null);
+		// create the default wallet
+		Wallet wallet = new Wallet();
+		walletService.setMinerWallet(wallet);
+		// create the genesis message
+
+		Message message = new Message();
+		message.setFrom(Miner.REWARD_ADDR);
+		message.setTo(wallet.getAddress());
+		message.setParams("Miner Reward.");
+		message.setCid(message.genMsgCid());
+		message.setPubKey(wallet.getPubKey());
+		message.setValue(Miner.GENESIS_ACCOUNT_BALANCE);
+		// sign the message
+		String sign = Sign.sign(wallet.getPriKey(), message.toSigned());
+		message.setSign(sign);
+
+		BlockHeader header = new BlockHeader(0, null);
 		header.setNonce(PowMiner.GENESIS_BLOCK_NONCE);
 		header.setDifficulty(ProofOfWork.getTarget());
 		header.setHash(header.genHash());
 
-		return new Block(header);
+		Block block = new Block(header);
+		block.addMessage(message);
+		return block;
 	}
 
 	@Override
-	public boolean validateBlock(Block block) {
+	public boolean validateBlock(Block block)
+	{
 		ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block.getHeader());
 		return proofOfWork.validate();
 	}

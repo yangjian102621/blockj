@@ -12,14 +12,12 @@ import java.math.BigDecimal;
 public class MessageTest extends BaseTester {
 
 	@Test
-	public void sendTransaction()
+	public void sendMessage()
 	{
 		String from = "t1uoarr4r2kw2g24c7lrnsxcsv3xfiknlbcp6zpda";
 		String to = "t1esjjrygs7adcfbjnodbpdjzulzobznnln4tmsxq";
 		BigDecimal value = BigDecimal.valueOf(123.456);
-		BigDecimal gasPrice = BigDecimal.valueOf(0.001);
-		Integer gasLimit = 300;
-		String cid = JBlockServiceWrapper.sendTransaction(from, to, value, gasPrice, gasLimit);
+		String cid = JBlockServiceWrapper.sendMessage(from, to, value);
 		Assert.assertNotNull(cid);
 		logger.info("CID: " + cid);
 	}
@@ -28,15 +26,10 @@ public class MessageTest extends BaseTester {
 	 * 查询交易状态
 	 */
 	@Test
-	public void getTransactionStatus()
+	public void getMessage()
 	{
 		String cid = "zDPWYqFD4mNgMtQ8GebcxHnie8YhAHYK3GVAAYfqe2VtmbstLZog";
-		MessageStatusRes.Message message = JBlockServiceWrapper.getTransaction(cid);
+		MessageStatusRes message = JBlockServiceWrapper.getMessage(cid);
 		logger.info("message： " + message);
-		if (message.isSuccess()) {
-			logger.info("Success.");
-		} else {
-			logger.warn("Message is unconfirmed");
-		}
 	}
 }

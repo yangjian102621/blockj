@@ -13,92 +13,38 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Filecoin 钱包 RPC 服务接口
+ * JBlock RPC service
  * @author yangjian
  */
 public interface JBlockService {
 
-	/**
-	 * create a new wallet
-	 * @return  return wallet address
-	 */
-	@GET("/api/address/new")
-	Call<Map<String, String>> newAddress();
+	@GET("/wallet/new")
+	Call<Map<String, String>> newWallet();
 
-	/**
-	 * get address list
-	 * @return
-	 */
-	@GET("/api/address/ls")
-	Call<Map<String, List>> getAddressList();
+	@GET("/wallet/list")
+	Call<Map<String, List>> walletList();
 
-	@GET("/api/address/default")
-	Call<Map<String, String>> getDefaultAddress();
+	@GET("/wallet/default")
+	Call<Map<String, String>> getDefaultWallet();
 
-	/**
-	 * export wallet by wallet address
-	 * @param address
-	 * @return
-	 */
-	@GET("/api/wallet/export")
-	Call<WalletExportRes> walletExport(@Query("arg") String address);
+	@GET("/wallet/export")
+	Call<WalletExportRes> walletExport(@Query("address") String address);
 
-	/**
-	 * import wallet
-	 * @param keyInfoReq
-	 * @return
-	 */
-	@POST("/api/wallet/import")
+	@POST("/wallet/import")
 	@Multipart
 	Call<Map<String, List>> walletImport(@Part("walletFile") KeyInfoReq keyInfoReq);
 
-	/**
-	 * query the balance of wallet by specified address
-	 * @param address
-	 * @return
-	 */
-	@GET("/api/wallet/balance")
+	@GET("/wallet/balance")
 	Call<BigDecimal> getBalance(@Query("arg") String address);
 
-	/**
-	 * send a message to transfer FIL
-	 * @param target
-	 * @param from
-	 * @param value
-	 * @param gasPrice
-	 * @param gasLimit
-	 * @return
-	 */
-	@GET("/api/message/send/{target}")
-	Call<SendMessageRes> sendMessage(@Path("target") String target,
+	@POST("/message/send")
+	Call<SendMessageRes> sendMessage(@Query("to") String to,
 	                                 @Query("from") String from,
-	                                 @Query("value") BigDecimal value,
-	                                 @Query("gas-price") BigDecimal gasPrice,
-	                                 @Query("gas-limit") Integer gasLimit);
+	                                 @Query("value") BigDecimal value);
+	@GET("/message/get")
+	Call<MessageStatusRes> getMessage(@Query("cid") String cid);
 
-	/**
-	 * query specified message status by message Cid
-	 * @param cid
-	 * @return
-	 */
-	@GET("/api/message/status")
-	Call<MessageStatusRes> getMessageStatus(@Query("arg") String cid);
 
-	/**
-	 * get configuration of daemon
-	 * @param key
-	 * @return
-	 */
-	@GET("/api/config/{key}")
-	Call<Object> config(@Path("key") String key);
-
-	/**
-	 * update configuration of daemon
-	 * @return
-	 */
-	@GET("/api/config")
-	Call<Object> config(@Query("arg") Object[] param);
-
-	@GET("/api/chain/head")
+	@GET("/chain/head")
 	Call<List<Cid>> chainHead();
 }

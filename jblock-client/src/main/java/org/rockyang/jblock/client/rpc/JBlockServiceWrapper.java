@@ -31,10 +31,10 @@ public class JBlockServiceWrapper {
 
 	private static JBlockService rpcService;
 
-	public JBlockServiceWrapper(String baseUrl, boolean logDebug)
+	public JBlockServiceWrapper(String baseUrl, boolean debug)
 	{
 		// open debug log model
-		if (logDebug) {
+		if (debug) {
 			HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
 			loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 			httpClient.addInterceptor(loggingInterceptor);
@@ -77,6 +77,7 @@ public class JBlockServiceWrapper {
 	 */
 	private static ApiError getApiError(Response<?> response) throws IOException, ApiException
 	{
+		assert response.errorBody() != null;
 		return (ApiError) retrofit.responseBodyConverter(ApiError.class, new Annotation[0]).convert(response.errorBody());
 	}
 
@@ -84,9 +85,9 @@ public class JBlockServiceWrapper {
 	 * get a new address
 	 * @return
 	 */
-	public String newAddress()
+	public String newWallet()
 	{
-		Map<String, String> map = executeSync(rpcService.newAddress());
+		Map<String, String> map = executeSync(rpcService.newWallet());
 		return map.get("Address");
 	}
 
@@ -94,27 +95,18 @@ public class JBlockServiceWrapper {
 	 * get all addresses of the filecoin daemon node
 	 * @return
 	 */
-	public List<String> getAddressList()
+	public List walletList()
 	{
-		Map<String, List> map = executeSync(rpcService.getAddressList());
+		Map<String, List> map = executeSync(rpcService.walletList());
 		return map.get("Addresses");
 	}
 
-	/**
-	 * get default address of node
-	 * @return
-	 */
-	public String getDefaultAddress()
+	public String getDefaultWallet()
 	{
-		Map<String, String> map = executeSync(rpcService.getDefaultAddress());
+		Map<String, String> map = executeSync(rpcService.getDefaultWallet());
 		return map.get("Address");
 	}
 
-	/**
-	 * export the specified wallet by address
-	 * @param address
-	 * @return
-	 */
 	public KeyInfo walletExport(String address)
 	{
 		WalletExportRes res = executeSync(rpcService.walletExport(address));
@@ -123,11 +115,6 @@ public class JBlockServiceWrapper {
 		return keyInfo;
 	}
 
-	/**
-	 * import wallet use private
-	 * @param privateKey
-	 * @return
-	 */
 	public String walletImport(String privateKey)
 	{
 		KeyInfoReq keyInfoReq = new KeyInfoReq();
@@ -140,86 +127,26 @@ public class JBlockServiceWrapper {
 		return map.get("Addresses").get(0).toString();
 	}
 
-	/**
-	 * get balance of specified address
-	 * @return
-	 */
 	public BigDecimal getBalance(String address)
 	{
 		return executeSync(rpcService.getBalance(address));
 	}
 
-	/**
-	 * send a transfer message
-	 * @param from
-	 * @param to
-	 * @param value
-	 * @param gasPrice
-	 * @param gasLimit
-	 * @return
-	 */
-	public String sendTransaction(String from, String to, BigDecimal value, BigDecimal gasPrice, Integer gasLimit)
+	public String sendMessage(String from, String to, BigDecimal value)
 	{
-		SendMessageRes res = executeSync(rpcService.sendMessage(to, from, value, gasPrice, gasLimit));
+		SendMessageRes res = executeSync(rpcService.sendMessage(to, from, value));
 		return res.getCid().getRoot();
 	}
 
-	/**
-	 * get transaction status by Cid
-	 * @param cid
-	 * @return
-	 */
-	public MessageStatusRes.Message getTransaction(String cid)
+	public MessageStatusRes getMessage(String cid)
 	{
-		MessageStatusRes res = executeSync(rpcService.getMessageStatus(cid));
-		MessageStatusRes.Message message;
-		if (res.isOnChain()) {
-			message = res.getChainMsg().getMessage().getMeteredMessage().getMessage();
-			message.setSuccess(true);
-		} else {
-			message = res.getPoolMsg().getMeteredMessage().getMessage();
-			message.setSuccess(false);
-		}
-		return message;
-	}
-
-	/**
-	 * query message status
-	 * @param cid
-	 * @return
-	 */
-	public MessageStatusRes getMessageStatus(String cid)
-	{
-		MessageStatusRes res = executeSync(rpcService.getMessageStatus(cid));
+		MessageStatusRes res = executeSync(rpcService.getMessage(cid));
 		if (res.isOnChain()) {
 			res.getChainMsg().getMessage().getMeteredMessage().getMessage().setSuccess(true);
 		} else {
 			res.getChainMsg().getMessage().getMeteredMessage().getMessage().setSuccess(false);
 		}
 		return res;
-	}
-
-	/**
-	 * get configuration of daemon
-	 * @param key
-	 * @return
-	 */
-	public Object config(String key)
-	{
-		return executeSync(rpcService.config(key));
-	}
-
-	/**
-	 * update configuration of daemon
-	 * @param key
-	 * @param value
-	 */
-	public void config(String key, Object value)
-	{
-		Object[] params = new Object[2];
-		params[0] = key;
-		params[1] = value;
-		executeSync(rpcService.config(params));
 	}
 
 	public String chainHead()

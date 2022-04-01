@@ -26,11 +26,7 @@ public class WalletTest extends BaseTester {
 		String privateKey = "pdHwTOrJXnAGvQ0861k66xRsiT7N3Ms8IGte3nT837E=";
 		String address = JBlockServiceWrapper.walletImport(privateKey);
 		Assert.assertNotNull(address);
-		if (address != null) {
-			logger.info("wallet import successfully, Address : " + address);
-		} else {
-			logger.info("wallet import fail");
-		}
+		logger.info("wallet import successfully, Address : " + address);
 	}
 
 	@Test
