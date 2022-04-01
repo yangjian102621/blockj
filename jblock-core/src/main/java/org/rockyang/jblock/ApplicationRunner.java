@@ -4,10 +4,14 @@ import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.service.ChainService;
 import org.rockyang.jblock.conf.MinerConfig;
 import org.rockyang.jblock.miner.Miner;
+import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Component;
+
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 
 /**
  * @author yangjian
@@ -41,7 +45,15 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 			chainService.saveBlock(block);
 			chainService.setChainHead(block.getHeader().getHeight());
 			logger.info("Initialize miner successfully, genesis block hash: {}", block.genCid());
-			// @TODO generate the genesis block file
+			// generate the genesis block file
+			String genesisFile = System.getProperty("user.dir")+"/genesis.car";
+			byte[] bytes = SerializeUtils.serialize(block);
+			FileOutputStream fos = new FileOutputStream(genesisFile);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(bytes);
+			oos.flush();
+			fos.close();
+			logger.info("generated the genesis file: {} successfully.", genesisFile);
 			System.exit(0);
 		}
 

@@ -25,6 +25,6 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
-block-data
 keystore
 *.log
+genesis.car
