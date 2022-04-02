@@ -1,5 +1,6 @@
 package org.rockyang.jblock.net.client;
 
+import org.rockyang.jblock.chain.sync.ClientHandler;
 import org.rockyang.jblock.net.base.BaseHandler;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
@@ -18,6 +19,13 @@ import org.tio.core.intf.Packet;
 public class AppClientHandler extends BaseHandler implements TioClientHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(AppClientHandler.class);
+
+	private final ClientHandler handler;
+
+	public AppClientHandler(ClientHandler request)
+	{
+		this.handler = request;
+	}
 
 	// message handler
 	@Override
@@ -44,9 +52,9 @@ public class AppClientHandler extends BaseHandler implements TioClientHandler {
 //					this.fetchNextBlock(body);
 					break;
 
-					//请求生成新的区块
+					// broadcast new block
 				case MessagePacketType.RES_NEW_BLOCK:
-//					this.newBlock(body);
+					handler.newBlock(body);
 					break;
 
 					// 同步节点信息
@@ -58,7 +66,4 @@ public class AppClientHandler extends BaseHandler implements TioClientHandler {
 
 		}
 	}
-
-
-
 }

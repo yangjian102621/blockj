@@ -1,4 +1,6 @@
-package org.rockyang.jblock.chain.p2p;
+package org.rockyang.jblock.chain.sync;
+
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -7,7 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * this handler will process the message response from the server
  * @author yangjian
  */
-public class ReqHandler {
+@Component
+public class ClientHandler {
 
 	// 已确认区块
 	private static ConcurrentHashMap<String, Integer> confirmedBlocks = new ConcurrentHashMap<>(16);

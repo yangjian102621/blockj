@@ -1,11 +1,11 @@
-package org.rockyang.jblock.net.base;
+package org.rockyang.jblock.chain.sync;
 
 /**
  * 服务器响应 VO
  * @author yangjian
  * @since 2018-04-19 下午10:13.
  */
-public class ServerResponseVo {
+public class RespVo {
 
 	/**
 	 * 响应实体
@@ -20,10 +20,10 @@ public class ServerResponseVo {
 	 */
 	private String message;
 
-	public ServerResponseVo() {
+	public RespVo() {
 	}
 
-	public ServerResponseVo(Object item, boolean status) {
+	public RespVo(Object item, boolean status) {
 		this.item = item;
 		this.success = status;
 	}

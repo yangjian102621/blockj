@@ -1,7 +1,5 @@
 package org.rockyang.jblock.net.base;
 
-import org.rockyang.jblock.chain.Block;
-import org.rockyang.jblock.store.Datastore;
 import org.tio.core.ChannelContext;
 import org.tio.core.TioConfig;
 import org.tio.core.exception.TioDecodeException;
@@ -93,40 +91,6 @@ public abstract class BaseHandler {
 		}
 		return buffer;
 	}
-
-	/**
-	 * 检验区块是否合法
-	 * 1. 验证改区块前一个区块是否存在，且 previousHash 是否合法（暂时不做验证）
-	 * 2. 验证该区块本身 hash 是否合法
-	 * @param block
-	 * @param dataStore
-	 * @return
-	 */
-	public boolean checkBlock(Block block, Datastore dataStore) {
-
-		//创世区块
-//		if (block.getHeight() == 1) {
-//			return Objects.equal(block.getHash(), block.genBlockHash());
-//		}
-//
-//		boolean blockValidate = false;
-////		if (block.getHeader().getIndex() > 1) {
-////			Optional<Block> prevBlock = dataStore.getBlock(block.getHeader().getIndex()-1);
-////			if (prevBlock.isPresent()
-////					&& prevBlock.get().getHeader().getHash().equals(block.getHeader().getPreviousHash())) {
-////				blockValidate = true;
-////			}
-////		}
-//		//检查是否符合工作量证明
-//		ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block);
-//		if (!proofOfWork.validate()) {
-//			blockValidate = false;
-//		}
-//
-//		return blockValidate;
-		return true;
-	}
-
 
 	public Packet heartbeatPacket(ChannelContext context) {
 		return heartbeatPacket;

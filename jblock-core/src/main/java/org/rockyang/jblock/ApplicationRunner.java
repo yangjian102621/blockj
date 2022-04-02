@@ -56,7 +56,6 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 			logger.info("generated the genesis file: {} successfully.", genesisFile);
 			System.exit(0);
 		}
-
 	}
 
 }

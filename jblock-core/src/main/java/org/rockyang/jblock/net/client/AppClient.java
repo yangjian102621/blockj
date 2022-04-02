@@ -1,8 +1,9 @@
 package org.rockyang.jblock.net.client;
 
-import org.rockyang.jblock.store.Datastore;
+import org.apache.commons.lang3.StringUtils;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.Peer;
+import org.rockyang.jblock.net.conf.AppConfig;
 import org.rockyang.jblock.net.conf.TioConfig;
 import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
@@ -22,16 +23,18 @@ import org.tio.core.Tio;
 public class AppClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(AppClient.class);
-	private TioClientConfig clientConfig;
-	private TioClient client;
-	private Datastore datastore;
+	private final TioClientConfig clientConfig;
+	private final TioClient client;
+	private final AppConfig appConfig;
 
-	public AppClient(TioClientConfig clientConfig, Datastore datastore) throws Exception
+
+	public AppClient(TioClientConfig clientConfig, AppConfig appConfig) throws Exception
 	{
 		this.clientConfig = clientConfig;
 		this.client = new TioClient(clientConfig);
-		this.datastore = datastore;
+		this.appConfig = appConfig;
 		// @TODO connect the genesis node?
+		connect(new Peer(appConfig.getGenesisAddress(), appConfig.getGenesisPort()));
 	}
 
 	public void sendGroup(MessagePacket messagePacket)
@@ -42,6 +45,10 @@ public class AppClient {
 	// connect a new node
 	public void connect(Peer peer) throws Exception
 	{
+		if (StringUtils.equals(peer.getIp(), appConfig.getServerAddress()) && peer.getPort() == appConfig.getServerPort()) {
+			logger.info("skip self connections, {}", peer.toString());
+			return;
+		}
 		ClientChannelContext channelContext = client.connect(peer);
 		// send a hello message after connected
 		MessagePacket packet = new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE));

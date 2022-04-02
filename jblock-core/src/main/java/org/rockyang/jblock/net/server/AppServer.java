@@ -15,7 +15,7 @@ import java.io.IOException;
 @Component
 public class AppServer {
 
-	private TioServerConfig serverConfig;
+	private final TioServerConfig serverConfig;
 	@Value("${tio.server.address}")
 	private String address;
 	@Value("${tio.server.port}")

@@ -4,7 +4,6 @@ import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
 import org.rockyang.jblock.chain.event.SyncBlockEvent;
 import org.rockyang.jblock.chain.service.ChainService;
-import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.net.client.AppClient;
@@ -59,7 +58,7 @@ public class BlockEventListener {
 		if (o != null) {
 			head = Integer.parseInt(o.toString());
 		}
-		ApplicationContextProvider.publishEvent(new SyncBlockEvent(head+1));
+		syncBlock(new SyncBlockEvent(head+1));
 	}
 
 	// sync the specified height block

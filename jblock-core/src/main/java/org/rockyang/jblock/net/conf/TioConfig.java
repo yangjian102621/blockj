@@ -11,9 +11,7 @@ import org.tio.client.TioClientConfig;
 import org.tio.server.TioServerConfig;
 
 /**
- * Group context 配置
  * @author yangjian
- * @since 18-4-18
  */
 @Configuration
 public class TioConfig {
