@@ -2,6 +2,7 @@ package org.rockyang.jblock.chain.listener;
 
 import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
+import org.rockyang.jblock.chain.event.NodeConnectEvent;
 import org.rockyang.jblock.chain.event.SyncBlockEvent;
 import org.rockyang.jblock.chain.service.ChainService;
 import org.rockyang.jblock.net.base.MessagePacket;
@@ -48,9 +49,9 @@ public class BlockEventListener {
 		appClient.sendGroup(messagePacket);
 	}
 
-	// start sync blocks when the application is ready
-	@EventListener(ApplicationReadyEvent.class)
-	public void appReady()
+	// start sync blocks when a new node is connected
+	@EventListener(NodeConnectEvent.class)
+	public void nodeConnected()
 	{
 		// get the chain head
 		Object o = chainService.chainHead();
@@ -59,6 +60,11 @@ public class BlockEventListener {
 			head = Integer.parseInt(o.toString());
 		}
 		syncBlock(new SyncBlockEvent(head+1));
+	}
+
+	@EventListener(ApplicationReadyEvent.class)
+	public void appReady(ApplicationReadyEvent event)
+	{
 	}
 
 	// sync the specified height block

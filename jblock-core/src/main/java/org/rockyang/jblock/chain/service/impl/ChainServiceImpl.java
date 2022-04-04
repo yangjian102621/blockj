@@ -185,7 +185,12 @@ public class ChainServiceImpl implements ChainService {
 			accountService.setAccount(recipient);
 		}
 		addBlock(block);
-		setChainHead(block.getHeader().getHeight());
+		// update the chain head
+		Object o = chainHead();
+		int head = Integer.parseInt(o.toString());
+		if (head < block.getHeader().getHeight()) {
+			setChainHead(block.getHeader().getHeight());
+		}
 	}
 
 	public String sendMessage(String from, String to, BigDecimal value, String param) throws Exception

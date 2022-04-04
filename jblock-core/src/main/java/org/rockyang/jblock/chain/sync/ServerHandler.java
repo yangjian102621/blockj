@@ -28,21 +28,6 @@ public class ServerHandler {
 	{
 		this.chainService = chainService;
 	}
-	/**
-	 * 普通字符串
-	 * @param body
-	 * @return
-	 */
-	public MessagePacket stringMessage(byte[] body) {
-
-		MessagePacket resPacket = new MessagePacket();
-		String str = (String) SerializeUtils.unSerialize(body);
-		logger.info("收到客户端请求消息："+str);
-		resPacket.setType(MessagePacketType.STRING_MESSAGE);
-		resPacket.setBody(SerializeUtils.serialize("收到了你的消息，你的消息是:" + str));
-
-		return resPacket;
-	}
 
 	/**
 	 * 去人确认交易
@@ -97,48 +82,50 @@ public class ServerHandler {
 		return resPacket;
 	}
 
+	/**
+	 * new block event handler
+	 */
 	public MessagePacket newBlock(byte[] body) throws Exception {
 
-		RespVo responseVo = new RespVo();
+		RespVo respVo = new RespVo();
 		MessagePacket resPacket = new MessagePacket();
 		Block newBlock = (Block) SerializeUtils.unSerialize(body);
-		logger.info("收到新区块确认请求： {}", newBlock);
-//		if (checkBlock(newBlock, dataStore)) {
-//			dataStore.putLastBlockIndex(newBlock.getHeader().getIndex());
-//			dataStore.putBlock(newBlock);
-//			responseVo.setSuccess(true);
-//			//执行区块中的交易，同步账户的余额
-//			executor.run(newBlock);
-//		} else {
-//			logger.error("区块确认失败：{}", newBlock);
-//			responseVo.setSuccess(false);
-//			responseVo.setMessage("区块校验失败，不合法的区块.");
-//		}
-		responseVo.setItem(newBlock);
+		logger.info("receive new block confirm request： {}", newBlock);
+		if (checkBlock(newBlock, respVo)) {
+			respVo.setSuccess(true);
+			chainService.saveBlock(newBlock);
+		} else {
+			logger.error("block confirmation failed：{}", respVo.getMessage());
+			respVo.setSuccess(false);
+		}
 		resPacket.setType(MessagePacketType.RES_NEW_BLOCK);
-		resPacket.setBody(SerializeUtils.serialize(responseVo));
+		resPacket.setBody(SerializeUtils.serialize(respVo));
 
 		return resPacket;
 	}
 
 	/**
-	 * 检验区块是否合法
-	 * 1. 验证改区块前一个区块是否存在，且 previousHash 是否合法（暂时不做验证）
-	 * 2. 验证该区块本身 hash 是否合法
+	 * check the block
+	 * 1. Check if the previous block is exists, and previousHash is correct
+	 * 2. Check if the pow result
+	 * 3. Check if the block signature is correct
 	 */
-	public boolean checkBlock(Block block) {
+	public boolean checkBlock(Block block, RespVo respVo) {
 
 		// @TODO: check the genesis block
 
 		// check the proof of work nonce
 		ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block.getHeader());
 		if (!proofOfWork.validate()) {
+			respVo.setMessage("Invalid Pow result");
 			return false;
 		}
 
+		// check the prev block
 		if (block.getHeader().getHeight() > 1) {
 			Block prevBlock = chainService.getBlock(block.getHeader().getHeight()-1);
-			if (prevBlock == null || StringUtils.equals(prevBlock.getHeader().getHash(), block.getHeader().getPreviousHash())) {
+			if (prevBlock == null || !StringUtils.equals(prevBlock.getHeader().getHash(), block.getHeader().getPreviousHash())) {
+				respVo.setMessage("Invalid previous hash");
 				return false;
 			}
 		}
@@ -149,11 +136,6 @@ public class ServerHandler {
 
 	}
 
-	/**
-	 * 获取节点列表
-	 * @param body
-	 * @return
-	 */
 	public MessagePacket getNodeList(byte[] body)
 	{
 		String message = (String) SerializeUtils.unSerialize(body);
@@ -175,33 +157,4 @@ public class ServerHandler {
 		return  resPacket;
 	}
 
-	public MessagePacket incBlockConfirmNum(byte[] body)
-	{
-		RespVo responseVo = new RespVo();
-		MessagePacket resPacket = new MessagePacket();
-		Integer blockIndex = (Integer) SerializeUtils.unSerialize(body);
-		logger.info("收到增加区块确认数请求, 同步区块高度为， {}", blockIndex);
-//		Optional<Block> blockOptional = dataStore.getBlock(blockIndex);
-//		if (blockOptional.isPresent()) {
-//			Block block = blockOptional.get();
-//			// 增加区块确认数
-//			block.setConfirmNum(block.getConfirmNum()+1);
-//
-//			if (block.getConfirmNum() >= appConfig.getMinConfirmNum()) {
-//				// 更改当前区块所有的交易状态
-//				for (Message message : block.getBody().getTransactions()) {
-//					message.setStatus(MessageStatus.SUCCESS);
-//				}
-//			}
-//			dataStore.putBlock(block); // 更新区块
-//			responseVo.setSuccess(true);
-//		} else {
-//			responseVo.setSuccess(false);
-//			responseVo.setMessage("区块高度不存在.{"+blockIndex+"}");
-//		}
-//		resPacket.setType(MessagePacketType.RES_INC_CONFIRM_NUM);
-//		resPacket.setBody(SerializeUtils.serialize(responseVo));
-
-		return resPacket;
-	}
 }
