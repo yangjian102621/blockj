@@ -4,7 +4,7 @@ import org.rockyang.jblock.chain.Message;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * 发送交易事件
+ * This event will be fired when receive a new message
  * @author yangjian
  */
 public class NewMessageEvent extends ApplicationEvent {

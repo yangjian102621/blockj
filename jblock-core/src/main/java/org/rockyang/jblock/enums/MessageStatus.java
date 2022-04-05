@@ -31,4 +31,7 @@ public enum MessageStatus {
 		return value;
 	}
 
+	public boolean equals(MessageStatus other) {
+		return value == other.value;
+	}
 }

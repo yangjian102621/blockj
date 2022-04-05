@@ -1,8 +1,10 @@
 package org.rockyang.jblock.chain.sync;
 
+import org.rockyang.jblock.chain.service.ChainService;
+import org.rockyang.jblock.utils.SerializeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * message request handler
@@ -11,32 +13,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component
 public class ClientHandler {
+	private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
 
-	// 已确认区块
-	private static ConcurrentHashMap<String, Integer> confirmedBlocks = new ConcurrentHashMap<>(16);
-	/**
-	 * 交易确认
-	 * @param body
-	 */
-	public void confirmTransaction(byte[] body) {
+	private final ChainService chainService;
 
-//		logger.info("收到交易确认响应");
-//		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
-//		Message tx = (Message) responseVo.getItem();
-//		if (responseVo.isSuccess()) {
-//			logger.info("交易确认成功， {}", tx);
-//		} else {
-//			// 将非法交易移除交易池
-//			messagePool.removeTransaction(tx.getTxHash());
-//			logger.error("交易确认失败, {}", tx);
-//		}
+	public ClientHandler(ChainService chainService)
+	{
+		this.chainService = chainService;
 	}
 
-	/**
-	 * 同步下一个区块
-	 * @param body
-	 */
-	public void fetchNextBlock(byte[] body) throws Exception {
+	public void SyncBlock(byte[] body)
+	{
 
 //		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
 //		if (!responseVo.isSuccess()) {
@@ -77,36 +64,30 @@ public class ClientHandler {
 //		}
 	}
 
-	/**
-	 * 新区块确认
-	 * @param body
-	 */
-	public void newBlock(byte[] body) throws Exception
+	// new block confirm
+	public void newBlock(byte[] body)
 	{
-//		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
-//		Block newBlock = (Block) responseVo.getItem();
-//
-//		if (responseVo.isSuccess()) {
-//			synchronized (this) {
-//				Integer confirmedCounter = confirmedBlocks.get(newBlock.getHash());
-//				if (null == confirmedCounter) {
-//					// 执行区块中的交易
-//					executor.run(newBlock);
-//					confirmedCounter = 0;
-//				}
-//				// 更新当前区块确认数
-////				newBlock.setConfirmNum(confirmedCounter+1);
-//				confirmedBlocks.put(newBlock.getHash(), confirmedCounter+1);
-//				// 更新数据库
-//				dataStore.putBlock(newBlock);
-//				logger.info("区块确认成功, {}", newBlock);
-//
-//				// 同步其他节点的区块确认数
-//				ApplicationContextProvider.publishEvent(new BlockConfirmNumEvent(newBlock.getHeight()));
-//			}
-//		} else {
-//			logger.error("区块确认失败, {}, {}", responseVo.getMessage(), newBlock);
-//		}
+		RespVo respVo = (RespVo) SerializeUtils.unSerialize(body);
+		Object blockIndex = respVo.getItem();
+
+		if (!respVo.isSuccess() && chainService.isBlockValidated(blockIndex)) {
+			logger.error("block confirm failed, remove it, {}", blockIndex);
+			chainService.unValidateBlock(blockIndex);
+		}
+	}
+
+	// new message validation
+	public void newMessage(byte[] body)
+	{
+
+		RespVo respVo = (RespVo) SerializeUtils.unSerialize(body);
+		String msgCid = (String) respVo.getItem();
+
+		if (!respVo.isSuccess()) {
+			logger.error("message confirm failed, ");
+			// remove message from message pool
+		}
+
 	}
 
 	/**

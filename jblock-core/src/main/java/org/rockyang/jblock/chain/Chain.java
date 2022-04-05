@@ -72,8 +72,7 @@ public class Chain {
 						iterator.remove();
 					}
 
-					// save block and execute messages in block
-					chainService.saveBlock(block);
+					chainService.validateBlock(block);
 
 					// broadcast the block
 					ApplicationContextProvider.publishEvent(new NewBlockEvent(block));

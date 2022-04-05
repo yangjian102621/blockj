@@ -86,6 +86,26 @@ public class ChainServiceImpl implements ChainService {
 	}
 
 	@Override
+	public void deleteBlock(Object blockIndex)
+	{
+		writeLock.lock();
+		Block block = getBlock(blockIndex);
+		if (block == null) {
+			writeLock.unlock();
+			return;
+		}
+		datastore.delete(BLOCK_PREFIX + block.getHeader().getHash());
+		datastore.delete(BLOCK_PREFIX + block.getHeader().getHeight());
+
+		// delete messages in block
+		block.getMessages().forEach(message -> {
+			datastore.delete(MESSAGE_PREFIX + message.getCid());
+		});
+		writeLock.unlock();
+	}
+
+
+	@Override
 	public Block getBlockByHash(String blockHash)
 	{
 		readLock.lock();
@@ -130,8 +150,9 @@ public class ChainServiceImpl implements ChainService {
 	}
 
 	// save block and execute messages in block
-	public void saveBlock(Block block) throws Exception
+	public void validateBlock(Block block) throws Exception
 	{
+		writeLock.lock();
 		for (Message message : block.getMessages()) {
 			Account recipient = accountService.getAccount(message.getTo());
 
@@ -181,6 +202,7 @@ public class ChainServiceImpl implements ChainService {
 			// update the message nonce for sender
 			sender.setMessageNonce(sender.getMessageNonce() + 1);
 
+			// update the accounts
 			accountService.setAccount(sender);
 			accountService.setAccount(recipient);
 		}
@@ -191,6 +213,43 @@ public class ChainServiceImpl implements ChainService {
 		if (head < block.getHeader().getHeight()) {
 			setChainHead(block.getHeader().getHeight());
 		}
+		writeLock.unlock();
+	}
+
+	@Override
+	public void unValidateBlock(Object blockIndex)
+	{
+		writeLock.lock();
+		Block block = getBlock(blockIndex);
+		for (Message message : block.getMessages()) {
+			if (!message.getStatus().equals(MessageStatus.SUCCESS)) {
+				continue;
+			}
+			Account recipient = accountService.getAccount(message.getTo());
+			Account sender = accountService.getAccount(message.getFrom());
+
+			// reverse transfer message and update account balances
+			sender.setBalance(sender.getBalance().add(message.getValue()));
+			recipient.setBalance(recipient.getBalance().subtract(message.getValue()));
+
+			// update the message nonce for sender
+			sender.setMessageNonce(sender.getMessageNonce() - 1);
+
+			// update the accounts
+			accountService.setAccount(sender);
+			accountService.setAccount(recipient);
+		}
+		deleteBlock(blockIndex);
+		writeLock.unlock();
+	}
+
+	@Override
+	public boolean isBlockValidated(Object blockIndex)
+	{
+		readLock.lock();
+		Block block = getBlock(blockIndex);
+		readLock.unlock();
+		return block != null;
 	}
 
 	public String sendMessage(String from, String to, BigDecimal value, String param) throws Exception

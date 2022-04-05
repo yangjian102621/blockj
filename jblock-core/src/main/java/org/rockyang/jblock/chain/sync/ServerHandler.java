@@ -3,7 +3,10 @@ package org.rockyang.jblock.chain.sync;
 import org.apache.commons.lang3.StringUtils;
 import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.Message;
+import org.rockyang.jblock.chain.MessagePool;
 import org.rockyang.jblock.chain.service.ChainService;
+import org.rockyang.jblock.crypto.Keys;
+import org.rockyang.jblock.crypto.Sign;
 import org.rockyang.jblock.miner.pow.ProofOfWork;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
@@ -23,45 +26,39 @@ public class ServerHandler {
 	private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
 	private final ChainService chainService;
+	private final MessagePool messagePool;
 
-	public ServerHandler(ChainService chainService)
+	public ServerHandler(ChainService chainService, MessagePool messagePool)
 	{
 		this.chainService = chainService;
+		this.messagePool = messagePool;
 	}
 
-	/**
-	 * 去人确认交易
-	 * @param body
-	 */
-	public MessagePacket confirmTransaction(byte[] body) throws Exception {
+	// new message validation
+	public MessagePacket newMessage(byte[] body) throws Exception {
 
-		RespVo responseVo = new RespVo();
+		RespVo respVo = new RespVo();
 		MessagePacket resPacket = new MessagePacket();
-		Message tx = (Message) SerializeUtils.unSerialize(body);
-		logger.info("收到交易确认请求， {}", tx);
-		responseVo.setItem(tx);
-//		//验证交易
-//		if (Sign.verify(Keys.publicKeyDecode(tx.getPublicKey()), tx.getSign(), tx.toSignString())) {
-//			responseVo.setSuccess(true);
-//			//将交易放入交易池
-//			messagePool.addTransaction(tx);
-//		} else {
-//			responseVo.setSuccess(false);
-//			responseVo.setMessage("交易签名错误");
-//			logger.info("交易确认失败, 交易签名错误, {}", tx);
-//		}
-		resPacket.setType(MessagePacketType.RES_CONFIRM_TRANSACTION);
-		resPacket.setBody(SerializeUtils.serialize(responseVo));
+		Message message = (Message) SerializeUtils.unSerialize(body);
+		logger.info("receive a new message， {}", message);
+		respVo.setItem(message.getCid());
+		// validate the message
+		if (Sign.verify(Keys.publicKeyDecode(message.getPubKey()), message.getSign(), message.toSigned())) {
+			respVo.setSuccess(true);
+			// put message into message pool
+			messagePool.pendingMessage(message);
+		} else {
+			respVo.setSuccess(false);
+			respVo.setMessage("Invalid message signature");
+			logger.info("failed to validate the message, invalid signature, {}", message);
+		}
+		resPacket.setType(MessagePacketType.RES_CONFIRM_MESSAGE);
+		resPacket.setBody(SerializeUtils.serialize(respVo));
 
 		return resPacket;
 	}
 
-	/**
-	 * 获取下一个区块
-	 * @param body
-	 * @return
-	 */
-	public MessagePacket fetchNextBlock(byte[] body) {
+	public MessagePacket SyncBlock(byte[] body) {
 
 		RespVo responseVo = new RespVo();
 		MessagePacket resPacket = new MessagePacket();
@@ -93,14 +90,19 @@ public class ServerHandler {
 		logger.info("receive new block confirm request： {}", newBlock);
 		if (checkBlock(newBlock, respVo)) {
 			respVo.setSuccess(true);
-			chainService.saveBlock(newBlock);
+			if (!chainService.isBlockValidated(newBlock.getHeader().getHeight())) {
+				chainService.validateBlock(newBlock);
+				logger.info("block confirmation successfully, height: {}, cid：{}", newBlock.getHeader().getHeight(), newBlock.genCid());
+			}
 		} else {
-			logger.error("block confirmation failed：{}", respVo.getMessage());
 			respVo.setSuccess(false);
+			logger.error("block confirmation failed：{}", respVo.getMessage());
 		}
+		respVo.setItem(newBlock.getHeader().getHash());
 		resPacket.setType(MessagePacketType.RES_NEW_BLOCK);
 		resPacket.setBody(SerializeUtils.serialize(respVo));
 
+		// @TODO: broadcast block to other node
 		return resPacket;
 	}
 
@@ -151,7 +153,7 @@ public class ServerHandler {
 //		} else {
 //			responseVo.setSuccess(false);
 //		}
-		resPacket.setType(MessagePacketType.RES_NODE_LIST);
+		resPacket.setType(MessagePacketType.RES_PEER_LIST);
 		resPacket.setBody(SerializeUtils.serialize(responseVo));
 
 		return  resPacket;

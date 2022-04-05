@@ -47,13 +47,8 @@ public class AppServerHandler extends BaseHandler implements TioServerHandler {
 				resPacket = new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE));
 				break;
 
-			// 确认交易
-			case MessagePacketType.REQ_CONFIRM_TRANSACTION:
-//						resPacket = this.confirmTransaction(body);
-				break;
-
 			// 同步下一个区块
-			case MessagePacketType.REQ_SYNC_NEXT_BLOCK:
+			case MessagePacketType.REQ_BLOCK_SYNC:
 //						resPacket = this.fetchNextBlock(body);
 				break;
 
@@ -63,14 +58,9 @@ public class AppServerHandler extends BaseHandler implements TioServerHandler {
 				break;
 
 			//获取节点列表
-			case MessagePacketType.REQ_NODE_LIST:
-//						resPacket = this.getNodeList(body);
+			case MessagePacketType.REQ_PEER_LIST:
+//				resPacket = this.getNodeList(body);
 				break;
-
-			case MessagePacketType.RES_INC_CONFIRM_NUM:
-//						resPacket = this.incBlockConfirmNum(body);
-				break;
-
 		} //end of switch
 
 		//发送消息

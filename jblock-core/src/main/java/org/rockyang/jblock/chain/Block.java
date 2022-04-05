@@ -1,7 +1,5 @@
 package org.rockyang.jblock.chain;
 
-import org.rockyang.jblock.crypto.Hash;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -62,22 +60,10 @@ public class Block implements Serializable {
 		this.header = header;
 	}
 
-	private String buildMessages()
-	{
-		StringBuilder builder = new StringBuilder();
-		messages.forEach(message -> {
-			builder.append(message.getCid());
-		});
-		return builder.toString();
-	}
-
 	// generate block content id
 	public String genCid()
 	{
-		return Hash.sha3("Block{" +
-				"header=" + header.toString()  +
-				", messages=" + buildMessages() +
-				'}');
+		return header.getHash();
 	}
 
 	@Override

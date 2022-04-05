@@ -2,7 +2,7 @@ package org.rockyang.jblock.chain.listener;
 
 import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
-import org.rockyang.jblock.chain.event.NodeConnectEvent;
+import org.rockyang.jblock.chain.event.PeerConnectEvent;
 import org.rockyang.jblock.chain.event.SyncBlockEvent;
 import org.rockyang.jblock.chain.service.ChainService;
 import org.rockyang.jblock.net.base.MessagePacket;
@@ -16,9 +16,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 /**
- * 区块事件监听器
  * @author yangjian
- * @since 18-4-19
  */
 @Component
 public class BlockEventListener {
@@ -34,10 +32,7 @@ public class BlockEventListener {
 		this.chainService = chainService;
 	}
 
-	/**
-	 * 挖矿事件监听
-	 * @param event
-	 */
+	// mine a new block event
 	@EventListener(NewBlockEvent.class)
 	public void newBlock(NewBlockEvent event) {
 
@@ -50,7 +45,7 @@ public class BlockEventListener {
 	}
 
 	// start sync blocks when a new node is connected
-	@EventListener(NodeConnectEvent.class)
+	@EventListener(PeerConnectEvent.class)
 	public void nodeConnected()
 	{
 		// get the chain head

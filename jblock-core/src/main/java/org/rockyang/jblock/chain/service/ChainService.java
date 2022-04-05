@@ -16,6 +16,8 @@ public interface ChainService {
 	void setChainHead(Object blockIndex);
 	// store the block
 	void addBlock(Block block);
+	// remove block from store
+	void deleteBlock(Object blockIndex);
 	// get block with the specified block hash
 	Block getBlockByHash(String blockHash);
 	// get block by height index
@@ -25,5 +27,11 @@ public interface ChainService {
 
 	// send a message and return the message Cid
 	String sendMessage(String from, String to, BigDecimal value, String param) throws Exception;
-	void saveBlock(Block block) throws Exception;
+
+	// save block and execute messages in block
+	void validateBlock(Block block) throws Exception;
+	// delete block and reverse the messages
+	void unValidateBlock(Object blockIndex);
+	// check if the block is validated
+	boolean isBlockValidated(Object blockIndex);
 }

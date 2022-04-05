@@ -4,12 +4,12 @@ import org.rockyang.jblock.net.base.Peer;
 import org.springframework.context.ApplicationEvent;
 
 /**
- *
+ * This event will be fired when a new node connected
  * @author yangjian
  */
-public class NodeConnectEvent extends ApplicationEvent {
+public class PeerConnectEvent extends ApplicationEvent {
 
-    public NodeConnectEvent(Peer peer) {
+    public PeerConnectEvent(Peer peer) {
         super(peer);
     }
 }

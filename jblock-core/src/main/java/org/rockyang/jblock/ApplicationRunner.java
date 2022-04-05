@@ -42,7 +42,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 			logger.info("Try to create a genesis miner in {}", minerConfig.getRepo());
 			// generate genesis block
 			Block block = miner.createGenesisBlock();
-			chainService.saveBlock(block);
+			chainService.validateBlock(block);
 			chainService.setChainHead(block.getHeader().getHeight());
 			logger.info("Initialize miner successfully, genesis block hash: {}", block.genCid());
 			// generate the genesis block file

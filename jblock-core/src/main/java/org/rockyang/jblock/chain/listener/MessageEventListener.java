@@ -13,9 +13,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 /**
- * 发送交易事件监听器
  * @author yangjian
- * @since 18-4-19
  */
 @Component
 public class MessageEventListener {
@@ -24,18 +22,14 @@ public class MessageEventListener {
 	private AppClient appClient;
 	private static Logger logger = LoggerFactory.getLogger(MessageEventListener.class);
 
-	/**
-	 * 向所有客户端广播交易
-	 * @param event
-	 */
 	@EventListener(NewMessageEvent.class)
-	public void sendTransaction(NewMessageEvent event)
+	public void broadCastMessage(NewMessageEvent event)
 	{
 
-		logger.info("++++++++++++++ 开始广播新新的交易订单 +++++++++++++++++++++");
+		logger.info("++++++++++++++ Start to broadcast new message +++++++++++++++++++++");
 		Message message = (Message) event.getSource();
 		MessagePacket messagePacket = new MessagePacket();
-		messagePacket.setType(MessagePacketType.REQ_CONFIRM_TRANSACTION);
+		messagePacket.setType(MessagePacketType.REQ_CONFIRM_MESSAGE);
 		messagePacket.setBody(SerializeUtils.serialize(message));
 		appClient.sendGroup(messagePacket);
 	}

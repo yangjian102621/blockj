@@ -43,12 +43,12 @@ public class AppClientHandler extends BaseHandler implements TioClientHandler {
 					break;
 
 					//确认交易回复
-				case MessagePacketType.RES_CONFIRM_TRANSACTION:
+				case MessagePacketType.RES_CONFIRM_MESSAGE:
 					//this.confirmTransaction(body);
 					break;
 
 					//同步区块回复
-				case MessagePacketType.RES_SYNC_NEXT_BLOCK:
+				case MessagePacketType.RES_BLOCK_SYNC:
 //					this.fetchNextBlock(body);
 					break;
 
@@ -58,7 +58,7 @@ public class AppClientHandler extends BaseHandler implements TioClientHandler {
 					break;
 
 					// 同步节点信息
-				case MessagePacketType.RES_NODE_LIST:
+				case MessagePacketType.RES_PEER_LIST:
 //					this.getNodeList(body);
 					break;
 
