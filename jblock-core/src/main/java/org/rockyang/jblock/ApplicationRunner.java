@@ -44,7 +44,7 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 			Block block = miner.createGenesisBlock();
 			chainService.validateBlock(block);
 			chainService.setChainHead(block.getHeader().getHeight());
-			logger.info("Initialize miner successfully, genesis block hash: {}", block.genCid());
+			logger.info("Initialize miner successfully, genesis block hash: {}", block.getHeader().genHash());
 			// generate the genesis block file
 			String genesisFile = System.getProperty("user.dir")+"/genesis.car";
 			byte[] bytes = SerializeUtils.serialize(block);

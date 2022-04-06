@@ -30,4 +30,10 @@ public class MessagePool {
 		return messages;
 	}
 
+	// remove message from the message pool
+	public void removeMessage(String cid)
+	{
+		messages.removeIf(message -> Objects.equal(message.getCid(), cid));
+	}
+
 }

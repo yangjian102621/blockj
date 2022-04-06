@@ -40,12 +40,12 @@ public class Chain {
 		new Thread(() -> {
 			while (true) {
 				// get the chain head
-				Object chainHead = chainService.chainHead();
-				if (chainHead == null) {
+				long chainHead = chainService.chainHead();
+				if (chainHead < 0) {
 					niceSleep(5);
 					continue;
 				}
-				Block preBlock = chainService.getBlock(chainHead);
+				Block preBlock = chainService.getBlockByHeight(chainHead);
 				if (preBlock == null) {
 					niceSleep(5);
 					continue;
@@ -60,7 +60,7 @@ public class Chain {
 				try {
 					Block block = miner.mineOne(preBlock);
 
-					logger.info("Mined a new block, Height: {}, Cid: {}", block.getHeader().getHeight(), block.genCid());
+					logger.info("Mined a new block, Height: {}, Hash: {}", block.getHeader().getHeight(), block.getHeader().getHash());
 					// package the messages in block from message pool
 					// @TODO: Should we limit the number of messages in each block?
 					// @TODO: Should we sort the message by message nonce?

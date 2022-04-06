@@ -9,7 +9,7 @@ import java.math.BigInteger;
 public class PowResult {
 
     // pow value
-    private final Long nonce;
+    private final long nonce;
     // hash of the new block
     private final String hash;
     // pow target
@@ -21,7 +21,7 @@ public class PowResult {
         this.target = target;
     }
 
-    public Long getNonce() {
+    public long getNonce() {
         return nonce;
     }
 

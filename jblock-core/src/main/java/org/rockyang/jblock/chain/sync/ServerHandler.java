@@ -4,10 +4,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.Message;
 import org.rockyang.jblock.chain.MessagePool;
+import org.rockyang.jblock.chain.event.NewBlockEvent;
 import org.rockyang.jblock.chain.service.ChainService;
-import org.rockyang.jblock.crypto.Keys;
-import org.rockyang.jblock.crypto.Sign;
 import org.rockyang.jblock.miner.pow.ProofOfWork;
+import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.utils.SerializeUtils;
@@ -43,7 +43,7 @@ public class ServerHandler {
 		logger.info("receive a new message， {}", message);
 		respVo.setItem(message.getCid());
 		// validate the message
-		if (Sign.verify(Keys.publicKeyDecode(message.getPubKey()), message.getSign(), message.toSigned())) {
+		if (chainService.validateMessage(message)) {
 			respVo.setSuccess(true);
 			// put message into message pool
 			messagePool.pendingMessage(message);
@@ -90,9 +90,12 @@ public class ServerHandler {
 		logger.info("receive new block confirm request： {}", newBlock);
 		if (checkBlock(newBlock, respVo)) {
 			respVo.setSuccess(true);
-			if (!chainService.isBlockValidated(newBlock.getHeader().getHeight())) {
+			if (!chainService.isBlockValidated(newBlock.getHeader().getHash())) {
 				chainService.validateBlock(newBlock);
-				logger.info("block confirmation successfully, height: {}, cid：{}", newBlock.getHeader().getHeight(), newBlock.genCid());
+				logger.info("block confirmation successfully, height: {}, hash：{}", newBlock.getHeader().getHeight(), newBlock.getHeader().getHash());
+
+				// @TODO: broadcast block to other peer
+				ApplicationContextProvider.publishEvent(new NewBlockEvent(newBlock));
 			}
 		} else {
 			respVo.setSuccess(false);
@@ -102,7 +105,6 @@ public class ServerHandler {
 		resPacket.setType(MessagePacketType.RES_NEW_BLOCK);
 		resPacket.setBody(SerializeUtils.serialize(respVo));
 
-		// @TODO: broadcast block to other node
 		return resPacket;
 	}
 
@@ -114,7 +116,11 @@ public class ServerHandler {
 	 */
 	public boolean checkBlock(Block block, RespVo respVo) {
 
-		// @TODO: check the genesis block
+		if (chainService.isBlockValidated(block.getHeader().getHash())) {
+			return true;
+		}
+
+		// @TODO: check the genesis block?
 
 		// check the proof of work nonce
 		ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block.getHeader());
@@ -125,7 +131,7 @@ public class ServerHandler {
 
 		// check the prev block
 		if (block.getHeader().getHeight() > 1) {
-			Block prevBlock = chainService.getBlock(block.getHeader().getHeight()-1);
+			Block prevBlock = chainService.getBlockByHeight(block.getHeader().getHeight()-1);
 			if (prevBlock == null || !StringUtils.equals(prevBlock.getHeader().getHash(), block.getHeader().getPreviousHash())) {
 				respVo.setMessage("Invalid previous hash");
 				return false;
@@ -135,7 +141,6 @@ public class ServerHandler {
 		// @TODO: check the block signature
 
 		return true;
-
 	}
 
 	public MessagePacket getNodeList(byte[] body)

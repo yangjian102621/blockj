@@ -25,7 +25,7 @@ public class Message {
 	// message parameters
 	private String params;
 	// block height
-	private int height;
+	private long height;
 	private String sign;
 
 	public Message(String from, String to, BigDecimal value, int nonce) {
@@ -141,12 +141,12 @@ public class Message {
 		this.params = params;
 	}
 
-	public int getHeight()
+	public long getHeight()
 	{
 		return height;
 	}
 
-	public void setHeight(int height)
+	public void setHeight(long height)
 	{
 		this.height = height;
 	}

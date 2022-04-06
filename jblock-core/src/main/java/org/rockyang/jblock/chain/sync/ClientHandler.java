@@ -1,5 +1,6 @@
 package org.rockyang.jblock.chain.sync;
 
+import org.rockyang.jblock.chain.MessagePool;
 import org.rockyang.jblock.chain.service.ChainService;
 import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
@@ -16,10 +17,12 @@ public class ClientHandler {
 	private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
 
 	private final ChainService chainService;
+	private final MessagePool messagePool;
 
-	public ClientHandler(ChainService chainService)
+	public ClientHandler(ChainService chainService, MessagePool messagePool)
 	{
 		this.chainService = chainService;
+		this.messagePool = messagePool;
 	}
 
 	public void SyncBlock(byte[] body)
@@ -68,26 +71,25 @@ public class ClientHandler {
 	public void newBlock(byte[] body)
 	{
 		RespVo respVo = (RespVo) SerializeUtils.unSerialize(body);
-		Object blockIndex = respVo.getItem();
+		String blockHash = (String) respVo.getItem();
 
-		if (!respVo.isSuccess() && chainService.isBlockValidated(blockIndex)) {
-			logger.error("block confirm failed, remove it, {}", blockIndex);
-			chainService.unValidateBlock(blockIndex);
+		if (!respVo.isSuccess() && chainService.isBlockValidated(blockHash)) {
+			logger.error("block confirm failed, remove it, {}", blockHash);
+			chainService.unValidateBlock(blockHash);
 		}
 	}
 
 	// new message validation
 	public void newMessage(byte[] body)
 	{
-
 		RespVo respVo = (RespVo) SerializeUtils.unSerialize(body);
 		String msgCid = (String) respVo.getItem();
 
 		if (!respVo.isSuccess()) {
 			logger.error("message confirm failed, ");
 			// remove message from message pool
+			messagePool.removeMessage(msgCid);
 		}
-
 	}
 
 	/**

@@ -11,12 +11,12 @@ import java.math.BigInteger;
  */
 public class BlockHeader implements Serializable {
 
-	private Integer height;
+	private long height;
 	// pow 难度指标
 	private BigInteger difficulty;
 	// PoW 问题的答案
-	private Long nonce;
-	private Long timestamp = System.currentTimeMillis();
+	private long nonce;
+	private long timestamp = System.currentTimeMillis();
 	// current block hash value
 	private String hash;
 	//  previous block hash value
@@ -24,18 +24,18 @@ public class BlockHeader implements Serializable {
 
 	public BlockHeader() {}
 
-	public BlockHeader(int height, String previousHash)
+	public BlockHeader(long height, String previousHash)
 	{
 		this.height = height;
 		this.previousHash = previousHash;
 	}
 
-	public Integer getHeight()
+	public long getHeight()
 	{
 		return height;
 	}
 
-	public void setHeight(Integer height)
+	public void setHeight(long height)
 	{
 		this.height = height;
 	}
@@ -50,22 +50,22 @@ public class BlockHeader implements Serializable {
 		this.difficulty = difficulty;
 	}
 
-	public Long getNonce()
+	public long getNonce()
 	{
 		return nonce;
 	}
 
-	public void setNonce(Long nonce)
+	public void setNonce(long nonce)
 	{
 		this.nonce = nonce;
 	}
 
-	public Long getTimestamp()
+	public long getTimestamp()
 	{
 		return timestamp;
 	}
 
-	public void setTimestamp(Long timestamp)
+	public void setTimestamp(long timestamp)
 	{
 		this.timestamp = timestamp;
 	}

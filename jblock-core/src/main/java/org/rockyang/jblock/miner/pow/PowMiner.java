@@ -62,6 +62,7 @@ public class PowMiner implements Miner {
 		newBlock.addMessage(message);
 
 		// sign the block
+		newBlock.setPubKey(minerKey.getPubKey());
 		String blockSig = Sign.sign(minerKey.getPriKey(), newBlock.genCid());
 		newBlock.setBlockSign(blockSig);
 
@@ -94,6 +95,12 @@ public class PowMiner implements Miner {
 
 		Block block = new Block(header);
 		block.addMessage(message);
+
+		// sign the block
+		block.setPubKey(wallet.getPubKey());
+		String blockSig = Sign.sign(wallet.getPriKey(), block.genCid());
+		block.setBlockSign(blockSig);
+
 		return block;
 	}
 

@@ -54,19 +54,19 @@ public class ChainServiceImpl implements ChainService {
 	}
 
 	@Override
-	public Object chainHead()
+	public long chainHead()
 	{
 		readLock.lock();
 		Optional<Object> o = datastore.get(CHAIN_HEAD_KEY);
 		readLock.unlock();
-		return o.orElse(null);
+		return (long) o.orElse(-1);
 	}
 
 	@Override
-	public void setChainHead(Object blockIndex)
+	public void setChainHead(long height)
 	{
 		writeLock.lock();
-		datastore.put(CHAIN_HEAD_KEY, blockIndex);
+		datastore.put(CHAIN_HEAD_KEY, height);
 		writeLock.unlock();
 	}
 
@@ -74,9 +74,9 @@ public class ChainServiceImpl implements ChainService {
 	public void addBlock(Block block)
 	{
 		writeLock.lock();
-		datastore.put(BLOCK_PREFIX + block.getHeader().getHeight(), block);
-		// add search index for block hash
-		datastore.put(BLOCK_PREFIX + block.getHeader().getHash(), block.getHeader().getHeight());
+		datastore.put(BLOCK_PREFIX + block.getHeader().getHash(), block);
+		// add search index for block height
+		datastore.put(BLOCK_PREFIX + block.getHeader().getHeight(), block.getHeader().getHash());
 
 		// add index for messages in block
 		block.getMessages().forEach(message -> {
@@ -86,10 +86,10 @@ public class ChainServiceImpl implements ChainService {
 	}
 
 	@Override
-	public void deleteBlock(Object blockIndex)
+	public void deleteBlock(String blockHash)
 	{
 		writeLock.lock();
-		Block block = getBlock(blockIndex);
+		Block block = getBlock(blockHash);
 		if (block == null) {
 			writeLock.unlock();
 			return;
@@ -106,21 +106,21 @@ public class ChainServiceImpl implements ChainService {
 
 
 	@Override
-	public Block getBlockByHash(String blockHash)
+	public Block getBlock(String blockHash)
 	{
 		readLock.lock();
 		Optional<Object> o = datastore.get(BLOCK_PREFIX + blockHash);
-		Block block = o.map(this::getBlock).orElse(null);
+		Block block = (Block) o.orElse(null);
 		readLock.unlock();
 		return block;
 	}
 
 	@Override
-	public Block getBlock(Object blockIndex)
+	public Block getBlockByHeight(long height)
 	{
 		readLock.lock();
-		Optional<Object> o = datastore.get(BLOCK_PREFIX + blockIndex);
-		Block block = (Block) o.orElse(null);
+		Optional<Object> o = datastore.get(BLOCK_PREFIX + height);
+		Block block = o.map(v -> getBlock((String) v)).orElse(null);
 		readLock.unlock();
 		return block;
 	}
@@ -149,47 +149,62 @@ public class ChainServiceImpl implements ChainService {
 		return null;
 	}
 
+	@Override
+	public boolean validateMessage(Message message)
+	{
+		Account recipient = accountService.getAccount(message.getTo());
+
+		// init the new address
+		if (recipient == null) {
+			logger.info("save a new address: {}", message.getTo());
+			recipient = new Account(message.getTo(), BigDecimal.ZERO, null, 0);
+			accountService.setAccount(recipient);
+		}
+		// mining reward message
+		if (message.getFrom().equals(Miner.REWARD_ADDR)) {
+			recipient.setBalance(recipient.getBalance().add(message.getValue()));
+			accountService.setAccount(recipient);
+			return true;
+		}
+
+		// transfer balance
+		Account sender = accountService.getAccount(message.getFrom());
+		if (sender == null) {
+			logger.info("Keys not exists {}", message.getFrom());
+			return false;
+		}
+
+		// check the sign
+		try {
+			boolean verify = Sign.verify(Keys.publicKeyDecode(message.getPubKey()),message.getSign(),message.toSigned());
+			if (!verify) {
+				message.setStatus(MessageStatus.INVALID_SIGN);
+				return false;
+			}
+		} catch (Exception e) {
+			message.setStatus(MessageStatus.INVALID_SIGN);
+			return false;
+		}
+
+		// check if the account had enough balance
+		if (sender.getBalance().compareTo(message.getValue()) < 0) {
+			message.setStatus(MessageStatus.INSUFFICIENT_BALANCE);
+			return false;
+		}
+		return true;
+	}
+
 	// save block and execute messages in block
-	public void validateBlock(Block block) throws Exception
+	public void validateBlock(Block block)
 	{
 		writeLock.lock();
 		for (Message message : block.getMessages()) {
+			if (!validateMessage(message)) {
+				continue;
+			}
+
 			Account recipient = accountService.getAccount(message.getTo());
-
-			// init the new address
-			if (recipient == null) {
-				logger.info("save a new address: {}", message.getTo());
-				recipient = new Account(message.getTo(), BigDecimal.ZERO, null, 0);
-				accountService.setAccount(recipient);
-			}
-			// mining reward message
-			if (message.getFrom().equals(Miner.REWARD_ADDR)) {
-				recipient.setBalance(recipient.getBalance().add(message.getValue()));
-				accountService.setAccount(recipient);
-				continue;
-			}
-
-			// transfer balance
 			Account sender = accountService.getAccount(message.getFrom());
-			if (sender == null) {
-				logger.info("Keys not exists {}", message.getFrom());
-				continue;
-			}
-
-			// check the sign
-			boolean verify = Sign.verify(
-					Keys.publicKeyDecode(message.getPubKey()),
-					message.getSign(),
-					message.toSigned());
-			if (!verify) {
-				message.setStatus(MessageStatus.INVALID_SIGN);
-				continue;
-			}
-			// check if the account had enough balance
-			if (sender.getBalance().compareTo(message.getValue()) < 0) {
-				message.setStatus(MessageStatus.INSUFFICIENT_BALANCE);
-				continue;
-			}
 
 			// update the message height
 			message.setHeight(block.getHeader().getHeight());
@@ -208,8 +223,7 @@ public class ChainServiceImpl implements ChainService {
 		}
 		addBlock(block);
 		// update the chain head
-		Object o = chainHead();
-		int head = Integer.parseInt(o.toString());
+		long head = chainHead();
 		if (head < block.getHeader().getHeight()) {
 			setChainHead(block.getHeader().getHeight());
 		}
@@ -217,10 +231,10 @@ public class ChainServiceImpl implements ChainService {
 	}
 
 	@Override
-	public void unValidateBlock(Object blockIndex)
+	public void unValidateBlock(String blockHash)
 	{
 		writeLock.lock();
-		Block block = getBlock(blockIndex);
+		Block block = getBlock(blockHash);
 		for (Message message : block.getMessages()) {
 			if (!message.getStatus().equals(MessageStatus.SUCCESS)) {
 				continue;
@@ -239,15 +253,15 @@ public class ChainServiceImpl implements ChainService {
 			accountService.setAccount(sender);
 			accountService.setAccount(recipient);
 		}
-		deleteBlock(blockIndex);
+		deleteBlock(blockHash);
 		writeLock.unlock();
 	}
 
 	@Override
-	public boolean isBlockValidated(Object blockIndex)
+	public boolean isBlockValidated(String blockHash)
 	{
 		readLock.lock();
-		Block block = getBlock(blockIndex);
+		Block block = getBlock(blockHash);
 		readLock.unlock();
 		return block != null;
 	}
