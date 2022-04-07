@@ -23,12 +23,12 @@ public class BlockEventListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(BlockEventListener.class);
 
-	private AppClient appClient;
+	private AppClient client;
 	private ChainService chainService;
 
 	public BlockEventListener(AppClient appClient, ChainService chainService)
 	{
-		this.appClient = appClient;
+		this.client = appClient;
 		this.chainService = chainService;
 	}
 
@@ -41,7 +41,7 @@ public class BlockEventListener {
 		MessagePacket messagePacket = new MessagePacket();
 		messagePacket.setType(MessagePacketType.REQ_NEW_BLOCK);
 		messagePacket.setBody(SerializeUtils.serialize(block));
-		appClient.sendGroup(messagePacket);
+		client.sendGroup(messagePacket);
 	}
 
 	// start sync blocks when a new node is connected
@@ -49,11 +49,7 @@ public class BlockEventListener {
 	public void nodeConnected()
 	{
 		// get the chain head
-		Object o = chainService.chainHead();
-		int head = 0;
-		if (o != null) {
-			head = Integer.parseInt(o.toString());
-		}
+		long head = chainService.chainHead();
 		syncBlock(new SyncBlockEvent(head+1));
 	}
 
@@ -66,21 +62,20 @@ public class BlockEventListener {
 	@EventListener(SyncBlockEvent.class)
 	public void syncBlock(SyncBlockEvent event)
 	{
-
-
 		logger.info("++++++++++++++++++++++++++++++ start to sync block {} +++++++++++++++++++++++++++++++++", event.getSource());
-//		Integer blockIndex = (Integer) event.getSource();
-//		if (blockIndex == 0) {
-//			Optional<Object> lastBlockIndex = dataStore.getLastBlockIndex();
-//			if (lastBlockIndex.isPresent()) {
-//				blockIndex = (Integer) lastBlockIndex.get();
-//			}
-//		}
-//		MessagePacket messagePacket = new MessagePacket();
-//		messagePacket.setType(MessagePacketType.REQ_SYNC_NEXT_BLOCK);
-//		messagePacket.setBody(SerializeUtils.serialize(blockIndex+1));
-//		//群发消息，从群组节点去获取下一个区块
-//		appClient.sendGroup(messagePacket);
+		long height = (long) event.getSource();
+		if (height == 0) {
+			long head = chainService.chainHead();
+			if (head > 0) {
+				height = head;
+			}
+		}
+		MessagePacket messagePacket = new MessagePacket();
+		messagePacket.setType(MessagePacketType.REQ_BLOCK_SYNC);
+		messagePacket.setBody(SerializeUtils.serialize(height+1));
+		// @TODO: maybe we should not to send all peers to fetch block
+		// it's a waste of network, we can choose some well-synchronized nodes ONLY.
+		client.sendGroup(messagePacket);
 	}
 
 

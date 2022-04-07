@@ -72,7 +72,7 @@ public class Chain {
 						iterator.remove();
 					}
 
-					chainService.validateBlock(block);
+					chainService.markBlockAsValidated(block);
 
 					// broadcast the block
 					ApplicationContextProvider.publishEvent(new NewBlockEvent(block));

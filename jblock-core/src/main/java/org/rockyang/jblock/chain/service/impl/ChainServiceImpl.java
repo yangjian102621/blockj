@@ -7,8 +7,10 @@ import org.rockyang.jblock.chain.event.NewMessageEvent;
 import org.rockyang.jblock.chain.service.AccountService;
 import org.rockyang.jblock.chain.service.ChainService;
 import org.rockyang.jblock.chain.service.WalletService;
+import org.rockyang.jblock.chain.sync.RespVo;
 import org.rockyang.jblock.crypto.Keys;
 import org.rockyang.jblock.crypto.Sign;
+import org.rockyang.jblock.miner.pow.ProofOfWork;
 import org.rockyang.jblock.store.Datastore;
 import org.rockyang.jblock.enums.MessageStatus;
 import org.rockyang.jblock.miner.Miner;
@@ -94,8 +96,16 @@ public class ChainServiceImpl implements ChainService {
 			writeLock.unlock();
 			return;
 		}
+		// remove block
 		datastore.delete(BLOCK_PREFIX + block.getHeader().getHash());
-		datastore.delete(BLOCK_PREFIX + block.getHeader().getHeight());
+		// we should check if this height of block hash is updated
+		Optional<Object> o = datastore.get(BLOCK_PREFIX + block.getHeader().getHeight());
+		if (o.isPresent()) {
+			String hash = (String) o.get();
+			if (StringUtils.equals(hash, blockHash)) {
+				datastore.delete(BLOCK_PREFIX + block.getHeader().getHeight());
+			}
+		}
 
 		// delete messages in block
 		block.getMessages().forEach(message -> {
@@ -195,7 +205,7 @@ public class ChainServiceImpl implements ChainService {
 	}
 
 	// save block and execute messages in block
-	public void validateBlock(Block block)
+	public void markBlockAsValidated(Block block)
 	{
 		writeLock.lock();
 		for (Message message : block.getMessages()) {
@@ -231,7 +241,7 @@ public class ChainServiceImpl implements ChainService {
 	}
 
 	@Override
-	public void unValidateBlock(String blockHash)
+	public void unmarkBlockAsValidated(String blockHash)
 	{
 		writeLock.lock();
 		Block block = getBlock(blockHash);
@@ -264,6 +274,46 @@ public class ChainServiceImpl implements ChainService {
 		Block block = getBlock(blockHash);
 		readLock.unlock();
 		return block != null;
+	}
+
+
+	/**
+	 * check the block
+	 * 1. Check if the previous block is exists, and previousHash is correct
+	 * 2. Check if the pow result
+	 * 3. Check if the block signature is correct
+	 */
+	@Override
+	public boolean checkBlock(Block block, RespVo respVo) {
+
+		if (isBlockValidated(block.getHeader().getHash())) {
+			return true;
+		}
+
+		// @TODO: check the genesis block?
+
+		// check the proof of work nonce
+		ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block.getHeader());
+		if (!proofOfWork.validate()) {
+			if (respVo != null) {
+				respVo.setMessage("Invalid Pow result");
+			}
+			return false;
+		}
+
+		// check the prev block
+		if (block.getHeader().getHeight() > 1) {
+			Block prevBlock = getBlockByHeight(block.getHeader().getHeight()-1);
+			if (prevBlock == null || !StringUtils.equals(prevBlock.getHeader().getHash(), block.getHeader().getPreviousHash())) {
+				if (respVo != null) {
+					respVo.setMessage("Invalid previous hash");
+				}
+				return false;
+			}
+		}
+
+		// @TODO: check the block signature
+		return true;
 	}
 
 	public String sendMessage(String from, String to, BigDecimal value, String param) throws Exception

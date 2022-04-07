@@ -169,7 +169,6 @@ public class Message {
 				", value=" + value +
 				", timestamp=" + timestamp +
 				", pubKey='" + pubKey + '\'' +
-				", cid='" + cid + '\'' +
 				", status=" + status +
 				", nonce=" + nonce +
 				", params='" + params + '\'' +

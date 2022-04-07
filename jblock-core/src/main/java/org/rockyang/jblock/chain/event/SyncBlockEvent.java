@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationEvent;
  */
 public class SyncBlockEvent extends ApplicationEvent {
 
-    public SyncBlockEvent(Integer blockIndex) {
-        super(blockIndex);
+    public SyncBlockEvent(long height) {
+        super(height);
     }
 }

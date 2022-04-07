@@ -2,6 +2,7 @@ package org.rockyang.jblock.chain.service;
 
 import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.Message;
+import org.rockyang.jblock.chain.sync.RespVo;
 
 import java.math.BigDecimal;
 
@@ -31,9 +32,11 @@ public interface ChainService {
 	String sendMessage(String from, String to, BigDecimal value, String param) throws Exception;
 
 	// save block and execute messages in block
-	void validateBlock(Block block);
+	void markBlockAsValidated(Block block);
 	// delete block and reverse the messages
-	void unValidateBlock(String blockHash);
+	void unmarkBlockAsValidated(String blockHash);
 	// check if the block is validated
 	boolean isBlockValidated(String blockHash);
+
+	boolean checkBlock(Block block, RespVo respVo);
 }

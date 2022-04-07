@@ -1,6 +1,7 @@
 package org.rockyang.jblock.chain;
 
 import com.google.common.base.Objects;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -34,6 +35,16 @@ public class MessagePool {
 	public void removeMessage(String cid)
 	{
 		messages.removeIf(message -> Objects.equal(message.getCid(), cid));
+	}
+
+	public boolean hasMessage(Message message)
+	{
+		for (Message msg : this.messages) {
+			if (StringUtils.equals(msg.getCid(), message.getCid())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
