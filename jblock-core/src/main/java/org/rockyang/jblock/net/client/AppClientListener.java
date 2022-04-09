@@ -12,9 +12,6 @@ import org.tio.core.Tio;
 import org.tio.core.intf.Packet;
 
 /**
- * client端对各个server连接的情况回调。</p>
- * 当某个server的心跳超时（2min）时，Aio会从group里remove掉该连接，需要在重新connect后重新加入group
- *
  * @author yangjian
  */
 @Component

@@ -1,7 +1,7 @@
 package org.rockyang.jblock.chain;
 
 import org.rockyang.jblock.chain.event.NewBlockEvent;
-import org.rockyang.jblock.chain.service.ChainService;
+import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.miner.Miner;
 import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.slf4j.Logger;
@@ -23,15 +23,15 @@ public class Chain {
 	@Qualifier(value = "powMiner")
 	private final Miner miner;
 	private final MessagePool messagePool;
-	private final ChainService chainService;
+	private final BlockService blockService;
 
 	public Chain(Miner miner,
 	             MessagePool messagePool,
-	             ChainService chainService)
+	             BlockService blockService)
 	{
 		this.miner = miner;
 		this.messagePool = messagePool;
-		this.chainService = chainService;
+		this.blockService = blockService;
 	}
 
 	@PostConstruct
@@ -40,12 +40,12 @@ public class Chain {
 		new Thread(() -> {
 			while (true) {
 				// get the chain head
-				long chainHead = chainService.chainHead();
+				long chainHead = blockService.chainHead();
 				if (chainHead < 0) {
 					niceSleep(5);
 					continue;
 				}
-				Block preBlock = chainService.getBlockByHeight(chainHead);
+				Block preBlock = blockService.getBlockByHeight(chainHead);
 				if (preBlock == null) {
 					niceSleep(5);
 					continue;
@@ -68,11 +68,11 @@ public class Chain {
 					while (iterator.hasNext()) {
 						Message message = iterator.next();
 						block.addMessage(message);
-						// remove message from message pool
+						// remove from message pool
 						iterator.remove();
 					}
 
-					chainService.markBlockAsValidated(block);
+					blockService.markBlockAsValidated(block);
 
 					// broadcast the block
 					ApplicationContextProvider.publishEvent(new NewBlockEvent(block));

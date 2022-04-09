@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 
 /**
  * wallet account
+ *
  * @author yangjian
  */
 public class Account implements Serializable {
@@ -12,7 +13,7 @@ public class Account implements Serializable {
 	private String address;
 	private BigDecimal balance;
 	private String pubKey;
-	private int messageNonce;
+	private long messageNonce;
 
 	public Account(String address, BigDecimal balance, String pubKey, int messageNonce)
 	{
@@ -20,7 +21,9 @@ public class Account implements Serializable {
 		this.balance = balance;
 	}
 
-	public Account() {}
+	public Account()
+	{
+	}
 
 	public String getAddress()
 	{
@@ -52,12 +55,12 @@ public class Account implements Serializable {
 		this.pubKey = pubKey;
 	}
 
-	public int getMessageNonce()
+	public long getMessageNonce()
 	{
 		return messageNonce;
 	}
 
-	public void setMessageNonce(int messageNonce)
+	public void setMessageNonce(long messageNonce)
 	{
 		this.messageNonce = messageNonce;
 	}

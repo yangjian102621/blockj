@@ -10,7 +10,7 @@ import java.util.List;
 public interface WalletService {
 
 	void addWallet(Wallet wallet);
-	List<Wallet> getWalletList();
+	List<Wallet> getWallets();
 	Wallet getWallet(String address);
 	Wallet getMinerWallet();
 	void setMinerWallet(Wallet wallet);

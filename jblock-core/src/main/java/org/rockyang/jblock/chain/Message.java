@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 
 /**
  * block message
+ *
  * @author yangjian
  */
 public class Message {
@@ -21,14 +22,15 @@ public class Message {
 	private String cid;
 	// massage status
 	private MessageStatus status = MessageStatus.APPENDING;
-	private int nonce;
+	private long nonce;
 	// message parameters
 	private String params;
 	// block height
 	private long height;
 	private String sign;
 
-	public Message(String from, String to, BigDecimal value, int nonce) {
+	public Message(String from, String to, BigDecimal value, long nonce)
+	{
 		this.from = from;
 		this.to = to;
 		this.value = value;
@@ -37,7 +39,8 @@ public class Message {
 		this.nonce = nonce;
 	}
 
-	public Message() {
+	public Message()
+	{
 		this.timestamp = System.currentTimeMillis();
 	}
 
@@ -121,12 +124,12 @@ public class Message {
 		this.status = status;
 	}
 
-	public int getNonce()
+	public long getNonce()
 	{
 		return nonce;
 	}
 
-	public void setNonce(int nonce)
+	public void setNonce(long nonce)
 	{
 		this.nonce = nonce;
 	}
@@ -169,13 +172,13 @@ public class Message {
 				", value=" + value +
 				", timestamp=" + timestamp +
 				", pubKey='" + pubKey + '\'' +
-				", status=" + status +
 				", nonce=" + nonce +
 				", params='" + params + '\'' +
 				'}';
 	}
 
-	public String genMsgCid() {
+	public String genMsgCid()
+	{
 		return Hash.sha3(this.toSigned());
 	}
 

@@ -1,7 +1,7 @@
 package org.rockyang.jblock;
 
 import org.rockyang.jblock.chain.Block;
-import org.rockyang.jblock.chain.service.ChainService;
+import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.conf.MinerConfig;
 import org.rockyang.jblock.miner.Miner;
 import org.rockyang.jblock.utils.SerializeUtils;
@@ -21,15 +21,15 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 
 	static final Logger logger = LoggerFactory.getLogger(ApplicationRunner.class);
 
-	private final ChainService chainService;
+	private final BlockService blockService;
 	private final MinerConfig minerConfig;
 	private final Miner miner;
 
-	public ApplicationRunner(ChainService chainService,
+	public ApplicationRunner(BlockService blockService,
 	                         MinerConfig minerConfig,
 	                         Miner miner)
 	{
-		this.chainService = chainService;
+		this.blockService = blockService;
 		this.minerConfig = minerConfig;
 		this.miner = miner;
 	}
@@ -42,11 +42,11 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 			logger.info("Try to create a genesis miner in {}", minerConfig.getRepo());
 			// generate genesis block
 			Block block = miner.createGenesisBlock();
-			chainService.markBlockAsValidated(block);
-			chainService.setChainHead(block.getHeader().getHeight());
+			blockService.markBlockAsValidated(block);
+			blockService.setChainHead(block.getHeader().getHeight());
 			logger.info("Initialize miner successfully, genesis block hash: {}", block.getHeader().genHash());
 			// generate the genesis block file
-			String genesisFile = System.getProperty("user.dir")+"/genesis.car";
+			String genesisFile = System.getProperty("user.dir") + "/genesis.car";
 			byte[] bytes = SerializeUtils.serialize(block);
 			FileOutputStream fos = new FileOutputStream(genesisFile);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);

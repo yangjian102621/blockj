@@ -5,7 +5,8 @@ import org.rockyang.jblock.chain.Message;
 import org.rockyang.jblock.chain.MessagePool;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
 import org.rockyang.jblock.chain.event.NewMessageEvent;
-import org.rockyang.jblock.chain.service.ChainService;
+import org.rockyang.jblock.chain.service.BlockService;
+import org.rockyang.jblock.chain.service.MessageService;
 import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 /**
  * message response handler
  * reply the message that send from the other client
+ *
  * @author yangjian
  */
 @Component
@@ -24,13 +26,15 @@ public class ServerHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
-	private final ChainService chainService;
+	private final BlockService blockService;
 	private final MessagePool messagePool;
+	private final MessageService messageService;
 
-	public ServerHandler(ChainService chainService, MessagePool messagePool)
+	public ServerHandler(BlockService blockService, MessagePool messagePool, MessageService messageService)
 	{
-		this.chainService = chainService;
+		this.blockService = blockService;
 		this.messagePool = messagePool;
+		this.messageService = messageService;
 	}
 
 	// new message validation
@@ -43,7 +47,7 @@ public class ServerHandler {
 		logger.info("receive a new message， {}", message);
 		respVo.setItem(message.getCid());
 		// validate the message
-		if (!messagePool.hasMessage(message) && chainService.validateMessage(message)) {
+		if (!messagePool.hasMessage(message) && messageService.validateMessage(message)) {
 			respVo.setSuccess(true);
 			// put message into message pool
 			messagePool.pendingMessage(message);
@@ -60,12 +64,13 @@ public class ServerHandler {
 		return resPacket;
 	}
 
-	public MessagePacket SyncBlock(byte[] body) {
+	public MessagePacket syncBlock(byte[] body)
+	{
 		RespVo respVo = new RespVo();
 		MessagePacket resPacket = new MessagePacket();
 		long height = (long) SerializeUtils.unSerialize(body);
 		logger.info("receive a block sync request, height: {}", height);
-		Block block = chainService.getBlockByHeight(height);
+		Block block = blockService.getBlockByHeight(height);
 		if (block != null) {
 			respVo.setItem(block);
 			respVo.setSuccess(true);
@@ -89,10 +94,10 @@ public class ServerHandler {
 		MessagePacket resPacket = new MessagePacket();
 		Block newBlock = (Block) SerializeUtils.unSerialize(body);
 		logger.info("receive new block confirm request： {}", newBlock);
-		if (chainService.checkBlock(newBlock, respVo)) {
+		if (blockService.checkBlock(newBlock, respVo)) {
 			respVo.setSuccess(true);
-			if (!chainService.isBlockValidated(newBlock.getHeader().getHash())) {
-				chainService.markBlockAsValidated(newBlock);
+			if (!blockService.isBlockValidated(newBlock.getHeader().getHash())) {
+				blockService.markBlockAsValidated(newBlock);
 				logger.info("block confirmation successfully, height: {}, hash：{}", newBlock.getHeader().getHeight(), newBlock.getHeader().getHash());
 				// broadcast block to other peers
 				ApplicationContextProvider.publishEvent(new NewBlockEvent(newBlock));
@@ -108,7 +113,7 @@ public class ServerHandler {
 		return resPacket;
 	}
 
-	public MessagePacket getNodeList(byte[] body)
+	public MessagePacket getPeers(byte[] body)
 	{
 		String message = (String) SerializeUtils.unSerialize(body);
 		RespVo responseVo = new RespVo();
@@ -126,7 +131,7 @@ public class ServerHandler {
 		resPacket.setType(MessagePacketType.RES_PEER_LIST);
 		resPacket.setBody(SerializeUtils.serialize(responseVo));
 
-		return  resPacket;
+		return resPacket;
 	}
 
 }

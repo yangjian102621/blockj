@@ -9,6 +9,14 @@ import java.math.BigDecimal;
  */
 public interface AccountService {
 	BigDecimal getBalance(String address);
+
+	void addBalance(String address, BigDecimal value);
+
+	void subBalance(String address, BigDecimal value);
+
+	void addMessageNonce(String address, long value);
+
 	void setAccount(Account account);
+
 	Account getAccount(String address);
 }

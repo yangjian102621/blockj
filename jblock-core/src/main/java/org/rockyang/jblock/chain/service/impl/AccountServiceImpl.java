@@ -38,6 +38,34 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
+	public void addBalance(String address, BigDecimal value)
+	{
+		writeLock.lock();
+		Account account = getAccount(address);
+		account.setBalance(account.getBalance().add(value));
+		writeLock.unlock();
+
+	}
+
+	@Override
+	public void subBalance(String address, BigDecimal value)
+	{
+		writeLock.lock();
+		Account account = getAccount(address);
+		account.setBalance(account.getBalance().subtract(value));
+		writeLock.unlock();
+	}
+
+	@Override
+	public void addMessageNonce(String address, long value)
+	{
+		writeLock.lock();
+		Account account = getAccount(address);
+		account.setMessageNonce(account.getMessageNonce() + value);
+		writeLock.unlock();
+	}
+
+	@Override
 	public void setAccount(Account account)
 	{
 		writeLock.lock();

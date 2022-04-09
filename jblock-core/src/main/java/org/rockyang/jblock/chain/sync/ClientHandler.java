@@ -3,7 +3,7 @@ package org.rockyang.jblock.chain.sync;
 import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.MessagePool;
 import org.rockyang.jblock.chain.event.SyncBlockEvent;
-import org.rockyang.jblock.chain.service.ChainService;
+import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
@@ -13,22 +13,23 @@ import org.springframework.stereotype.Component;
 /**
  * message request handler
  * this handler will process the message response from the server
+ *
  * @author yangjian
  */
 @Component
 public class ClientHandler {
 	private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
 
-	private final ChainService chainService;
+	private final BlockService blockService;
 	private final MessagePool messagePool;
 
-	public ClientHandler(ChainService chainService, MessagePool messagePool)
+	public ClientHandler(BlockService blockService, MessagePool messagePool)
 	{
-		this.chainService = chainService;
+		this.blockService = blockService;
 		this.messagePool = messagePool;
 	}
 
-	public void SyncBlock(byte[] body)
+	public void syncBlock(byte[] body)
 	{
 
 		RespVo respVo = (RespVo) SerializeUtils.unSerialize(body);
@@ -37,19 +38,19 @@ public class ClientHandler {
 			return;
 		}
 		Block newBlock = (Block) respVo.getItem();
-		Block block = chainService.getBlock(newBlock.getHeader().getHash());
+		Block block = blockService.getBlock(newBlock.getHeader().getHash());
 		// keep the older block
 		if (block != null && block.getHeader().getTimestamp() <= newBlock.getHeader().getTimestamp()) {
 			return;
 		}
 
-		if (chainService.checkBlock(newBlock, respVo)) {
-			chainService.markBlockAsValidated(newBlock);
+		if (blockService.checkBlock(newBlock, respVo)) {
+			blockService.markBlockAsValidated(newBlock);
 			if (block != null) {
-				chainService.unmarkBlockAsValidated(block.getHeader().getHash());
+				blockService.unmarkBlockAsValidated(block.getHeader().getHash());
 			}
 			// sync the next block
-			ApplicationContextProvider.publishEvent(new SyncBlockEvent(newBlock.getHeader().getHeight()+1));
+			ApplicationContextProvider.publishEvent(new SyncBlockEvent(newBlock.getHeader().getHeight() + 1));
 		}
 	}
 
@@ -59,9 +60,9 @@ public class ClientHandler {
 		RespVo respVo = (RespVo) SerializeUtils.unSerialize(body);
 		String blockHash = (String) respVo.getItem();
 
-		if (!respVo.isSuccess() && chainService.isBlockValidated(blockHash)) {
+		if (!respVo.isSuccess() && blockService.isBlockValidated(blockHash)) {
 			logger.error("block confirm failed, remove it, {}", blockHash);
-			chainService.unmarkBlockAsValidated(blockHash);
+			blockService.unmarkBlockAsValidated(blockHash);
 		}
 	}
 
@@ -80,11 +81,13 @@ public class ClientHandler {
 
 	/**
 	 * 获取节点列表
+	 *
 	 * @param body
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	public void getNodeList(byte[] body) throws Exception {
+	public void getNodeList(byte[] body) throws Exception
+	{
 
 //		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
 //		if (!responseVo.isSuccess()) {

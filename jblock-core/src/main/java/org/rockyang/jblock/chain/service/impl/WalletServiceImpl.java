@@ -1,16 +1,12 @@
 package org.rockyang.jblock.chain.service.impl;
 
-import org.apache.commons.lang3.StringUtils;
 import org.rockyang.jblock.chain.Wallet;
 import org.rockyang.jblock.chain.service.WalletService;
 import org.rockyang.jblock.store.Datastore;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author yangjian
@@ -18,14 +14,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Service
 public class WalletServiceImpl implements WalletService {
 
-	private final String WALLET_PREFIX = "/wallets/list";
+	private final String WALLET_PREFIX = "/wallets/";
 	private final String MINER_ADDR_KEY = "/wallets/miner";
 	private final String DEFAULT_ADDR_KEY = "/wallets/default";
 	private final Datastore datastore;
-
-	private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
-	private final Lock readLock = rwl.readLock();
-	private final Lock writeLock = rwl.writeLock();
 
 	public WalletServiceImpl(Datastore datastore)
 	{
@@ -35,63 +27,39 @@ public class WalletServiceImpl implements WalletService {
 	@Override
 	public void addWallet(Wallet wallet)
 	{
-		writeLock.lock();
-		List<Wallet> wallets = getWalletList();
-		wallets.add(wallet);
-		datastore.put(WALLET_PREFIX, wallets);
-		writeLock.unlock();
+		datastore.put(WALLET_PREFIX + wallet.getAddress(), wallet);
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public List<Wallet> getWalletList()
+	public List<Wallet> getWallets()
 	{
-		readLock.lock();
-		Optional<Object> o = datastore.get(WALLET_PREFIX);
-		readLock.unlock();
-		return (List<Wallet>) o.orElse(new ArrayList<Wallet>());
+		return datastore.search(WALLET_PREFIX);
 	}
 
 	@Override
 	public Wallet getWallet(String address)
 	{
-		readLock.lock();
-		Wallet wallet = null;
-		List<Wallet> wallets = getWalletList();
-		for (Wallet w : wallets) {
-			if (StringUtils.equals(address, w.getAddress())) {
-				wallet = w;
-			}
-		}
-		readLock.unlock();
-		return wallet;
+		return (Wallet) datastore.get(WALLET_PREFIX + address).orElse(null);
 	}
 
 	@Override
 	public Wallet getMinerWallet()
 	{
-		readLock.lock();
-		Wallet wallet;
 		Optional<Object> o = datastore.get(MINER_ADDR_KEY);
-		wallet = o.map(address -> getWallet(String.valueOf(address))).orElse(null);
-		readLock.unlock();
-		return wallet;
+		return o.map(address -> getWallet(String.valueOf(address))).orElse(null);
 	}
 
 	@Override
 	public void setMinerWallet(Wallet wallet)
 	{
-		writeLock.lock();
 		addWallet(wallet);
 		datastore.put(MINER_ADDR_KEY, wallet.getAddress());
-		writeLock.unlock();
 	}
 
 	@Override
 	public String getDefaultWallet()
 	{
-		Optional<Object> o = datastore.get(DEFAULT_ADDR_KEY);
-		return (String) o.orElse(null);
+		return (String) datastore.get(DEFAULT_ADDR_KEY).orElse(null);
 	}
 
 	@Override

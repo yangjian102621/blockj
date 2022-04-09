@@ -16,4 +16,10 @@ public class Peer extends Node implements Serializable {
 	public Peer() {
 		super(null, 0);
 	}
+
+	@Override
+	public String toString()
+	{
+		return String.format("%s:%s", getIp(), getPort());
+	}
 }

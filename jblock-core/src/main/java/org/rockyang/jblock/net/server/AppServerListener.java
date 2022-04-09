@@ -8,7 +8,6 @@ import org.tio.core.intf.Packet;
 import org.tio.server.intf.TioServerListener;
 
 /**
- * 服务端连接状态的监听器
  * @author yangjian
  */
 @Component

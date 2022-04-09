@@ -1,19 +1,19 @@
 package org.rockyang.jblock.store;
 
-import org.rocksdb.Options;
-import org.rocksdb.RocksDB;
-import org.rocksdb.RocksDBException;
+import org.rocksdb.*;
 import org.rockyang.jblock.conf.MinerConfig;
 import org.rockyang.jblock.utils.SerializeUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * RocksDB datastore wrapper
+ *
  * @author yangjian
  */
 @Component
@@ -21,7 +21,8 @@ public class RocksDatastore implements Datastore {
 
 	private RocksDB datastore;
 
-	public RocksDatastore(MinerConfig config) {
+	public RocksDatastore(MinerConfig config)
+	{
 		// load base dir from
 		String dataPath = String.format("%s/datastore", config.getRepo());
 		try {
@@ -38,7 +39,8 @@ public class RocksDatastore implements Datastore {
 	}
 
 	@Override
-	public boolean put(String key, Object value) {
+	public boolean put(String key, Object value)
+	{
 		try {
 			datastore.put(key.getBytes(), SerializeUtils.serialize(value));
 			return true;
@@ -49,7 +51,8 @@ public class RocksDatastore implements Datastore {
 	}
 
 	@Override
-	public Optional<Object> get(String key) {
+	public Optional<Object> get(String key)
+	{
 		try {
 			return Optional.of(SerializeUtils.unSerialize(datastore.get(key.getBytes())));
 		} catch (Exception e) {
@@ -59,7 +62,8 @@ public class RocksDatastore implements Datastore {
 	}
 
 	@Override
-	public boolean delete(String key) {
+	public boolean delete(String key)
+	{
 		try {
 			datastore.delete(key.getBytes());
 			return true;
@@ -70,13 +74,21 @@ public class RocksDatastore implements Datastore {
 	}
 
 	@Override
-	public List<Object> search(String keyPrefix)
+	@SuppressWarnings("unchecked")
+	public <T> List<T> search(String keyPrefix)
 	{
-		return null;
+		ArrayList<T> list = new ArrayList<>();
+		RocksIterator iterator = datastore.newIterator(new ReadOptions());
+		byte[] key = keyPrefix.getBytes();
+		for (iterator.seek(key); iterator.isValid(); iterator.next()) {
+			list.add((T) SerializeUtils.unSerialize(iterator.value()));
+		}
+		return list;
 	}
 
 	@Override
-	public void close() {
+	public void close()
+	{
 		if (datastore != null) {
 			datastore.close();
 		}
