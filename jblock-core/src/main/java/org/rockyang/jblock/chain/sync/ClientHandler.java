@@ -4,11 +4,16 @@ import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.MessagePool;
 import org.rockyang.jblock.chain.event.SyncBlockEvent;
 import org.rockyang.jblock.chain.service.BlockService;
+import org.rockyang.jblock.chain.service.PeerService;
 import org.rockyang.jblock.net.ApplicationContextProvider;
+import org.rockyang.jblock.net.base.Peer;
+import org.rockyang.jblock.net.client.AppClient;
 import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * message request handler
@@ -22,11 +27,18 @@ public class ClientHandler {
 
 	private final BlockService blockService;
 	private final MessagePool messagePool;
+	private final PeerService peerService;
+	private final AppClient client;
 
-	public ClientHandler(BlockService blockService, MessagePool messagePool)
+	public ClientHandler(BlockService blockService,
+	                     MessagePool messagePool,
+	                     PeerService peerService,
+	                     AppClient client)
 	{
 		this.blockService = blockService;
 		this.messagePool = messagePool;
+		this.peerService = peerService;
+		this.client = client;
 	}
 
 	public void syncBlock(byte[] body)
@@ -71,7 +83,6 @@ public class ClientHandler {
 	{
 		RespVo respVo = (RespVo) SerializeUtils.unSerialize(body);
 		String msgCid = (String) respVo.getItem();
-
 		if (!respVo.isSuccess()) {
 			logger.error("message confirm failed, ");
 			// remove message from message pool
@@ -79,27 +90,25 @@ public class ClientHandler {
 		}
 	}
 
-	/**
-	 * 获取节点列表
-	 *
-	 * @param body
-	 * @throws Exception
-	 */
+	// get peers list
 	@SuppressWarnings("unchecked")
-	public void getNodeList(byte[] body) throws Exception
+	public void getPeers(byte[] body) throws Exception
 	{
+		RespVo respVo = (RespVo) SerializeUtils.unSerialize(body);
+		if (!respVo.isSuccess()) {
+			return;
+		}
+		List<Peer> peers = (List<Peer>) respVo.getItem();
+		for (Peer peer : peers) {
+			if (peerService.hasPeer(peer)) {
+				continue;
+			}
+			client.connect(peer);
+		}
+	}
 
-//		ServerResponseVo responseVo = (ServerResponseVo) SerializeUtils.unSerialize(body);
-//		if (!responseVo.isSuccess()) {
-//			return;
-//		}
-//		List<Node> nodes = (List<Node>) responseVo.getItem();
-//		for (Node node : nodes) {
-//			// fix bug https://gitee.com/blackfox/blockchain-java/issues/IWSPJ
-//			if (dataStore.addNode(node)) {
-//				appClient.addNode(node.getIp(), node.getPort());
-//			}
-//		}
+	public void newPeer(byte[] body)
+	{
 
 	}
 }

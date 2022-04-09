@@ -13,4 +13,6 @@ public interface PeerService {
 	List<Peer> getPeers();
 
 	void removePeer(Peer peer);
+
+	boolean hasPeer(Peer peer);
 }

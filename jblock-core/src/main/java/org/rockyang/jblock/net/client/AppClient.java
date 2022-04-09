@@ -1,6 +1,7 @@
 package org.rockyang.jblock.net.client;
 
 import org.apache.commons.lang3.StringUtils;
+import org.rockyang.jblock.chain.service.PeerService;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.Peer;
 import org.rockyang.jblock.net.conf.AppConfig;
@@ -16,8 +17,8 @@ import org.tio.core.Tio;
 
 /**
  * Tio client starter
- * @author yangjian
  *
+ * @author yangjian
  */
 @Component
 public class AppClient {
@@ -26,13 +27,15 @@ public class AppClient {
 	private final TioClientConfig clientConfig;
 	private final TioClient client;
 	private final AppConfig appConfig;
+	private final PeerService peerService;
 
 
-	public AppClient(TioClientConfig clientConfig, AppConfig appConfig) throws Exception
+	public AppClient(TioClientConfig clientConfig, AppConfig appConfig, PeerService peerService) throws Exception
 	{
 		this.clientConfig = clientConfig;
 		this.client = new TioClient(clientConfig);
 		this.appConfig = appConfig;
+		this.peerService = peerService;
 		// @TODO connect the genesis node?
 		connect(new Peer(appConfig.getGenesisAddress(), appConfig.getGenesisPort()));
 	}
@@ -50,6 +53,7 @@ public class AppClient {
 			return;
 		}
 		ClientChannelContext channelContext = client.connect(peer);
+		peerService.addPeer(peer);
 		// send a hello message after connected
 		MessagePacket packet = new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE));
 		if (Tio.send(channelContext, packet)) {

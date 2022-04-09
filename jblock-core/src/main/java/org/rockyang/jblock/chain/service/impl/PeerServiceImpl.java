@@ -38,4 +38,10 @@ public class PeerServiceImpl implements PeerService {
 	{
 		datastore.delete(peer.toString());
 	}
+
+	@Override
+	public boolean hasPeer(Peer peer)
+	{
+		return datastore.get(PEER_PREFIX + peer.toString()).isPresent();
+	}
 }

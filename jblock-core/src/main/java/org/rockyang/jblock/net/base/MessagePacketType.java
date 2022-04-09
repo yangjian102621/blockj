@@ -2,6 +2,7 @@ package org.rockyang.jblock.net.base;
 
 /**
  * Packet 消息类别, 请求为正数，响应为负数
+ *
  * @author yangjian
  */
 public interface MessagePacketType {
@@ -32,5 +33,11 @@ public interface MessagePacketType {
 
 	// get node list response
 	byte RES_PEER_LIST = -4;
+
+	// new peer connected request
+	byte REQ_NEW_PEER = 5;
+	
+	// new peer connected response
+	byte RES_NEW_PEER = -5;
 
 }

@@ -12,7 +12,7 @@ public class PeerEventListener {
 	private static Logger logger = LoggerFactory.getLogger(PeerEventListener.class);
 
 	@EventListener(PeerConnectEvent.class)
-	public void fetchNodeList()
+	public void fetchPeers()
 	{
 //		logger.info("++++++++++++++++++++++++++ 开始获取在线节点 +++++++++++++++++++++++++++");
 //		MessagePacket packet = new MessagePacket();

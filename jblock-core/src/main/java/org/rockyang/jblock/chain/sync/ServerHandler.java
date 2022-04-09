@@ -7,13 +7,17 @@ import org.rockyang.jblock.chain.event.NewBlockEvent;
 import org.rockyang.jblock.chain.event.NewMessageEvent;
 import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.chain.service.MessageService;
+import org.rockyang.jblock.chain.service.PeerService;
 import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
+import org.rockyang.jblock.net.base.Peer;
 import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * message response handler
@@ -29,12 +33,17 @@ public class ServerHandler {
 	private final BlockService blockService;
 	private final MessagePool messagePool;
 	private final MessageService messageService;
+	private final PeerService peerService;
 
-	public ServerHandler(BlockService blockService, MessagePool messagePool, MessageService messageService)
+	public ServerHandler(BlockService blockService,
+	                     MessagePool messagePool,
+	                     MessageService messageService,
+	                     PeerService peerService)
 	{
 		this.blockService = blockService;
 		this.messagePool = messagePool;
 		this.messageService = messageService;
+		this.peerService = peerService;
 	}
 
 	// new message validation
@@ -89,7 +98,6 @@ public class ServerHandler {
 	 */
 	public MessagePacket newBlock(byte[] body)
 	{
-
 		RespVo respVo = new RespVo();
 		MessagePacket resPacket = new MessagePacket();
 		Block newBlock = (Block) SerializeUtils.unSerialize(body);
@@ -115,23 +123,31 @@ public class ServerHandler {
 
 	public MessagePacket getPeers(byte[] body)
 	{
-		String message = (String) SerializeUtils.unSerialize(body);
-		RespVo responseVo = new RespVo();
+		RespVo respVo = new RespVo();
 		MessagePacket resPacket = new MessagePacket();
-		logger.info("收到获取节点列表请求");
-//		if (Objects.equal(message, MessagePacket.FETCH_NODE_LIST_SYMBOL)) {
-//			Optional<List<Node>> nodes = dataStore.getNodeList();
-//			if (nodes.isPresent()) {
-//				responseVo.setSuccess(true);
-//				responseVo.setItem(nodes.get());
-//			}
-//		} else {
-//			responseVo.setSuccess(false);
-//		}
+		List<Peer> peers = peerService.getPeers();
+		if (peers.size() > 0) {
+			respVo.setSuccess(true);
+			respVo.setItem(peers);
+		} else {
+			respVo.setSuccess(false);
+			respVo.setMessage("No peers found");
+		}
 		resPacket.setType(MessagePacketType.RES_PEER_LIST);
-		resPacket.setBody(SerializeUtils.serialize(responseVo));
-
+		resPacket.setBody(SerializeUtils.serialize(respVo));
 		return resPacket;
 	}
 
+	public MessagePacket newPeer(byte[] body)
+	{
+		Peer peer = (Peer) SerializeUtils.unSerialize(body);
+		peerService.addPeer(peer);
+		// @TODO: connect the peer
+		RespVo respVo = new RespVo();
+		respVo.setSuccess(true);
+		MessagePacket resPacket = new MessagePacket();
+		resPacket.setType(MessagePacketType.RES_NEW_PEER);
+		resPacket.setBody(SerializeUtils.serialize(respVo));
+		return resPacket;
+	}
 }
