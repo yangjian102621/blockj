@@ -24,6 +24,9 @@ public class PeerServiceImpl implements PeerService {
 	@Override
 	public void addPeer(Peer peer)
 	{
+		if (hasPeer(peer)) {
+			return;
+		}
 		datastore.put(PEER_PREFIX + peer.toString(), peer);
 	}
 

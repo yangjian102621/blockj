@@ -12,12 +12,11 @@ import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.net.base.Peer;
+import org.rockyang.jblock.net.client.AppClient;
 import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * message response handler
@@ -34,22 +33,24 @@ public class ServerHandler {
 	private final MessagePool messagePool;
 	private final MessageService messageService;
 	private final PeerService peerService;
+	private final AppClient client;
 
 	public ServerHandler(BlockService blockService,
 	                     MessagePool messagePool,
 	                     MessageService messageService,
-	                     PeerService peerService)
+	                     PeerService peerService,
+	                     AppClient client)
 	{
 		this.blockService = blockService;
 		this.messagePool = messagePool;
 		this.messageService = messageService;
 		this.peerService = peerService;
+		this.client = client;
 	}
 
 	// new message validation
 	public MessagePacket newMessage(byte[] body)
 	{
-
 		RespVo respVo = new RespVo();
 		MessagePacket resPacket = new MessagePacket();
 		Message message = (Message) SerializeUtils.unSerialize(body);
@@ -67,7 +68,7 @@ public class ServerHandler {
 			respVo.setMessage("Invalid message signature");
 			logger.info("failed to validate the message, invalid signature, {}", message);
 		}
-		resPacket.setType(MessagePacketType.RES_CONFIRM_MESSAGE);
+		resPacket.setType(MessagePacketType.RES_NEW_MESSAGE);
 		resPacket.setBody(SerializeUtils.serialize(respVo));
 
 		return resPacket;
@@ -121,33 +122,13 @@ public class ServerHandler {
 		return resPacket;
 	}
 
-	public MessagePacket getPeers(byte[] body)
-	{
-		RespVo respVo = new RespVo();
-		MessagePacket resPacket = new MessagePacket();
-		List<Peer> peers = peerService.getPeers();
-		if (peers.size() > 0) {
-			respVo.setSuccess(true);
-			respVo.setItem(peers);
-		} else {
-			respVo.setSuccess(false);
-			respVo.setMessage("No peers found");
-		}
-		resPacket.setType(MessagePacketType.RES_PEER_LIST);
-		resPacket.setBody(SerializeUtils.serialize(respVo));
-		return resPacket;
-	}
-
-	public MessagePacket newPeer(byte[] body)
+	public MessagePacket newPeer(byte[] body) throws Exception
 	{
 		Peer peer = (Peer) SerializeUtils.unSerialize(body);
+		// store peer
 		peerService.addPeer(peer);
-		// @TODO: connect the peer
-		RespVo respVo = new RespVo();
-		respVo.setSuccess(true);
-		MessagePacket resPacket = new MessagePacket();
-		resPacket.setType(MessagePacketType.RES_NEW_PEER);
-		resPacket.setBody(SerializeUtils.serialize(respVo));
-		return resPacket;
+		// try to connect peer
+		client.connect(peer);
+		return null;
 	}
 }

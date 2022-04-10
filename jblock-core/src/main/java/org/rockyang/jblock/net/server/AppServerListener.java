@@ -13,11 +13,11 @@ import org.tio.server.intf.TioServerListener;
 @Component
 public class AppServerListener implements TioServerListener {
 
-	private static Logger log = LoggerFactory.getLogger(AppServerListener.class);
+	private static final Logger log = LoggerFactory.getLogger(AppServerListener.class);
 
 	@Override
-	public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect) {
-
+	public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect)
+	{
 	}
 
 	@Override
@@ -33,7 +33,8 @@ public class AppServerListener implements TioServerListener {
 	}
 
 	@Override
-	public void onAfterSent(ChannelContext channelContext, Packet packet, boolean isSentSuccess) {
+	public void onAfterSent(ChannelContext channelContext, Packet packet, boolean isSentSuccess)
+	{
 
 	}
 
@@ -44,7 +45,8 @@ public class AppServerListener implements TioServerListener {
 	}
 
 	@Override
-	public void onBeforeClose(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove) {
+	public void onBeforeClose(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove)
+	{
 
 	}
 

@@ -8,7 +8,6 @@ import org.rockyang.jblock.net.client.AppClient;
 import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +17,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageEventListener {
 
-	@Autowired
-	private AppClient appClient;
-	private static Logger logger = LoggerFactory.getLogger(MessageEventListener.class);
+	private final AppClient client;
+	private static final Logger logger = LoggerFactory.getLogger(MessageEventListener.class);
+
+	public MessageEventListener(AppClient client)
+	{
+		this.client = client;
+	}
 
 	@EventListener(NewMessageEvent.class)
 	public void broadCastMessage(NewMessageEvent event)
@@ -29,9 +32,9 @@ public class MessageEventListener {
 		logger.info("++++++++++++++ Start to broadcast new message +++++++++++++++++++++");
 		Message message = (Message) event.getSource();
 		MessagePacket messagePacket = new MessagePacket();
-		messagePacket.setType(MessagePacketType.REQ_CONFIRM_MESSAGE);
+		messagePacket.setType(MessagePacketType.REQ_NEW_MESSAGE);
 		messagePacket.setBody(SerializeUtils.serialize(message));
-		appClient.sendGroup(messagePacket);
+		client.sendGroup(messagePacket);
 	}
 
 }

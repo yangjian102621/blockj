@@ -5,11 +5,13 @@ import org.springframework.context.ApplicationEvent;
 
 /**
  * This event will be fired when a new node connected
+ *
  * @author yangjian
  */
-public class PeerConnectEvent extends ApplicationEvent {
+public class NewPeerEvent extends ApplicationEvent {
 
-    public PeerConnectEvent(Peer peer) {
-        super(peer);
-    }
+	public NewPeerEvent(Peer peer)
+	{
+		super(peer);
+	}
 }

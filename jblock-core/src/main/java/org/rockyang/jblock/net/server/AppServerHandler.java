@@ -42,29 +42,16 @@ public class AppServerHandler extends BaseHandler implements TioServerHandler {
 
 		MessagePacket resPacket = null;
 		switch (type) {
-			case MessagePacketType.STRING_MESSAGE:
-				logger.info("Receive a message: {}", body);
-				resPacket = new MessagePacket(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE));
-				break;
-
-			// 同步下一个区块
-			case MessagePacketType.REQ_BLOCK_SYNC:
-//						resPacket = this.fetchNextBlock(body);
-				break;
-
-			// new block confirm
-			case MessagePacketType.REQ_NEW_BLOCK:
-				resPacket = handler.newBlock(body);
-				break;
-
-			//获取节点列表
-			case MessagePacketType.REQ_PEER_LIST:
-//				resPacket = this.getNodeList(body);
-				break;
+			case MessagePacketType.HELLO_MESSAGE -> logger.info("hello message: {}", SerializeUtils.unSerialize(body));
+			case MessagePacketType.REQ_BLOCK_SYNC -> resPacket = handler.syncBlock(body);
+			case MessagePacketType.REQ_NEW_BLOCK -> resPacket = handler.newBlock(body);
+			case MessagePacketType.REQ_NEW_MESSAGE -> resPacket = handler.newMessage(body);
+			case MessagePacketType.REQ_NEW_PEER -> resPacket = handler.newPeer(body);
 		} //end of switch
 
-		//发送消息
-		Tio.send(channelContext, resPacket);
+		if (resPacket != null) {
+			Tio.send(channelContext, resPacket);
+		}
 	}
 
 

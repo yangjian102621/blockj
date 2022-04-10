@@ -7,8 +7,8 @@ package org.rockyang.jblock.net.base;
  */
 public interface MessagePacketType {
 
-	// normal message
-	byte STRING_MESSAGE = 0;
+	// hello message
+	byte HELLO_MESSAGE = 0;
 
 	// new block message request
 	byte REQ_NEW_BLOCK = 1;
@@ -17,10 +17,10 @@ public interface MessagePacketType {
 	byte RES_NEW_BLOCK = -1;
 
 	// new message request
-	byte REQ_CONFIRM_MESSAGE = 2;
+	byte REQ_NEW_MESSAGE = 2;
 
 	// new message confirm
-	byte RES_CONFIRM_MESSAGE = -2;
+	byte RES_NEW_MESSAGE = -2;
 
 	// block sync request
 	byte REQ_BLOCK_SYNC = 3;
@@ -28,16 +28,10 @@ public interface MessagePacketType {
 	// block sync response
 	byte RES_BLOCK_SYNC = -3;
 
-	// get node list request
-	byte REQ_PEER_LIST = 4;
-
-	// get node list response
-	byte RES_PEER_LIST = -4;
-
 	// new peer connected request
-	byte REQ_NEW_PEER = 5;
-	
+	byte REQ_NEW_PEER = 4;
+
 	// new peer connected response
-	byte RES_NEW_PEER = -5;
+	byte RES_NEW_PEER = -4;
 
 }

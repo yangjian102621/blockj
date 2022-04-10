@@ -19,6 +19,8 @@ public class Account implements Serializable {
 	{
 		this.address = address;
 		this.balance = balance;
+		this.pubKey = pubKey;
+		this.messageNonce = messageNonce;
 	}
 
 	public Account()

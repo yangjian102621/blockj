@@ -69,6 +69,11 @@ public class AccountServiceImpl implements AccountService {
 	public void setAccount(Account account)
 	{
 		writeLock.lock();
+		// @Note: we should not to set the balance directly, it should ONLY to be add or subtract
+		Account old = getAccount(account.getAddress());
+		if (old != null) {
+			account.setBalance(old.getBalance());
+		}
 		datastore.put(ACCOUNT_PREFIX + account.getAddress(), account);
 		writeLock.unlock();
 	}

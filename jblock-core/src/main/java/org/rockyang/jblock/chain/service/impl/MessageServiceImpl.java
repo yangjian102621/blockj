@@ -87,6 +87,12 @@ public class MessageServiceImpl implements MessageService {
 			return false;
 		}
 
+		// init the public key?
+		if (StringUtils.isEmpty(sender.getPubKey())) {
+			sender.setPubKey(message.getPubKey());
+			accountService.setAccount(sender);
+		}
+
 		// check the sign
 		try {
 			boolean verify = Sign.verify(Keys.publicKeyDecode(message.getPubKey()), message.getSign(), message.toSigned());

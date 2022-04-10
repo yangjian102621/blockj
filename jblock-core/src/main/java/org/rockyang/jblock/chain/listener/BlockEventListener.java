@@ -2,7 +2,6 @@ package org.rockyang.jblock.chain.listener;
 
 import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
-import org.rockyang.jblock.chain.event.PeerConnectEvent;
 import org.rockyang.jblock.chain.event.SyncBlockEvent;
 import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.net.base.MessagePacket;
@@ -23,8 +22,8 @@ public class BlockEventListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(BlockEventListener.class);
 
-	private AppClient client;
-	private BlockService blockService;
+	private final AppClient client;
+	private final BlockService blockService;
 
 	public BlockEventListener(AppClient appClient, BlockService blockService)
 	{
@@ -36,22 +35,12 @@ public class BlockEventListener {
 	@EventListener(NewBlockEvent.class)
 	public void newBlock(NewBlockEvent event)
 	{
-
-		logger.info("++++++++++++++ 开始广播新区块 +++++++++++++++++++++");
+		logger.info("++++++++++++++ start to broadcast block +++++++++++++++++++++");
 		Block block = (Block) event.getSource();
 		MessagePacket messagePacket = new MessagePacket();
 		messagePacket.setType(MessagePacketType.REQ_NEW_BLOCK);
 		messagePacket.setBody(SerializeUtils.serialize(block));
 		client.sendGroup(messagePacket);
-	}
-
-	// start sync blocks when a new node is connected
-	@EventListener(PeerConnectEvent.class)
-	public void nodeConnected()
-	{
-		// get the chain head
-		long head = blockService.chainHead();
-		syncBlock(new SyncBlockEvent(head + 1));
 	}
 
 	@EventListener(ApplicationReadyEvent.class)
@@ -73,9 +62,9 @@ public class BlockEventListener {
 		}
 		MessagePacket messagePacket = new MessagePacket();
 		messagePacket.setType(MessagePacketType.REQ_BLOCK_SYNC);
-		messagePacket.setBody(SerializeUtils.serialize(height + 1));
+		messagePacket.setBody(SerializeUtils.serialize(height));
 		// @TODO: maybe we should not to send all peers to fetch block
-		// it's a waste of network, we can choose some well-synchronized nodes ONLY.
+		// @TODO: it's a waste of network, we can choose some well-synchronized nodes ONLY.
 		client.sendGroup(messagePacket);
 	}
 
