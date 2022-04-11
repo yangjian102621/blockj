@@ -4,6 +4,7 @@ import org.rockyang.jblock.chain.Block;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
 import org.rockyang.jblock.chain.event.SyncBlockEvent;
 import org.rockyang.jblock.chain.service.BlockService;
+import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.net.client.AppClient;
@@ -46,6 +47,11 @@ public class BlockEventListener {
 	@EventListener(ApplicationReadyEvent.class)
 	public void appReady(ApplicationReadyEvent event)
 	{
+		long head = blockService.chainHead();
+		if (head < 0) {
+			head = 0;
+		}
+		ApplicationContextProvider.publishEvent(new SyncBlockEvent(head));
 	}
 
 	// sync the specified height block
@@ -67,6 +73,4 @@ public class BlockEventListener {
 		// @TODO: it's a waste of network, we can choose some well-synchronized nodes ONLY.
 		client.sendGroup(messagePacket);
 	}
-
-
 }

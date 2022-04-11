@@ -50,7 +50,8 @@ public class BlockServiceImpl implements BlockService {
 	@Override
 	public long chainHead()
 	{
-		return (long) datastore.get(CHAIN_HEAD_KEY).orElse(-1);
+		Optional<Object> o = datastore.get(CHAIN_HEAD_KEY);
+		return o.map(value -> (long) value).orElse(-1L);
 	}
 
 	@Override
@@ -111,13 +112,13 @@ public class BlockServiceImpl implements BlockService {
 	{
 		readLock.lock();
 		Optional<Object> o = datastore.get(BLOCK_PREFIX + blockHash);
+		Block block = null;
 		if (o.isPresent()) {
 			// fill message for block
-			Block block = (Block) o.get();
+			block = (Block) o.get();
 			List<Message> messages = datastore.search(BLOCK_MESSAGE_PREFIX);
 			block.setMessages(messages);
 		}
-		Block block = (Block) o.orElse(null);
 		readLock.unlock();
 		return block;
 	}
@@ -154,9 +155,11 @@ public class BlockServiceImpl implements BlockService {
 		}
 		addBlock(block);
 		// update the chain head
-		long head = chainHead();
-		if (head < block.getHeader().getHeight()) {
-			setChainHead(block.getHeader().getHeight());
+		if (block.getHeader().getHeight() > 0) {
+			long head = chainHead();
+			if (head < block.getHeader().getHeight()) {
+				setChainHead(block.getHeader().getHeight());
+			}
 		}
 		writeLock.unlock();
 	}

@@ -19,8 +19,10 @@ public class AppServer {
 	private final TioServerConfig serverConfig;
 	private final AppConfig appConfig;
 
-	public AppServer(TioServerConfig serverConfig, AppConfig appConfig)
+	public AppServer(AppConfig appConfig, AppServerHandler serverHandler, AppServerListener serverListener)
 	{
+		TioServerConfig serverConfig = new TioServerConfig(AppConfig.SERVER_GROUP_NAME, serverHandler, serverListener);
+		serverConfig.setHeartbeatTimeout(AppConfig.HEART_TIMEOUT);
 		this.serverConfig = serverConfig;
 		this.appConfig = appConfig;
 	}

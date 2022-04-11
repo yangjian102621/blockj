@@ -35,10 +35,6 @@ public class PeerEventListener {
 		MessagePacket packet = new MessagePacket();
 		packet.setType(MessagePacketType.REQ_BLOCK_SYNC);
 		packet.setBody(SerializeUtils.serialize(peer));
-
-		// save peer info
-		peerService.addPeer(peer);
-
 		// broadcast peer
 		client.sendGroup(packet);
 	}

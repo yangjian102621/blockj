@@ -5,6 +5,7 @@ import org.rockyang.jblock.chain.Message;
 import org.rockyang.jblock.chain.MessagePool;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
 import org.rockyang.jblock.chain.event.NewMessageEvent;
+import org.rockyang.jblock.chain.event.NewPeerEvent;
 import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.chain.service.MessageService;
 import org.rockyang.jblock.chain.service.PeerService;
@@ -129,6 +130,8 @@ public class ServerHandler {
 		peerService.addPeer(peer);
 		// try to connect peer
 		client.connect(peer);
+		// fire new peer connected event
+		ApplicationContextProvider.publishEvent(new NewPeerEvent(peer));
 		return null;
 	}
 }

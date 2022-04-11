@@ -1,0 +1,2 @@
+#!/bin/bash 
+java -jar ./jblock-core/target/jblock-core-2.0.0.jar $*

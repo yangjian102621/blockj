@@ -39,7 +39,6 @@ public class AppServerHandler extends BaseHandler implements TioServerHandler {
 			logger.debug("Invalid message, client: {}, drop it.", channelContext.getClientNode());
 			return;
 		}
-
 		MessagePacket resPacket = null;
 		switch (type) {
 			case MessagePacketType.HELLO_MESSAGE -> logger.info("hello message: {}", SerializeUtils.unSerialize(body));

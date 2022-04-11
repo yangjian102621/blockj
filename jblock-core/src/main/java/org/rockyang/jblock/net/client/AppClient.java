@@ -5,15 +5,17 @@ import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.net.base.Peer;
 import org.rockyang.jblock.net.conf.AppConfig;
-import org.rockyang.jblock.net.conf.TioConfig;
 import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.tio.client.ClientChannelContext;
+import org.tio.client.ReconnConf;
 import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
 import org.tio.core.Tio;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Tio client starter
@@ -24,23 +26,34 @@ import org.tio.core.Tio;
 public class AppClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(AppClient.class);
-	private final TioClientConfig clientConfig;
-	private final TioClient client;
+
+	private TioClient client;
 	private final AppConfig appConfig;
+	private final TioClientConfig clientConfig;
 
-
-	public AppClient(TioClientConfig clientConfig, AppConfig appConfig) throws Exception
+	public AppClient(AppConfig appConfig, AppClientHandler clientHandler, AppClientListener clientListener)
 	{
+		// set the auto reconnect
+		ReconnConf reconnConf = new ReconnConf(5000L, 20);
+		// init client config
+		TioClientConfig clientConfig = new TioClientConfig(clientHandler, clientListener, reconnConf);
+		clientConfig.setHeartbeatTimeout(AppConfig.HEART_TIMEOUT);
 		this.clientConfig = clientConfig;
-		this.client = new TioClient(clientConfig);
 		this.appConfig = appConfig;
+	}
+
+	@PostConstruct
+	public void run() throws Exception
+	{
+		this.client = new TioClient(clientConfig);
 		// try to connect the genesis node
 		connect(new Peer(appConfig.getGenesisAddress(), appConfig.getGenesisPort()));
+
 	}
 
 	public void sendGroup(MessagePacket messagePacket)
 	{
-		Tio.sendToGroup(clientConfig, TioConfig.CLIENT_GROUP_NAME, messagePacket);
+		Tio.sendToGroup(clientConfig, AppConfig.CLIENT_GROUP_NAME, messagePacket);
 	}
 
 	// connect a new node
@@ -51,13 +64,13 @@ public class AppClient {
 			return;
 		}
 		ClientChannelContext channelContext = client.connect(peer);
-		// send a hello message to server
+		// send self server connection info
 		Peer server = new Peer(appConfig.getServerAddress(), appConfig.getServerPort());
 		MessagePacket packet = new MessagePacket();
-		packet.setType(MessagePacketType.HELLO_MESSAGE);
-		packet.setBody(SerializeUtils.serialize(MessagePacket.HELLO_MESSAGE));
+		packet.setType(MessagePacketType.REQ_NEW_PEER);
+		packet.setBody(SerializeUtils.serialize(server));
 		if (Tio.send(channelContext, packet)) {
-			Tio.bindGroup(channelContext, TioConfig.CLIENT_GROUP_NAME);
+			Tio.bindGroup(channelContext, AppConfig.CLIENT_GROUP_NAME);
 		}
 	}
 }

@@ -1,9 +1,6 @@
 package org.rockyang.jblock.net.client;
 
-import org.rockyang.jblock.chain.event.NewPeerEvent;
-import org.rockyang.jblock.net.ApplicationContextProvider;
-import org.rockyang.jblock.net.base.Peer;
-import org.rockyang.jblock.net.conf.TioConfig;
+import org.rockyang.jblock.net.conf.AppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,11 +22,8 @@ public class AppClientListener implements TioClientListener {
 	{
 		if (isConnected) {
 			logger.info("New node connected: {}", channelContext.getServerNode());
-			Peer peer = new Peer(channelContext.getServerNode().getIp(), channelContext.getServerNode().getPort());
-			// fire the new node connected event
-			ApplicationContextProvider.publishEvent(new NewPeerEvent(peer));
 			// bind peer to group
-			Tio.bindGroup(channelContext, TioConfig.CLIENT_GROUP_NAME);
+			Tio.bindGroup(channelContext, AppConfig.CLIENT_GROUP_NAME);
 		} else {
 			logger.warn("New node connected failed: {}", channelContext.getServerNode());
 		}

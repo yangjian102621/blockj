@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * The PoW algorithm implements
+ *
  * @author yangjian
  */
 @Component(value = "powMiner")
@@ -35,10 +36,10 @@ public class PowMiner implements Miner {
 		}
 		BlockHeader preBlockHeader = preBlock.getHeader();
 		// check if it's the time for new round
-		if (System.currentTimeMillis() - preBlockHeader.getTimestamp() <= Miner.BLOCK_DELAY_SECS*1000L) {
+		if (System.currentTimeMillis() - preBlockHeader.getTimestamp() <= Miner.BLOCK_DELAY_SECS * 1000L) {
 			return null;
 		}
-		BlockHeader newBlockHeader = new BlockHeader(preBlockHeader.getHeight()+1, preBlockHeader.getHash());
+		BlockHeader newBlockHeader = new BlockHeader(preBlockHeader.getHeight() + 1, preBlockHeader.getHash());
 		ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(newBlockHeader);
 		// run the proof of work, and get the result
 		PowResult result = proofOfWork.run();
@@ -75,8 +76,11 @@ public class PowMiner implements Miner {
 		// create the default wallet
 		Wallet wallet = new Wallet();
 		walletService.setMinerWallet(wallet);
+		// init the reward address balance
+		Account rewardAccount = new Account(Miner.REWARD_ADDR, Miner.TOTAL_SUPPLY, null, 0);
+		accountService.setAccount(rewardAccount);
+		
 		// create the genesis message
-
 		Message message = new Message();
 		message.setFrom(Miner.REWARD_ADDR);
 		message.setTo(wallet.getAddress());

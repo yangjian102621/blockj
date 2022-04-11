@@ -15,7 +15,7 @@ public class Account implements Serializable {
 	private String pubKey;
 	private long messageNonce;
 
-	public Account(String address, BigDecimal balance, String pubKey, int messageNonce)
+	public Account(String address, BigDecimal balance, String pubKey, long messageNonce)
 	{
 		this.address = address;
 		this.balance = balance;
