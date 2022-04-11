@@ -43,12 +43,17 @@ public class AppClient {
 	}
 
 	@PostConstruct
-	public void run() throws Exception
+	public void run()
 	{
-		this.client = new TioClient(clientConfig);
-		// try to connect the genesis node
-		connect(new Peer(appConfig.getGenesisAddress(), appConfig.getGenesisPort()));
-
+		new Thread(() -> {
+			try {
+				this.client = new TioClient(clientConfig);
+				// try to connect the genesis node
+				connect(new Peer(appConfig.getGenesisAddress(), appConfig.getGenesisPort()));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}).start();
 	}
 
 	public void sendGroup(MessagePacket messagePacket)

@@ -28,9 +28,16 @@ public class AppServer {
 	}
 
 	@PostConstruct
-	public void start() throws IOException
+	public void start()
 	{
-		TioServer server = new TioServer(serverConfig);
-		server.start(appConfig.getServerAddress(), appConfig.getServerPort());
+		new Thread(() -> {
+			try {
+				TioServer server = new TioServer(serverConfig);
+				server.start(appConfig.getServerAddress(), appConfig.getServerPort());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}).start();
+
 	}
 }

@@ -74,7 +74,7 @@ public class MessageServiceImpl implements MessageService {
 		}
 		// mining reward message
 		if (message.getFrom().equals(Miner.REWARD_ADDR)) {
-			accountService.setAccount(recipient);
+			accountService.setAccount(new Account(message.getFrom(), Miner.TOTAL_SUPPLY, null, 0));
 			return true;
 		}
 

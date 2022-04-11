@@ -47,11 +47,7 @@ public class BlockEventListener {
 	@EventListener(ApplicationReadyEvent.class)
 	public void appReady(ApplicationReadyEvent event)
 	{
-		long head = blockService.chainHead();
-		if (head < 0) {
-			head = 0;
-		}
-		ApplicationContextProvider.publishEvent(new SyncBlockEvent(head));
+		ApplicationContextProvider.publishEvent(new SyncBlockEvent(0));
 	}
 
 	// sync the specified height block
@@ -63,7 +59,7 @@ public class BlockEventListener {
 		if (height == 0) {
 			long head = blockService.chainHead();
 			if (head > 0) {
-				height = head;
+				height = head + 1;
 			}
 		}
 		MessagePacket messagePacket = new MessagePacket();

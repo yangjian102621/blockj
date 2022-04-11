@@ -35,13 +35,16 @@ public class ClientHandler {
 
 		RespVo respVo = (RespVo) SerializeUtils.unSerialize(body);
 		if (!respVo.isSuccess()) {
-			logger.warn("failed to sync block, {}", respVo);
+			logger.warn("failed to sync block, {}", respVo.getItem());
 			return;
 		}
 		Block newBlock = (Block) respVo.getItem();
 		Block block = blockService.getBlock(newBlock.getHeader().getHash());
 		// keep the older block
 		if (block != null && block.getHeader().getTimestamp() <= newBlock.getHeader().getTimestamp()) {
+			logger.info("block {} is already validate, skip it.", newBlock.getHeader().getHeight());
+			// sync the next block
+			ApplicationContextProvider.publishEvent(new SyncBlockEvent(newBlock.getHeader().getHeight() + 1));
 			return;
 		}
 
@@ -50,8 +53,10 @@ public class ClientHandler {
 			if (block != null) {
 				blockService.unmarkBlockAsValidated(block.getHeader().getHash());
 			}
-			// sync the next block
+			logger.info("sync block {} successfully, hash: {}", newBlock.getHeader().getHeight(), newBlock.getHeader().getHash());
 			ApplicationContextProvider.publishEvent(new SyncBlockEvent(newBlock.getHeader().getHeight() + 1));
+		} else {
+			logger.warn("Invalid block, height: {}, message: {}", newBlock.getHeader().getHeight(), respVo.getMessage());
 		}
 	}
 

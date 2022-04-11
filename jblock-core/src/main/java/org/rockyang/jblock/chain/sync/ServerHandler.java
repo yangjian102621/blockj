@@ -126,10 +126,12 @@ public class ServerHandler {
 	public MessagePacket newPeer(byte[] body) throws Exception
 	{
 		Peer peer = (Peer) SerializeUtils.unSerialize(body);
-		// store peer
-		peerService.addPeer(peer);
-		// try to connect peer
-		client.connect(peer);
+		if (!peerService.hasPeer(peer)) {
+			// store peer
+			peerService.addPeer(peer);
+			// try to connect peer
+			client.connect(peer);
+		}
 		// fire new peer connected event
 		ApplicationContextProvider.publishEvent(new NewPeerEvent(peer));
 		return null;

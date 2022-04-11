@@ -14,10 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author yangjian
@@ -30,9 +27,6 @@ public class BlockServiceImpl implements BlockService {
 	private final static String CHAIN_HEAD_KEY = "block/head";
 	private final static String BLOCK_PREFIX = "/blocks/";
 	private final static String BLOCK_MESSAGE_PREFIX = "/block/message/";
-	private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
-	private final Lock readLock = rwl.readLock();
-	private final Lock writeLock = rwl.writeLock();
 
 	private final Datastore datastore;
 	private final AccountService accountService;
@@ -63,9 +57,7 @@ public class BlockServiceImpl implements BlockService {
 	@Override
 	public void addBlock(Block block)
 	{
-		writeLock.lock();
 		if (isBlockValidated(block.getHeader().getHash())) {
-			writeLock.unlock();
 			return;
 		}
 		datastore.put(BLOCK_PREFIX + block.getHeader().getHash(), block);
@@ -76,16 +68,13 @@ public class BlockServiceImpl implements BlockService {
 		block.getMessages().forEach(message -> {
 			datastore.put(BLOCK_MESSAGE_PREFIX + message.getCid(), message);
 		});
-		writeLock.unlock();
 	}
 
 	@Override
 	public void deleteBlock(String blockHash)
 	{
-		writeLock.lock();
 		Block block = getBlock(blockHash);
 		if (block == null) {
-			writeLock.unlock();
 			return;
 		}
 		// remove block
@@ -103,40 +92,26 @@ public class BlockServiceImpl implements BlockService {
 		block.getMessages().forEach(message -> {
 			datastore.delete(BLOCK_MESSAGE_PREFIX + message.getCid());
 		});
-		writeLock.unlock();
 	}
 
 
 	@Override
 	public Block getBlock(String blockHash)
 	{
-		readLock.lock();
 		Optional<Object> o = datastore.get(BLOCK_PREFIX + blockHash);
-		Block block = null;
-		if (o.isPresent()) {
-			// fill message for block
-			block = (Block) o.get();
-			List<Message> messages = datastore.search(BLOCK_MESSAGE_PREFIX);
-			block.setMessages(messages);
-		}
-		readLock.unlock();
-		return block;
+		return (Block) o.orElse(null);
 	}
 
 	@Override
 	public Block getBlockByHeight(long height)
 	{
-		readLock.lock();
 		Optional<Object> o = datastore.get(BLOCK_PREFIX + height);
-		Block block = o.map(v -> getBlock((String) v)).orElse(null);
-		readLock.unlock();
-		return block;
+		return o.map(v -> getBlock((String) v)).orElse(null);
 	}
 
 	// save block and execute messages in block
-	public void markBlockAsValidated(Block block)
+	public synchronized void markBlockAsValidated(Block block)
 	{
-		writeLock.lock();
 		for (Message message : block.getMessages()) {
 			if (!messageService.validateMessage(message)) {
 				continue;
@@ -161,13 +136,11 @@ public class BlockServiceImpl implements BlockService {
 				setChainHead(block.getHeader().getHeight());
 			}
 		}
-		writeLock.unlock();
 	}
 
 	@Override
-	public void unmarkBlockAsValidated(String blockHash)
+	public synchronized void unmarkBlockAsValidated(String blockHash)
 	{
-		writeLock.lock();
 		Block block = getBlock(blockHash);
 		for (Message message : block.getMessages()) {
 			if (!message.getStatus().equals(MessageStatus.SUCCESS)) {
@@ -181,7 +154,6 @@ public class BlockServiceImpl implements BlockService {
 			accountService.addMessageNonce(message.getFrom(), -1);
 		}
 		deleteBlock(blockHash);
-		writeLock.unlock();
 	}
 
 	@Override
@@ -200,12 +172,14 @@ public class BlockServiceImpl implements BlockService {
 	@Override
 	public boolean checkBlock(Block block, RespVo respVo)
 	{
-		readLock.lock();
 		if (isBlockValidated(block.getHeader().getHash())) {
 			return true;
 		}
 
 		// @TODO: check the genesis block?
+		if (block.getHeader().getHeight() == 0) {
+			return true;
+		}
 
 		// check the proof of work nonce
 		ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block.getHeader());
@@ -228,7 +202,6 @@ public class BlockServiceImpl implements BlockService {
 		}
 
 		// @TODO: check the block signature
-		readLock.unlock();
 		return true;
 	}
 }
