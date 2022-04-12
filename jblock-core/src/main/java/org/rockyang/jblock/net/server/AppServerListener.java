@@ -13,11 +13,12 @@ import org.tio.server.intf.TioServerListener;
 @Component
 public class AppServerListener implements TioServerListener {
 
-	private static final Logger log = LoggerFactory.getLogger(AppServerListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(AppServerListener.class);
 
 	@Override
 	public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect)
 	{
+		logger.info("New node connected: {}", channelContext.getClientNode());
 	}
 
 	@Override

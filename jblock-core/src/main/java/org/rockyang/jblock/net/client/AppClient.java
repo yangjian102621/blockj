@@ -13,9 +13,13 @@ import org.tio.client.ClientChannelContext;
 import org.tio.client.ReconnConf;
 import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
+import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
+import org.tio.utils.lock.ReadLockHandler;
+import org.tio.utils.lock.SetWithLock;
 
 import javax.annotation.PostConstruct;
+import java.util.Set;
 
 /**
  * Tio client starter
@@ -68,6 +72,30 @@ public class AppClient {
 			logger.info("skip self connections, {}", peer.toString());
 			return;
 		}
+
+		SetWithLock<ChannelContext> setWithLock = Tio.getByGroup(clientConfig, AppConfig.CLIENT_GROUP_NAME);
+		if (setWithLock == null) {
+			doConnect(peer);
+			return;
+		}
+		setWithLock.handle((ReadLockHandler<Set<ChannelContext>>) set -> {
+			for (ChannelContext channelContext : set) {
+				// if the node is connected, skip it
+				if (channelContext.getClientNode().equals(peer)) {
+					logger.info("skip connected peer {}", peer);
+					return;
+				}
+			}
+			try {
+				doConnect(peer);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	private void doConnect(Peer peer) throws Exception
+	{
 		ClientChannelContext channelContext = client.connect(peer);
 		// send self server connection info
 		Peer server = new Peer(appConfig.getServerAddress(), appConfig.getServerPort());

@@ -21,11 +21,11 @@ public class AppClientListener implements TioClientListener {
 	public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect)
 	{
 		if (isConnected) {
-			logger.info("New node connected: {}", channelContext.getServerNode());
+			logger.info("connect {} successfully", channelContext.getServerNode());
 			// bind peer to group
 			Tio.bindGroup(channelContext, AppConfig.CLIENT_GROUP_NAME);
 		} else {
-			logger.warn("New node connected failed: {}", channelContext.getServerNode());
+			logger.warn("connect {} successfully", channelContext.getServerNode());
 		}
 	}
 
