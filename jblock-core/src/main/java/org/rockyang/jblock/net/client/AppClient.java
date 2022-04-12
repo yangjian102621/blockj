@@ -1,6 +1,6 @@
 package org.rockyang.jblock.net.client;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.codec.binary.StringUtils;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.net.base.Peer;
@@ -13,13 +13,11 @@ import org.tio.client.ClientChannelContext;
 import org.tio.client.ReconnConf;
 import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
-import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
-import org.tio.utils.lock.ReadLockHandler;
-import org.tio.utils.lock.SetWithLock;
 
 import javax.annotation.PostConstruct;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tio client starter
@@ -34,6 +32,8 @@ public class AppClient {
 	private TioClient client;
 	private final AppConfig appConfig;
 	private final TioClientConfig clientConfig;
+
+	private static final Map<Peer, Boolean> connectedPeers = new ConcurrentHashMap<>(16);
 
 	public AppClient(AppConfig appConfig, AppClientHandler clientHandler, AppClientListener clientListener)
 	{
@@ -72,30 +72,12 @@ public class AppClient {
 			logger.info("skip self connections, {}", peer.toString());
 			return;
 		}
-
-		SetWithLock<ChannelContext> setWithLock = Tio.getByGroup(clientConfig, AppConfig.CLIENT_GROUP_NAME);
-		if (setWithLock == null) {
-			doConnect(peer);
+		
+		if (connectedPeers.containsKey(peer)) {
 			return;
 		}
-		setWithLock.handle((ReadLockHandler<Set<ChannelContext>>) set -> {
-			for (ChannelContext channelContext : set) {
-				// if the node is connected, skip it
-				if (channelContext.getClientNode().equals(peer)) {
-					logger.info("skip connected peer {}", peer);
-					return;
-				}
-			}
-			try {
-				doConnect(peer);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
-	}
+		connectedPeers.put(peer, true);
 
-	private void doConnect(Peer peer) throws Exception
-	{
 		ClientChannelContext channelContext = client.connect(peer);
 		// send self server connection info
 		Peer server = new Peer(appConfig.getServerAddress(), appConfig.getServerPort());
@@ -106,4 +88,5 @@ public class AppClient {
 			Tio.bindGroup(channelContext, AppConfig.CLIENT_GROUP_NAME);
 		}
 	}
+
 }

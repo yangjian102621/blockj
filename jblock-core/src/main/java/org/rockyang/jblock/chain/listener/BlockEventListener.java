@@ -54,7 +54,6 @@ public class BlockEventListener {
 	@EventListener(SyncBlockEvent.class)
 	public void syncBlock(SyncBlockEvent event)
 	{
-		logger.info("++++++++++++++++++++++++++++++ start to sync block {} +++++++++++++++++++++++++++++++++", event.getSource());
 		long height = (long) event.getSource();
 		if (height == 0) {
 			long head = blockService.chainHead();
@@ -62,6 +61,7 @@ public class BlockEventListener {
 				height = head + 1;
 			}
 		}
+		logger.info("++++++++++++++++++++++++++++++ start to sync block {} +++++++++++++++++++++++++++++++++", height);
 		MessagePacket messagePacket = new MessagePacket();
 		messagePacket.setType(MessagePacketType.REQ_BLOCK_SYNC);
 		messagePacket.setBody(SerializeUtils.serialize(height));
