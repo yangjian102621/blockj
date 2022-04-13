@@ -26,6 +26,7 @@ public class BlockServiceImpl implements BlockService {
 
 	private final static String CHAIN_HEAD_KEY = "block/head";
 	private final static String BLOCK_PREFIX = "/blocks/";
+	private final static String BLOCK_HEIGHT_PREFIX = "/blocks/height/";
 	private final static String BLOCK_MESSAGE_PREFIX = "/block/message/";
 
 	private final Datastore datastore;
@@ -60,9 +61,10 @@ public class BlockServiceImpl implements BlockService {
 		if (isBlockValidated(block.getHeader().getHash())) {
 			return;
 		}
+		logger.info("saved block {}, {}", block.getHeader().getHeight(), block.getHeader().getHash());
 		datastore.put(BLOCK_PREFIX + block.getHeader().getHash(), block);
 		// add search index for block height
-		datastore.put(BLOCK_PREFIX + block.getHeader().getHeight(), block.getHeader().getHash());
+		datastore.put(BLOCK_HEIGHT_PREFIX + block.getHeader().getHeight(), block.getHeader().getHash());
 
 		// add index for messages in block
 		block.getMessages().forEach(message -> {
@@ -105,7 +107,7 @@ public class BlockServiceImpl implements BlockService {
 	@Override
 	public Block getBlockByHeight(long height)
 	{
-		Optional<Object> o = datastore.get(BLOCK_PREFIX + height);
+		Optional<Object> o = datastore.get(BLOCK_HEIGHT_PREFIX + height);
 		return o.map(v -> getBlock((String) v)).orElse(null);
 	}
 
@@ -157,6 +159,17 @@ public class BlockServiceImpl implements BlockService {
 	}
 
 	@Override
+	public boolean isBlockValidated(Block block)
+	{
+		Block old = getBlock(block.getHeader().getHash());
+		if (old == null) {
+			return false;
+		}
+		// is the older block?
+		return old.getHeader().getTimestamp() <= block.getHeader().getTimestamp();
+	}
+
+	@Override
 	public boolean isBlockValidated(String blockHash)
 	{
 		return getBlock(blockHash) != null;
@@ -193,6 +206,7 @@ public class BlockServiceImpl implements BlockService {
 		// check the prev block
 		if (block.getHeader().getHeight() > 1) {
 			Block prevBlock = getBlockByHeight(block.getHeader().getHeight() - 1);
+//			logger.info("{}, prevBlock {}", block.getHeader(), prevBlock.getHeader());
 			if (prevBlock == null || !StringUtils.equals(prevBlock.getHeader().getHash(), block.getHeader().getPreviousHash())) {
 				if (respVo != null) {
 					respVo.setMessage("Invalid previous hash");

@@ -33,6 +33,8 @@ public interface BlockService {
 	void unmarkBlockAsValidated(String blockHash);
 
 	// check if the block is validated
+	boolean isBlockValidated(Block block);
+
 	boolean isBlockValidated(String blockHash);
 
 	boolean checkBlock(Block block, RespVo respVo);

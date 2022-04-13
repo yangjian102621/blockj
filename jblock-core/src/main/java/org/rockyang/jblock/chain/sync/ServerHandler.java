@@ -100,21 +100,22 @@ public class ServerHandler {
 	 */
 	public MessagePacket newBlock(byte[] body)
 	{
-		RespVo respVo = new RespVo();
+		RespVo respVo = new RespVo(null, false);
 		MessagePacket resPacket = new MessagePacket();
 		Block newBlock = (Block) SerializeUtils.unSerialize(body);
-		logger.info("receive new block confirm request： {}", newBlock);
+		logger.info("receive new block confirm request, height: {}, hash: {}", newBlock.getHeader().getHeight(), newBlock.getHeader().getHash());
 		if (blockService.checkBlock(newBlock, respVo)) {
-			respVo.setSuccess(true);
-			if (!blockService.isBlockValidated(newBlock.getHeader().getHash())) {
+			if (!blockService.isBlockValidated(newBlock)) {
 				blockService.markBlockAsValidated(newBlock);
-				logger.info("block confirmation successfully, height: {}, hash：{}", newBlock.getHeader().getHeight(), newBlock.getHeader().getHash());
+				respVo.setSuccess(true);
+				logger.info("block validate successfully, height: {}, hash：{}", newBlock.getHeader().getHeight(), newBlock.getHeader().getHash());
 				// broadcast block to other peers
 				ApplicationContextProvider.publishEvent(new NewBlockEvent(newBlock));
+			} else {
+				logger.info("the older block of {} is exists, drop the newer {}", newBlock.getHeader().getHeight(), newBlock.getHeader().getHash());
 			}
 		} else {
-			respVo.setSuccess(false);
-			logger.error("block confirmation failed：{}", respVo.getMessage());
+			logger.error("block validate failed：{}", respVo.getMessage());
 		}
 		respVo.setItem(newBlock.getHeader().getHash());
 		resPacket.setType(MessagePacketType.RES_NEW_BLOCK);

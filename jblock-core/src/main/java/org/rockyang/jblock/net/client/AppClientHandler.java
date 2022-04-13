@@ -34,18 +34,9 @@ public class AppClientHandler extends BaseHandler implements TioClientHandler {
 		byte type = messagePacket.getType();
 		if (body != null) {
 			switch (type) {
-				case MessagePacketType.RES_NEW_MESSAGE -> {
-					logger.info("Received a new message from {}, ", channelContext.getServerNode());
-					handler.newMessage(body);
-				}
-				case MessagePacketType.RES_BLOCK_SYNC -> {
-					logger.info("Sync a block from {}, ", channelContext.getServerNode());
-					handler.syncBlock(body);
-				}
-				case MessagePacketType.RES_NEW_BLOCK -> {
-					logger.info("Received a new block from {}, ", channelContext.getServerNode());
-					handler.newBlock(body);
-				}
+				case MessagePacketType.RES_NEW_MESSAGE -> handler.newMessage(body);
+				case MessagePacketType.RES_BLOCK_SYNC -> handler.syncBlock(body);
+				case MessagePacketType.RES_NEW_BLOCK -> handler.newBlock(body);
 			} //end of switch
 
 		}

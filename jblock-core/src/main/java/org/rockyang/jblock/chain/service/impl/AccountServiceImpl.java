@@ -42,6 +42,9 @@ public class AccountServiceImpl implements AccountService {
 	{
 		writeLock.lock();
 		Account account = getAccount(address);
+		if (account == null) {
+			return;
+		}
 		account.setBalance(account.getBalance().add(value));
 		writeLock.unlock();
 
@@ -52,6 +55,9 @@ public class AccountServiceImpl implements AccountService {
 	{
 		writeLock.lock();
 		Account account = getAccount(address);
+		if (account == null) {
+			return;
+		}
 		account.setBalance(account.getBalance().subtract(value));
 		writeLock.unlock();
 	}

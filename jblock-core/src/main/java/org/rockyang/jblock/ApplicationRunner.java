@@ -1,8 +1,12 @@
 package org.rockyang.jblock;
 
 import org.apache.commons.lang3.StringUtils;
+import org.rockyang.jblock.chain.Account;
 import org.rockyang.jblock.chain.Block;
+import org.rockyang.jblock.chain.Wallet;
+import org.rockyang.jblock.chain.service.AccountService;
 import org.rockyang.jblock.chain.service.BlockService;
+import org.rockyang.jblock.chain.service.WalletService;
 import org.rockyang.jblock.conf.MinerConfig;
 import org.rockyang.jblock.miner.Miner;
 import org.rockyang.jblock.utils.SerializeUtils;
@@ -26,6 +30,8 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 
 	private final BlockService blockService;
 	private final MinerConfig minerConfig;
+	private final WalletService walletService;
+	private final AccountService accountService;
 	private final Miner miner;
 	@Value("${genesis}")
 	private String genesis;
@@ -33,10 +39,14 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 	private String repo;
 
 	public ApplicationRunner(BlockService blockService,
+	                         WalletService walletService,
+	                         AccountService accountService,
 	                         MinerConfig minerConfig,
 	                         Miner miner)
 	{
 		this.blockService = blockService;
+		this.walletService = walletService;
+		this.accountService = accountService;
 		this.minerConfig = minerConfig;
 		this.miner = miner;
 	}
@@ -84,6 +94,13 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 			fis.close();
 			Block block = (Block) SerializeUtils.unSerialize(data);
 			if (blockService.checkBlock(block, null)) {
+				// create the default wallet
+				Wallet wallet = new Wallet();
+				walletService.setMinerWallet(wallet);
+				// init the reward address balance
+				Account rewardAccount = new Account(Miner.REWARD_ADDR, Miner.TOTAL_SUPPLY, null, 0);
+				accountService.setAccount(rewardAccount);
+				// validate genesis block
 				blockService.markBlockAsValidated(block);
 				logger.info("init miner successfully, repo: {}", repo);
 			}

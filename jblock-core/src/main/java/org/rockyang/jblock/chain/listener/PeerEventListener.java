@@ -33,7 +33,7 @@ public class PeerEventListener {
 		logger.info("++++++++++++++++++++++++++ new peer connected +++++++++++++++++++++++++++");
 		Peer peer = (Peer) event.getSource();
 		MessagePacket packet = new MessagePacket();
-		packet.setType(MessagePacketType.REQ_BLOCK_SYNC);
+		packet.setType(MessagePacketType.REQ_NEW_PEER);
 		packet.setBody(SerializeUtils.serialize(peer));
 		// broadcast peer
 		client.sendGroup(packet);

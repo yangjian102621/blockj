@@ -57,6 +57,6 @@ public class AppClientListener implements TioClientListener {
 	@Override
 	public void onBeforeClose(ChannelContext channelContext, Throwable throwable, String s, boolean b)
 	{
-
+		Tio.unbindGroup(AppConfig.CLIENT_GROUP_NAME, channelContext);
 	}
 }

@@ -36,8 +36,8 @@ public class BlockEventListener {
 	@EventListener(NewBlockEvent.class)
 	public void newBlock(NewBlockEvent event)
 	{
-		logger.info("++++++++++++++ start to broadcast block +++++++++++++++++++++");
 		Block block = (Block) event.getSource();
+		logger.info("++++++++++++++ start to broadcast block {} +++++++++++++++++++++", block.getHeader().getHeight());
 		MessagePacket messagePacket = new MessagePacket();
 		messagePacket.setType(MessagePacketType.REQ_NEW_BLOCK);
 		messagePacket.setBody(SerializeUtils.serialize(block));

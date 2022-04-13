@@ -66,10 +66,10 @@ public class ClientHandler {
 		RespVo respVo = (RespVo) SerializeUtils.unSerialize(body);
 		String blockHash = (String) respVo.getItem();
 
-		if (!respVo.isSuccess() && blockService.isBlockValidated(blockHash)) {
-			logger.error("block confirm failed, remove it, {}", blockHash);
-			blockService.unmarkBlockAsValidated(blockHash);
-		}
+//		if (!respVo.isSuccess() && blockService.isBlockValidated(blockHash)) {
+//			logger.error("block confirm failed, drop it, {}", blockHash);
+//			blockService.unmarkBlockAsValidated(blockHash);
+//		}
 	}
 
 	// new message validation
@@ -78,7 +78,7 @@ public class ClientHandler {
 		RespVo respVo = (RespVo) SerializeUtils.unSerialize(body);
 		String msgCid = (String) respVo.getItem();
 		if (!respVo.isSuccess()) {
-			logger.error("message confirm failed, ");
+			logger.error("message {} confirm failed, drop it", msgCid);
 			// remove message from message pool
 			messagePool.removeMessage(msgCid);
 		}

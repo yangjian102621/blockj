@@ -7,6 +7,7 @@ import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -24,6 +25,8 @@ public class Chain {
 	private final Miner miner;
 	private final MessagePool messagePool;
 	private final BlockService blockService;
+	@Value("${server.port}")
+	private String genesis;
 
 	public Chain(Miner miner,
 	             MessagePool messagePool,
@@ -38,6 +41,10 @@ public class Chain {
 	public void run()
 	{
 		new Thread(() -> {
+			if (!genesis.equals("8009")) {
+				return;
+			}
+			logger.info("JBlock Miner started");
 			while (true) {
 				// get the chain head
 				long chainHead = blockService.chainHead();

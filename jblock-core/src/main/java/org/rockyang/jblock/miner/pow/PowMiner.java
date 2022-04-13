@@ -79,7 +79,7 @@ public class PowMiner implements Miner {
 		// init the reward address balance
 		Account rewardAccount = new Account(Miner.REWARD_ADDR, Miner.TOTAL_SUPPLY, null, 0);
 		accountService.setAccount(rewardAccount);
-		
+
 		// create the genesis message
 		Message message = new Message();
 		message.setFrom(Miner.REWARD_ADDR);
