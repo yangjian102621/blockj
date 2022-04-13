@@ -25,8 +25,8 @@ public class Chain {
 	private final Miner miner;
 	private final MessagePool messagePool;
 	private final BlockService blockService;
-	@Value("${server.port}")
-	private String genesis;
+	@Value("${is-genesis-miner}")
+	private boolean isGenesisMiner;
 
 	public Chain(Miner miner,
 	             MessagePool messagePool,
@@ -41,6 +41,9 @@ public class Chain {
 	public void run()
 	{
 		new Thread(() -> {
+			if (!isGenesisMiner) {
+				return;
+			}
 			logger.info("JBlock Miner started");
 			while (true) {
 				// get the chain head
@@ -49,6 +52,8 @@ public class Chain {
 					niceSleep(5);
 					continue;
 				}
+				// @TODO: fill the blocks of null round, ONLY the genesis miner allow to do this.
+
 				Block preBlock = blockService.getBlockByHeight(chainHead);
 				if (preBlock == null) {
 					niceSleep(5);

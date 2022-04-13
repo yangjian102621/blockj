@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author yangjian
@@ -28,6 +30,10 @@ public class BlockServiceImpl implements BlockService {
 	private final static String BLOCK_PREFIX = "/blocks/";
 	private final static String BLOCK_HEIGHT_PREFIX = "/blocks/height/";
 	private final static String BLOCK_MESSAGE_PREFIX = "/block/message/";
+
+	private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+	private final Lock readLock = rwl.readLock();
+	private final Lock writeLock = rwl.writeLock();
 
 	private final Datastore datastore;
 	private final AccountService accountService;
@@ -45,69 +51,87 @@ public class BlockServiceImpl implements BlockService {
 	@Override
 	public long chainHead()
 	{
+		readLock.lock();
 		Optional<Object> o = datastore.get(CHAIN_HEAD_KEY);
+		readLock.unlock();
 		return o.map(value -> (long) value).orElse(-1L);
 	}
 
 	@Override
 	public void setChainHead(long height)
 	{
+		writeLock.lock();
 		datastore.put(CHAIN_HEAD_KEY, height);
+		writeLock.unlock();
 	}
 
 	@Override
 	public void addBlock(Block block)
 	{
-		if (isBlockValidated(block.getHeader().getHash())) {
-			return;
-		}
-		logger.info("saved block {}, {}", block.getHeader().getHeight(), block.getHeader().getHash());
-		datastore.put(BLOCK_PREFIX + block.getHeader().getHash(), block);
-		// add search index for block height
-		datastore.put(BLOCK_HEIGHT_PREFIX + block.getHeader().getHeight(), block.getHeader().getHash());
+		try {
+			writeLock.lock();
+			if (isBlockValidated(block.getHeader().getHash())) {
+				return;
+			}
+			logger.info("saved block {}, {}", block.getHeader().getHeight(), block.getHeader().getHash());
+			datastore.put(BLOCK_PREFIX + block.getHeader().getHash(), block);
+			// add search index for block height
+			datastore.put(BLOCK_HEIGHT_PREFIX + block.getHeader().getHeight(), block.getHeader().getHash());
 
-		// add index for messages in block
-		block.getMessages().forEach(message -> {
-			datastore.put(BLOCK_MESSAGE_PREFIX + message.getCid(), message);
-		});
+			// add index for messages in block
+			block.getMessages().forEach(message -> {
+				datastore.put(BLOCK_MESSAGE_PREFIX + message.getCid(), message);
+			});
+		} finally {
+			writeLock.unlock();
+		}
 	}
 
 	@Override
 	public void deleteBlock(String blockHash)
 	{
-		Block block = getBlock(blockHash);
-		if (block == null) {
-			return;
-		}
-		// remove block
-		datastore.delete(BLOCK_PREFIX + block.getHeader().getHash());
-		// we should check if this height of block hash is updated
-		Optional<Object> o = datastore.get(BLOCK_PREFIX + block.getHeader().getHeight());
-		if (o.isPresent()) {
-			String hash = (String) o.get();
-			if (StringUtils.equals(hash, blockHash)) {
-				datastore.delete(BLOCK_PREFIX + block.getHeader().getHeight());
+		try {
+			writeLock.lock();
+			Block block = getBlock(blockHash);
+			if (block == null) {
+				return;
 			}
-		}
+			// remove block
+			datastore.delete(BLOCK_PREFIX + block.getHeader().getHash());
+			// we should check if this height of block hash is updated
+			Optional<Object> o = datastore.get(BLOCK_PREFIX + block.getHeader().getHeight());
+			if (o.isPresent()) {
+				String hash = (String) o.get();
+				if (StringUtils.equals(hash, blockHash)) {
+					datastore.delete(BLOCK_PREFIX + block.getHeader().getHeight());
+				}
+			}
 
-		// delete messages in block
-		block.getMessages().forEach(message -> {
-			datastore.delete(BLOCK_MESSAGE_PREFIX + message.getCid());
-		});
+			// delete messages in block
+			block.getMessages().forEach(message -> {
+				datastore.delete(BLOCK_MESSAGE_PREFIX + message.getCid());
+			});
+		} finally {
+			writeLock.unlock();
+		}
 	}
 
 
 	@Override
 	public Block getBlock(String blockHash)
 	{
+		readLock.lock();
 		Optional<Object> o = datastore.get(BLOCK_PREFIX + blockHash);
+		readLock.unlock();
 		return (Block) o.orElse(null);
 	}
 
 	@Override
 	public Block getBlockByHeight(long height)
 	{
+		readLock.lock();
 		Optional<Object> o = datastore.get(BLOCK_HEIGHT_PREFIX + height);
+		readLock.unlock();
 		return o.map(v -> getBlock((String) v)).orElse(null);
 	}
 
@@ -161,10 +185,13 @@ public class BlockServiceImpl implements BlockService {
 	@Override
 	public boolean isBlockValidated(Block block)
 	{
+		readLock.lock();
 		Block old = getBlock(block.getHeader().getHash());
 		if (old == null) {
+			readLock.unlock();
 			return false;
 		}
+		readLock.unlock();
 		// is the older block?
 		return old.getHeader().getTimestamp() <= block.getHeader().getTimestamp();
 	}

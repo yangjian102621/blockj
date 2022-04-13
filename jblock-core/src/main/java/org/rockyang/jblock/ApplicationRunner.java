@@ -9,6 +9,7 @@ import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.chain.service.WalletService;
 import org.rockyang.jblock.conf.MinerConfig;
 import org.rockyang.jblock.miner.Miner;
+import org.rockyang.jblock.utils.CmdArgsParser;
 import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +34,6 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 	private final WalletService walletService;
 	private final AccountService accountService;
 	private final Miner miner;
-	@Value("${genesis}")
-	private String genesis;
 	@Value("${jblock.repo}")
 	private String repo;
 
@@ -59,7 +58,8 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 			return;
 		}
 
-		if (args[0].equals("genesis")) {
+		CmdArgsParser parser = new CmdArgsParser(args);
+		if (StringUtils.equals(parser.getArgs(0), "genesis")) {
 			logger.info("Try to create a genesis miner in {}", minerConfig.getRepo());
 			// generate genesis block
 			Block block = miner.createGenesisBlock();
@@ -74,7 +74,8 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 			fos.close();
 			logger.info("generated the genesis file: {} successfully.", genesisFile);
 			System.exit(0);
-		} else if (args[0].equals("init")) {
+		} else if (StringUtils.equals(parser.getArgs(0), "init")) {
+			String genesis = parser.getOption("genesis");
 			if (StringUtils.isEmpty(genesis)) {
 				logger.error("must pass genesis file path");
 				System.exit(0);

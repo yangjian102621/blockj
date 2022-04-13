@@ -50,7 +50,7 @@ public class ServerHandler {
 	}
 
 	// new message validation
-	public MessagePacket newMessage(byte[] body)
+	public synchronized MessagePacket newMessage(byte[] body)
 	{
 		RespVo respVo = new RespVo();
 		MessagePacket resPacket = new MessagePacket();
@@ -75,7 +75,7 @@ public class ServerHandler {
 		return resPacket;
 	}
 
-	public MessagePacket syncBlock(byte[] body)
+	public synchronized MessagePacket syncBlock(byte[] body)
 	{
 		RespVo respVo = new RespVo();
 		MessagePacket resPacket = new MessagePacket();
@@ -98,7 +98,7 @@ public class ServerHandler {
 	/**
 	 * new block event handler
 	 */
-	public MessagePacket newBlock(byte[] body)
+	public synchronized MessagePacket newBlock(byte[] body)
 	{
 		RespVo respVo = new RespVo(null, false);
 		MessagePacket resPacket = new MessagePacket();
@@ -109,7 +109,8 @@ public class ServerHandler {
 				blockService.markBlockAsValidated(newBlock);
 				respVo.setSuccess(true);
 				logger.info("block validate successfully, height: {}, hash：{}", newBlock.getHeader().getHeight(), newBlock.getHeader().getHash());
-				// broadcast block to other peers
+				// if we receive this block for the first time,
+				// we need to forward it to the other nodes
 				ApplicationContextProvider.publishEvent(new NewBlockEvent(newBlock));
 			} else {
 				logger.info("the older block of {} is exists, drop the newer {}", newBlock.getHeader().getHeight(), newBlock.getHeader().getHash());
@@ -124,7 +125,7 @@ public class ServerHandler {
 		return resPacket;
 	}
 
-	public MessagePacket newPeer(byte[] body) throws Exception
+	public synchronized MessagePacket newPeer(byte[] body) throws Exception
 	{
 		Peer peer = (Peer) SerializeUtils.unSerialize(body);
 		if (!peerService.hasPeer(peer)) {

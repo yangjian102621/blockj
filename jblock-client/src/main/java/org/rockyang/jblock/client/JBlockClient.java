@@ -15,7 +15,7 @@ public class JBlockClient {
 		final Option option = new Option("file", true, "Configuration file path");
 		options.addOption(option);
 
-		final CommandLineParser parser = new PosixParser();
+		final CommandLineParser parser = new GnuParser();
 		CommandLine cmd = parser.parse(options, args);
 
 		System.out.println("Your first argument is: " + cmd.getOptionValue("file"));

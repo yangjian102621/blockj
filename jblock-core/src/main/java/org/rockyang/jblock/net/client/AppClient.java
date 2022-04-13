@@ -72,13 +72,13 @@ public class AppClient {
 			logger.info("skip self connections, {}", peer.toString());
 			return false;
 		}
-
 		if (connectedPeers.containsKey(peer)) {
 			return false;
 		}
-		connectedPeers.put(peer, true);
 
+		logger.info("try to connect peer {}", peer);
 		ClientChannelContext channelContext = client.connect(peer);
+		connectedPeers.put(peer, true);
 		// send self server connection info
 		Peer server = new Peer(appConfig.getServerAddress(), appConfig.getServerPort());
 		MessagePacket packet = new MessagePacket();
