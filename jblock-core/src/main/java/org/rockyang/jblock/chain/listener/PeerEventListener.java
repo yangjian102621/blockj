@@ -1,7 +1,6 @@
 package org.rockyang.jblock.chain.listener;
 
 import org.rockyang.jblock.chain.event.NewPeerEvent;
-import org.rockyang.jblock.chain.service.PeerService;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.net.base.Peer;
@@ -10,25 +9,25 @@ import org.rockyang.jblock.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 
 /**
  * @author yangjian
  */
+@Component
 public class PeerEventListener {
 	private static final Logger logger = LoggerFactory.getLogger(PeerEventListener.class);
 
-	private final PeerService peerService;
 	private final AppClient client;
 
-	public PeerEventListener(AppClient client, PeerService peerService)
+	public PeerEventListener(AppClient client)
 	{
 		this.client = client;
-		this.peerService = peerService;
 	}
 
 	// when a new peer connected, notify all peers to connect the new peer
 	@EventListener(NewPeerEvent.class)
-	public void peerConnected(NewPeerEvent event)
+	public void newPeerConnected(NewPeerEvent event)
 	{
 		logger.info("++++++++++++++++++++++++++ new peer connected +++++++++++++++++++++++++++");
 		Peer peer = (Peer) event.getSource();

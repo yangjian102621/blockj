@@ -41,9 +41,6 @@ public class Chain {
 	public void run()
 	{
 		new Thread(() -> {
-			if (!genesis.equals("8009")) {
-				return;
-			}
 			logger.info("JBlock Miner started");
 			while (true) {
 				// get the chain head

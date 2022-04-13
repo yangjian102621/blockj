@@ -132,9 +132,10 @@ public class ServerHandler {
 			peerService.addPeer(peer);
 		}
 		// try to connect peer
-		client.connect(peer);
-		// fire new peer connected event
-		ApplicationContextProvider.publishEvent(new NewPeerEvent(peer));
+		if (client.connect(peer)) {
+			// fire new peer connected event
+			ApplicationContextProvider.publishEvent(new NewPeerEvent(peer));
+		}
 		return null;
 	}
 }

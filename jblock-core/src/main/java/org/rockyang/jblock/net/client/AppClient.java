@@ -66,15 +66,15 @@ public class AppClient {
 	}
 
 	// connect a new node
-	public void connect(Peer peer) throws Exception
+	public boolean connect(Peer peer) throws Exception
 	{
 		if (StringUtils.equals(peer.getIp(), appConfig.getServerAddress()) && peer.getPort() == appConfig.getServerPort()) {
 			logger.info("skip self connections, {}", peer.toString());
-			return;
+			return false;
 		}
-		
+
 		if (connectedPeers.containsKey(peer)) {
-			return;
+			return false;
 		}
 		connectedPeers.put(peer, true);
 
@@ -87,6 +87,7 @@ public class AppClient {
 		if (Tio.send(channelContext, packet)) {
 			Tio.bindGroup(channelContext, AppConfig.CLIENT_GROUP_NAME);
 		}
+		return true;
 	}
 
 }
