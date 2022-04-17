@@ -1,3 +1,3 @@
 #!/bin/bash 
 # --spring.profiles.active=node2
-java -jar ./jblock-core/target/jblock-core-2.0.0.jar $*
+java -jar ./jblock-miner/target/jblock-miner-2.0.0.jar $*
