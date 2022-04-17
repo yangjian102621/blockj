@@ -13,11 +13,14 @@ import java.math.BigInteger;
 public class BlockHeader implements Serializable {
 
 	private long height;
-	// pow 难度指标
+	// pow difficulty
 	private BigInteger difficulty;
-	// PoW 问题的答案
+	// answer of PoW
 	private long nonce;
-	private long timestamp = System.currentTimeMillis();
+	// block created time
+	private long createTime;
+	// block timestamp
+	private long timestamp;
 	// current block hash value
 	private String hash;
 	//  previous block hash value
@@ -31,6 +34,7 @@ public class BlockHeader implements Serializable {
 	{
 		this.height = height;
 		this.previousHash = previousHash;
+		this.createTime = System.currentTimeMillis() / 1000;
 	}
 
 	public long getHeight()
@@ -93,26 +97,37 @@ public class BlockHeader implements Serializable {
 		this.previousHash = previousHash;
 	}
 
+	public long getCreateTime()
+	{
+		return createTime;
+	}
+
+	public void setCreateTime(long createTime)
+	{
+		this.createTime = createTime;
+	}
+
 	@Override
 	public String toString()
 	{
+		// we should ignore signature and timestamp
 		return "BlockHeader{" +
 				"height=" + height +
 				", difficulty=" + difficulty +
 				", nonce=" + nonce +
-				", timestamp=" + timestamp +
+				", createTime=" + createTime +
 				", hash='" + hash + '\'' +
 				", previousHash='" + previousHash + '\'' +
 				'}';
 	}
 
-	public String genHash()
+	public String genCid()
 	{
 		return Hash.sha3("BlockHeader{" +
 				"height=" + height +
 				", difficulty=" + difficulty +
 				", nonce=" + nonce +
-				", timestamp=" + timestamp +
+				", createTime=" + createTime +
 				", previousHash='" + previousHash + '\'' +
 				'}');
 	}

@@ -95,7 +95,7 @@ public class PowMiner implements Miner {
 		BlockHeader header = new BlockHeader(0, null);
 		header.setNonce(PowMiner.GENESIS_BLOCK_NONCE);
 		header.setDifficulty(ProofOfWork.getTarget());
-		header.setHash(header.genHash());
+		header.setHash(header.genCid());
 
 		Block block = new Block(header);
 		block.addMessage(message);

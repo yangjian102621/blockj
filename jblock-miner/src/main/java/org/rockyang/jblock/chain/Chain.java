@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author yangjian
@@ -27,45 +28,55 @@ public class Chain {
 	@Qualifier(value = "powMiner")
 	private final Miner miner;
 	private final MessagePool messagePool;
+	private final BlockPool blockPool;
 	private final BlockService blockService;
-	@Value("${is-genesis-miner}")
-	private boolean isGenesisMiner;
+	@Value("${run-mining}")
+	private boolean isRunMining;
+	private final AtomicLong head;
 
 	public Chain(Miner miner,
 	             MessagePool messagePool,
+	             BlockPool blockPool,
 	             BlockService blockService)
 	{
 		this.miner = miner;
 		this.messagePool = messagePool;
+		this.blockPool = blockPool;
 		this.blockService = blockService;
+		head = new AtomicLong();
 	}
 
 	@PostConstruct
 	public void run()
 	{
 		new Thread(() -> {
-			if (!isGenesisMiner) {
+			if (!isRunMining) {
 				return;
 			}
 			logger.info("JBlock Miner started");
 			while (true) {
 				// get the chain head
-				long chainHead = blockService.chainHead();
-				if (chainHead < 0) {
-					niceSleep(5);
+				if (head.get() <= 0) {
+					long chainHead = blockService.chainHead();
+					head.getAndSet(chainHead);
+				}
+
+				if (head.get() < 0) {
+					niceSleep(3);
 					continue;
 				}
 				// @TODO: fill the blocks of null round, ONLY the genesis miner allow to do this.
 
-				Block preBlock = blockService.getBlockByHeight(chainHead);
+				Block preBlock = blockService.getBlockByHeight(head.get());
 				if (preBlock == null) {
-					niceSleep(5);
+					niceSleep(3);
 					continue;
 				}
 				BlockHeader preBlockHeader = preBlock.getHeader();
 				// check if it's the time for a new round
-				if (System.currentTimeMillis() - preBlockHeader.getTimestamp() <= Miner.BLOCK_DELAY_SECS * 1000L) {
-					niceSleep(5);
+				long now = System.currentTimeMillis() / 1000;
+				if (now - preBlockHeader.getTimestamp() <= Miner.BLOCK_DELAY_SECS) {
+					niceSleep(3);
 					continue;
 				}
 
@@ -83,14 +94,14 @@ public class Chain {
 						// remove from message pool
 						iterator.remove();
 					}
-
-					blockService.markBlockAsValidated(block);
-
+					// put block to block pool
+					blockPool.putBlock(block);
+					head.getAndSet(block.getHeader().getHeight());
 					// broadcast the block
 					ApplicationContextProvider.publishEvent(new NewBlockEvent(block));
 
 				} catch (Exception e) {
-					niceSleep(5);
+					niceSleep(3);
 					e.printStackTrace();
 				}
 

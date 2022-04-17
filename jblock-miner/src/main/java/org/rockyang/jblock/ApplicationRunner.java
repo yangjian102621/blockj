@@ -11,6 +11,7 @@ import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.chain.service.WalletService;
 import org.rockyang.jblock.conf.MinerConfig;
 import org.rockyang.jblock.miner.Miner;
+import org.rockyang.jblock.vo.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,8 +65,9 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 			// generate genesis block
 			Block block = miner.createGenesisBlock();
 			blockService.markBlockAsValidated(block);
+			logger.info("Initialize miner successfully, genesis block hash: {}", block.getHeader().getHash());
+			// update chain head
 			blockService.setChainHead(block.getHeader().getHeight());
-			logger.info("Initialize miner successfully, genesis block hash: {}", block.getHeader().genHash());
 			// generate the genesis block file
 			String genesisFile = System.getProperty("user.dir") + "/genesis.car";
 			byte[] bytes = SerializeUtils.serialize(block);
@@ -94,7 +96,8 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 			}
 			fis.close();
 			Block block = (Block) SerializeUtils.unSerialize(data);
-			if (blockService.checkBlock(block, null)) {
+			Result result = blockService.checkBlock(block);
+			if (result.isOk()) {
 				// create the default wallet
 				Wallet wallet = new Wallet();
 				walletService.setMinerWallet(wallet);

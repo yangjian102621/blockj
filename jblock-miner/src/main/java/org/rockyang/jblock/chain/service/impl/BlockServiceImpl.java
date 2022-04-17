@@ -1,6 +1,8 @@
 package org.rockyang.jblock.chain.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.rockyang.jblock.base.crypto.Keys;
+import org.rockyang.jblock.base.crypto.Sign;
 import org.rockyang.jblock.base.enums.MessageStatus;
 import org.rockyang.jblock.base.model.Block;
 import org.rockyang.jblock.base.model.Message;
@@ -8,8 +10,9 @@ import org.rockyang.jblock.base.store.Datastore;
 import org.rockyang.jblock.chain.service.AccountService;
 import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.chain.service.MessageService;
-import org.rockyang.jblock.chain.sync.RespVo;
+import org.rockyang.jblock.miner.Miner;
 import org.rockyang.jblock.miner.pow.ProofOfWork;
+import org.rockyang.jblock.vo.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -138,6 +141,21 @@ public class BlockServiceImpl implements BlockService {
 	// save block and execute messages in block
 	public synchronized void markBlockAsValidated(Block block)
 	{
+		if (block.getHeader().getTimestamp() == 0) {
+			long head = chainHead();
+			if (head == -1) { //genesis block
+				long createTime = block.getHeader().getCreateTime();
+				block.getHeader().setTimestamp((createTime - (createTime % Miner.BLOCK_DELAY_SECS)) + Miner.BLOCK_DELAY_SECS);
+			} else {
+				Block headBlock = getBlockByHeight(head);
+				if (headBlock == null) {
+					throw new RuntimeException("Can not find the head block");
+				}
+				long diff = block.getHeader().getHeight() - head;
+				block.getHeader().setTimestamp(headBlock.getHeader().getTimestamp() + diff * Miner.BLOCK_DELAY_SECS);
+			}
+		}
+
 		for (Message message : block.getMessages()) {
 			if (!messageService.validateMessage(message)) {
 				continue;
@@ -186,14 +204,9 @@ public class BlockServiceImpl implements BlockService {
 	public boolean isBlockValidated(Block block)
 	{
 		readLock.lock();
-		Block old = getBlock(block.getHeader().getHash());
-		if (old == null) {
-			readLock.unlock();
-			return false;
-		}
+		Block item = getBlockByHeight(block.getHeader().getHeight());
 		readLock.unlock();
-		// is the older block?
-		return old.getHeader().getTimestamp() <= block.getHeader().getTimestamp();
+		return item == null;
 	}
 
 	@Override
@@ -210,39 +223,40 @@ public class BlockServiceImpl implements BlockService {
 	 * 3. Check if the block signature is correct
 	 */
 	@Override
-	public boolean checkBlock(Block block, RespVo respVo)
+	public Result checkBlock(Block block) throws Exception
 	{
 		if (isBlockValidated(block.getHeader().getHash())) {
-			return true;
+			return Result.OK;
 		}
 
 		// @TODO: check the genesis block?
 		if (block.getHeader().getHeight() == 0) {
-			return true;
+			return Result.OK;
 		}
 
 		// check the proof of work nonce
 		ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block.getHeader());
 		if (!proofOfWork.validate()) {
-			if (respVo != null) {
-				respVo.setMessage("Invalid Pow result");
-			}
-			return false;
+			return new Result(false, "Invalid Pow result");
 		}
 
 		// check the prev block
 		if (block.getHeader().getHeight() > 1) {
 			Block prevBlock = getBlockByHeight(block.getHeader().getHeight() - 1);
-//			logger.info("{}, prevBlock {}", block.getHeader(), prevBlock.getHeader());
-			if (prevBlock == null || !StringUtils.equals(prevBlock.getHeader().getHash(), block.getHeader().getPreviousHash())) {
-				if (respVo != null) {
-					respVo.setMessage("Invalid previous hash");
-				}
-				return false;
+			if (prevBlock == null) {
+				return new Result(false, "previous block is not exists");
+			}
+			if (!StringUtils.equals(prevBlock.getHeader().getHash(), block.getHeader().getPreviousHash())) {
+				return new Result(false, "Invalid previous hash");
 			}
 		}
 
-		// @TODO: check the block signature
-		return true;
+		// check the block signature
+		boolean verify = Sign.verify(Keys.publicKeyDecode(block.getPubKey()), block.getBlockSign(), block.genCid());
+		if (verify) {
+			return Result.OK;
+		} else {
+			return new Result(false, "Invalid block signature");
+		}
 	}
 }

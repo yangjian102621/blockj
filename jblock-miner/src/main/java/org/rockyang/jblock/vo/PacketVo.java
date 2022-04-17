@@ -1,10 +1,10 @@
-package org.rockyang.jblock.chain.sync;
+package org.rockyang.jblock.vo;
 
 /**
- * server response VO
+ * P2P packet data transfer VO
  * @author yangjian
  */
-public class RespVo {
+public class PacketVo {
 
 	private Object item;
 	// operation result
@@ -12,10 +12,10 @@ public class RespVo {
 	// error message
 	private String message;
 
-	public RespVo() {
+	public PacketVo() {
 	}
 
-	public RespVo(Object item, boolean status) {
+	public PacketVo(Object item, boolean status) {
 		this.item = item;
 		this.success = status;
 	}

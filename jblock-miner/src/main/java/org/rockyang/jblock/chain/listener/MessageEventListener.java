@@ -29,7 +29,7 @@ public class MessageEventListener {
 	public void broadCastMessage(NewMessageEvent event)
 	{
 		Message message = (Message) event.getSource();
-		logger.info("broadcast new message, cid: {}", message.getCid());
+		logger.info("NewMessageEvent: start to broadcast new message, cid: {}", message.getCid());
 		MessagePacket messagePacket = new MessagePacket();
 		messagePacket.setType(MessagePacketType.REQ_NEW_MESSAGE);
 		messagePacket.setBody(SerializeUtils.serialize(message));

@@ -27,7 +27,7 @@ public class AppClientHandler extends BaseHandler implements TioClientHandler {
 
 	// message handler
 	@Override
-	public void handler(Packet packet, ChannelContext channelContext)
+	public void handler(Packet packet, ChannelContext channelContext) throws Exception
 	{
 		MessagePacket messagePacket = (MessagePacket) packet;
 		byte[] body = messagePacket.getBody();

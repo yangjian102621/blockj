@@ -2,10 +2,13 @@ package org.rockyang.jblock.chain.sync;
 
 import org.rockyang.jblock.base.model.Block;
 import org.rockyang.jblock.base.utils.SerializeUtils;
+import org.rockyang.jblock.chain.BlockPool;
 import org.rockyang.jblock.chain.MessagePool;
 import org.rockyang.jblock.chain.event.SyncBlockEvent;
 import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.net.ApplicationContextProvider;
+import org.rockyang.jblock.vo.PacketVo;
+import org.rockyang.jblock.vo.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -22,62 +25,64 @@ public class ClientHandler {
 
 	private final BlockService blockService;
 	private final MessagePool messagePool;
+	private final BlockPool blockPool;
 
 	public ClientHandler(BlockService blockService,
-	                     MessagePool messagePool)
+	                     MessagePool messagePool,
+	                     BlockPool blockPool)
 	{
 		this.blockService = blockService;
 		this.messagePool = messagePool;
+		this.blockPool = blockPool;
 	}
 
-	public void syncBlock(byte[] body)
+	public void syncBlock(byte[] body) throws Exception
 	{
-
-		RespVo respVo = (RespVo) SerializeUtils.unSerialize(body);
-		if (!respVo.isSuccess()) {
-			logger.warn("failed to sync block, {}", respVo.getItem());
+		PacketVo packetVo = (PacketVo) SerializeUtils.unSerialize(body);
+		if (!packetVo.isSuccess()) {
+			logger.warn("failed to sync block, {}", packetVo.getMessage());
 			return;
 		}
-		Block newBlock = (Block) respVo.getItem();
-		Block block = blockService.getBlock(newBlock.getHeader().getHash());
-		// keep the older block
-		if (block != null && block.getHeader().getTimestamp() <= newBlock.getHeader().getTimestamp()) {
-			logger.info("block {} is already validate, skip it.", newBlock.getHeader().getHeight());
+		Block block = (Block) packetVo.getItem();
+		if (blockService.isBlockValidated(block)) {
+			logger.info("block {} is already validate, skip it.", block.getHeader().getHeight());
 			// sync the next block
-			ApplicationContextProvider.publishEvent(new SyncBlockEvent(newBlock.getHeader().getHeight() + 1));
+			ApplicationContextProvider.publishEvent(new SyncBlockEvent(block.getHeader().getHeight() + 1));
 			return;
 		}
 
-		if (blockService.checkBlock(newBlock, respVo)) {
-			blockService.markBlockAsValidated(newBlock);
-			if (block != null) {
-				blockService.unmarkBlockAsValidated(block.getHeader().getHash());
-			}
-			logger.info("sync block {} successfully, hash: {}", newBlock.getHeader().getHeight(), newBlock.getHeader().getHash());
-			ApplicationContextProvider.publishEvent(new SyncBlockEvent(newBlock.getHeader().getHeight() + 1));
+		Result result = blockService.checkBlock(block);
+		if (result.isOk()) {
+			blockService.markBlockAsValidated(block);
+			logger.info("sync block {} successfully, hash: {}", block.getHeader().getHeight(), block.getHeader().getHash());
+			ApplicationContextProvider.publishEvent(new SyncBlockEvent(block.getHeader().getHeight() + 1));
 		} else {
-			logger.warn("Invalid block, height: {}, message: {}", newBlock.getHeader().getHeight(), respVo.getMessage());
+			logger.warn("Invalid block, height: {}, message: {}", block.getHeader().getHeight(), result.getMessage());
 		}
 	}
 
 	// new block confirm
 	public void newBlock(byte[] body)
 	{
-		RespVo respVo = (RespVo) SerializeUtils.unSerialize(body);
-		String blockHash = (String) respVo.getItem();
+		PacketVo packetVo = (PacketVo) SerializeUtils.unSerialize(body);
+		String blockHash = (String) packetVo.getItem();
 
-//		if (!respVo.isSuccess() && blockService.isBlockValidated(blockHash)) {
-//			logger.error("block confirm failed, drop it, {}", blockHash);
-//			blockService.unmarkBlockAsValidated(blockHash);
-//		}
+		if (packetVo.isSuccess()) {
+			Block block = blockPool.getBlock(blockHash);
+			if (block == null) {
+				return;
+			}
+			blockService.markBlockAsValidated(block);
+			blockPool.removeBlock(blockHash);
+		}
 	}
 
 	// new message validation
 	public void newMessage(byte[] body)
 	{
-		RespVo respVo = (RespVo) SerializeUtils.unSerialize(body);
-		String msgCid = (String) respVo.getItem();
-		if (!respVo.isSuccess()) {
+		PacketVo packetVo = (PacketVo) SerializeUtils.unSerialize(body);
+		String msgCid = (String) packetVo.getItem();
+		if (!packetVo.isSuccess()) {
 			logger.error("message {} confirm failed, drop it", msgCid);
 			// remove message from message pool
 			messagePool.removeMessage(msgCid);

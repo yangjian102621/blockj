@@ -15,6 +15,8 @@ import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.net.base.Peer;
 import org.rockyang.jblock.net.client.AppClient;
+import org.rockyang.jblock.vo.PacketVo;
+import org.rockyang.jblock.vo.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -52,77 +54,62 @@ public class ServerHandler {
 	// new message validation
 	public synchronized MessagePacket newMessage(byte[] body)
 	{
-		RespVo respVo = new RespVo();
+		PacketVo packetVo = new PacketVo();
 		MessagePacket resPacket = new MessagePacket();
 		Message message = (Message) SerializeUtils.unSerialize(body);
 		logger.info("receive a new message， {}", message);
-		respVo.setItem(message.getCid());
+
+		packetVo.setItem(message.getCid());
 		// validate the message
 		if (!messagePool.hasMessage(message) && messageService.validateMessage(message)) {
-			respVo.setSuccess(true);
+			packetVo.setSuccess(true);
 			// put message into message pool
 			messagePool.pendingMessage(message);
 			// broadcast message to other peers
 			ApplicationContextProvider.publishEvent(new NewMessageEvent(message));
+			return buildPacket(MessagePacketType.RES_NEW_MESSAGE, message.getCid(), true, null);
 		} else {
-			respVo.setSuccess(false);
-			respVo.setMessage("Invalid message signature");
 			logger.info("failed to validate the message, invalid signature, {}", message);
+			return buildPacket(MessagePacketType.RES_NEW_MESSAGE, message.getCid(), false, "Invalid message signature");
 		}
-		resPacket.setType(MessagePacketType.RES_NEW_MESSAGE);
-		resPacket.setBody(SerializeUtils.serialize(respVo));
-
-		return resPacket;
 	}
 
 	public synchronized MessagePacket syncBlock(byte[] body)
 	{
-		RespVo respVo = new RespVo();
-		MessagePacket resPacket = new MessagePacket();
 		long height = (long) SerializeUtils.unSerialize(body);
 		logger.info("receive a block sync request, height: {}", height);
 		Block block = blockService.getBlockByHeight(height);
-		if (block != null) {
-			respVo.setItem(block);
-			respVo.setSuccess(true);
+		if (block == null) {
+			String message = String.format("block not exists, height: %d", height);
+			return buildPacket(MessagePacketType.RES_BLOCK_SYNC, null, false, message);
 		} else {
-			respVo.setSuccess(false);
-			respVo.setItem(null);
-			respVo.setMessage(String.format("block not exists, height: %d", height));
+			return buildPacket(MessagePacketType.RES_BLOCK_SYNC, block, true, null);
 		}
-		resPacket.setType(MessagePacketType.RES_BLOCK_SYNC);
-		resPacket.setBody(SerializeUtils.serialize(respVo));
-		return resPacket;
 	}
 
 	/**
 	 * new block event handler
 	 */
-	public synchronized MessagePacket newBlock(byte[] body)
+	public synchronized MessagePacket newBlock(byte[] body) throws Exception
 	{
-		RespVo respVo = new RespVo(null, false);
-		MessagePacket resPacket = new MessagePacket();
-		Block newBlock = (Block) SerializeUtils.unSerialize(body);
-		logger.info("receive new block confirm request, height: {}, hash: {}", newBlock.getHeader().getHeight(), newBlock.getHeader().getHash());
-		if (blockService.checkBlock(newBlock, respVo)) {
-			if (!blockService.isBlockValidated(newBlock)) {
-				blockService.markBlockAsValidated(newBlock);
-				respVo.setSuccess(true);
-				logger.info("block validate successfully, height: {}, hash：{}", newBlock.getHeader().getHeight(), newBlock.getHeader().getHash());
-				// if we receive this block for the first time,
-				// we need to forward it to the other nodes
-				ApplicationContextProvider.publishEvent(new NewBlockEvent(newBlock));
-			} else {
-				logger.info("the older block of {} is exists, drop the newer {}", newBlock.getHeader().getHeight(), newBlock.getHeader().getHash());
-			}
-		} else {
-			logger.error("block validate failed：{}", respVo.getMessage());
+		Block block = (Block) SerializeUtils.unSerialize(body);
+		logger.info("receive new block confirm request, height: {}, hash: {}", block.getHeader().getHeight(), block.getHeader().getHash());
+		if (blockService.isBlockValidated(block)) {
+			logger.info("block exists {}, {}", block.getHeader().getHeight(), block.getHeader().getHash());
+			return buildPacket(MessagePacketType.RES_NEW_BLOCK, block.getHeader().getHash(), false, null);
 		}
-		respVo.setItem(newBlock.getHeader().getHash());
-		resPacket.setType(MessagePacketType.RES_NEW_BLOCK);
-		resPacket.setBody(SerializeUtils.serialize(respVo));
+		Result result = blockService.checkBlock(block);
+		if (result.isOk()) {
+			blockService.markBlockAsValidated(block);
+			logger.info("block validate successfully, height: {}, hash：{}", block.getHeader().getHeight(), block.getHeader().getHash());
 
-		return resPacket;
+			// if we receive this block for the first time,
+			// we need to forward it to the other nodes
+			ApplicationContextProvider.publishEvent(new NewBlockEvent(block));
+			return buildPacket(MessagePacketType.RES_NEW_BLOCK, block.getHeader().getHash(), true, null);
+		} else {
+			return buildPacket(MessagePacketType.RES_NEW_BLOCK, block.getHeader().getHash(), false, result.getMessage());
+		}
 	}
 
 	public synchronized MessagePacket newPeer(byte[] body) throws Exception
@@ -138,5 +125,15 @@ public class ServerHandler {
 			ApplicationContextProvider.publishEvent(new NewPeerEvent(peer));
 		}
 		return null;
+	}
+
+	private MessagePacket buildPacket(byte type, Object data, boolean status, String message)
+	{
+		MessagePacket resPacket = new MessagePacket();
+		PacketVo packetVo = new PacketVo(data, status);
+		packetVo.setMessage(message);
+		resPacket.setType(type);
+		resPacket.setBody(SerializeUtils.serialize(packetVo));
+		return resPacket;
 	}
 }

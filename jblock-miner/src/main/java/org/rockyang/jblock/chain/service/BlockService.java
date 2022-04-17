@@ -1,7 +1,7 @@
 package org.rockyang.jblock.chain.service;
 
 import org.rockyang.jblock.base.model.Block;
-import org.rockyang.jblock.chain.sync.RespVo;
+import org.rockyang.jblock.vo.Result;
 
 /**
  * @author yangjian
@@ -37,5 +37,5 @@ public interface BlockService {
 
 	boolean isBlockValidated(String blockHash);
 
-	boolean checkBlock(Block block, RespVo respVo);
+	Result checkBlock(Block block) throws Exception;
 }

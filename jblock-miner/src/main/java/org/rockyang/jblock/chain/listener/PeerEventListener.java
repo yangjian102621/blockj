@@ -30,7 +30,7 @@ public class PeerEventListener {
 	public void newPeerConnected(NewPeerEvent event)
 	{
 		Peer peer = (Peer) event.getSource();
-		logger.info("++++++++++++++++++++++++++ new peer connected {} +++++++++++++++++++++++++++", peer);
+		logger.info("NewPeerEvent: new peer connected {}", peer);
 		MessagePacket packet = new MessagePacket();
 		packet.setType(MessagePacketType.REQ_NEW_PEER);
 		packet.setBody(SerializeUtils.serialize(peer));
