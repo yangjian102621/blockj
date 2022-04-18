@@ -67,12 +67,8 @@ public class ClientHandler {
 		PacketVo packetVo = (PacketVo) SerializeUtils.unSerialize(body);
 		String blockHash = (String) packetVo.getItem();
 
-		if (packetVo.isSuccess()) {
-			Block block = blockPool.getBlock(blockHash);
-			if (block == null) {
-				return;
-			}
-			blockService.markBlockAsValidated(block);
+		// if confirm failed, remove the block from pool
+		if (!packetVo.isSuccess()) {
 			blockPool.removeBlock(blockHash);
 		}
 	}

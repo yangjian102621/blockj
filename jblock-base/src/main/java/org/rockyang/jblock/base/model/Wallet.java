@@ -23,7 +23,7 @@ public class Wallet implements Serializable {
 	{
 		ECKeyPair keyPair = Keys.createEcKeyPair();
 		this.priKey = keyPair.exportPrivateKey();
-		this.pubKey = keyPair.getPublicKey().toString();
+		this.pubKey = Keys.publicKeyEncode(keyPair.getPublicKey().getEncoded());
 		this.address = keyPair.getAddress();
 	}
 

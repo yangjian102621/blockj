@@ -64,6 +64,10 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 			logger.info("Try to create a genesis miner in {}", minerConfig.getRepo());
 			// generate genesis block
 			Block block = miner.createGenesisBlock();
+			// initialize the timestamp of block
+			long createTime = block.getHeader().getCreateTime();
+			block.getHeader().setTimestamp((createTime - (createTime % Miner.BLOCK_DELAY_SECS)) + Miner.BLOCK_DELAY_SECS);
+
 			blockService.markBlockAsValidated(block);
 			logger.info("Initialize miner successfully, genesis block hash: {}", block.getHeader().getHash());
 			// update chain head

@@ -3,6 +3,7 @@ package org.rockyang.jblock.chain.sync;
 import org.rockyang.jblock.base.model.Block;
 import org.rockyang.jblock.base.model.Message;
 import org.rockyang.jblock.base.utils.SerializeUtils;
+import org.rockyang.jblock.chain.BlockPool;
 import org.rockyang.jblock.chain.MessagePool;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
 import org.rockyang.jblock.chain.event.NewMessageEvent;
@@ -34,18 +35,21 @@ public class ServerHandler {
 
 	private final BlockService blockService;
 	private final MessagePool messagePool;
+	private final BlockPool blockPool;
 	private final MessageService messageService;
 	private final PeerService peerService;
 	private final AppClient client;
 
 	public ServerHandler(BlockService blockService,
 	                     MessagePool messagePool,
+	                     BlockPool blockPool,
 	                     MessageService messageService,
 	                     PeerService peerService,
 	                     AppClient client)
 	{
 		this.blockService = blockService;
 		this.messagePool = messagePool;
+		this.blockPool = blockPool;
 		this.messageService = messageService;
 		this.peerService = peerService;
 		this.client = client;
@@ -100,7 +104,9 @@ public class ServerHandler {
 		}
 		Result result = blockService.checkBlock(block);
 		if (result.isOk()) {
-			blockService.markBlockAsValidated(block);
+			// put it to block pool
+			blockPool.putBlock(block);
+			//blockService.markBlockAsValidated(block);
 			logger.info("block validate successfully, height: {}, hash：{}", block.getHeader().getHeight(), block.getHeader().getHash());
 
 			// if we receive this block for the first time,

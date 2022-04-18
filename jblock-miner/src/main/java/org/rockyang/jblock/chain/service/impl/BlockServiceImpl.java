@@ -10,7 +10,6 @@ import org.rockyang.jblock.base.store.Datastore;
 import org.rockyang.jblock.chain.service.AccountService;
 import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.chain.service.MessageService;
-import org.rockyang.jblock.miner.Miner;
 import org.rockyang.jblock.miner.pow.ProofOfWork;
 import org.rockyang.jblock.vo.Result;
 import org.slf4j.Logger;
@@ -141,21 +140,6 @@ public class BlockServiceImpl implements BlockService {
 	// save block and execute messages in block
 	public synchronized void markBlockAsValidated(Block block)
 	{
-		if (block.getHeader().getTimestamp() == 0) {
-			long head = chainHead();
-			if (head == -1) { //genesis block
-				long createTime = block.getHeader().getCreateTime();
-				block.getHeader().setTimestamp((createTime - (createTime % Miner.BLOCK_DELAY_SECS)) + Miner.BLOCK_DELAY_SECS);
-			} else {
-				Block headBlock = getBlockByHeight(head);
-				if (headBlock == null) {
-					throw new RuntimeException("Can not find the head block");
-				}
-				long diff = block.getHeader().getHeight() - head;
-				block.getHeader().setTimestamp(headBlock.getHeader().getTimestamp() + diff * Miner.BLOCK_DELAY_SECS);
-			}
-		}
-
 		for (Message message : block.getMessages()) {
 			if (!messageService.validateMessage(message)) {
 				continue;
@@ -206,7 +190,7 @@ public class BlockServiceImpl implements BlockService {
 		readLock.lock();
 		Block item = getBlockByHeight(block.getHeader().getHeight());
 		readLock.unlock();
-		return item == null;
+		return item != null;
 	}
 
 	@Override

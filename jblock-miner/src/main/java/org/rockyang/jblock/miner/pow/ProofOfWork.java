@@ -76,7 +76,7 @@ public class ProofOfWork {
 
 		return ByteUtils.merge(
 				prevBlockHashBytes,
-				ByteUtils.toBytes(this.blockHeader.getTimestamp()),
+				ByteUtils.toBytes(this.blockHeader.getCreateTime()),
 				ByteUtils.toBytes(TARGET_BITS),
 				ByteUtils.toBytes(nonce)
 		);
