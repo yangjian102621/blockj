@@ -138,50 +138,60 @@ public class BlockServiceImpl implements BlockService {
 	}
 
 	// save block and execute messages in block
-	public synchronized void markBlockAsValidated(Block block)
+	public void markBlockAsValidated(Block block)
 	{
-		for (Message message : block.getMessages()) {
-			if (!messageService.validateMessage(message)) {
-				continue;
+		try {
+			writeLock.lock();
+			for (Message message : block.getMessages()) {
+				if (!messageService.validateMessage(message)) {
+					continue;
+				}
+
+				// update the message height
+				message.setHeight(block.getHeader().getHeight());
+				message.setStatus(MessageStatus.SUCCESS);
+
+				// Perform transfer operations and update account balances
+				accountService.addBalance(message.getTo(), message.getValue());
+				accountService.subBalance(message.getFrom(), message.getValue());
+
+				// update the message nonce for sender
+				accountService.addMessageNonce(message.getFrom(), 1);
 			}
-
-			// update the message height
-			message.setHeight(block.getHeader().getHeight());
-			message.setStatus(MessageStatus.SUCCESS);
-
-			// Perform transfer operations and update account balances
-			accountService.addBalance(message.getTo(), message.getValue());
-			accountService.subBalance(message.getFrom(), message.getValue());
-
-			// update the message nonce for sender
-			accountService.addMessageNonce(message.getFrom(), 1);
-		}
-		addBlock(block);
-		// update the chain head
-		if (block.getHeader().getHeight() > 0) {
-			long head = chainHead();
-			if (head < block.getHeader().getHeight()) {
-				setChainHead(block.getHeader().getHeight());
+			addBlock(block);
+			// update the chain head
+			if (block.getHeader().getHeight() > 0) {
+				long head = chainHead();
+				if (head < block.getHeader().getHeight()) {
+					setChainHead(block.getHeader().getHeight());
+				}
 			}
+		} finally {
+			writeLock.unlock();
 		}
 	}
 
 	@Override
 	public synchronized void unmarkBlockAsValidated(String blockHash)
 	{
-		Block block = getBlock(blockHash);
-		for (Message message : block.getMessages()) {
-			if (!message.getStatus().equals(MessageStatus.SUCCESS)) {
-				continue;
-			}
-			// reverse transfer message and update account balances
-			accountService.addBalance(message.getFrom(), message.getValue());
-			accountService.subBalance(message.getTo(), message.getValue());
+		try {
+			writeLock.lock();
+			Block block = getBlock(blockHash);
+			for (Message message : block.getMessages()) {
+				if (!message.getStatus().equals(MessageStatus.SUCCESS)) {
+					continue;
+				}
+				// reverse transfer message and update account balances
+				accountService.addBalance(message.getFrom(), message.getValue());
+				accountService.subBalance(message.getTo(), message.getValue());
 
-			// update the message nonce for sender
-			accountService.addMessageNonce(message.getFrom(), -1);
+				// update the message nonce for sender
+				accountService.addMessageNonce(message.getFrom(), -1);
+			}
+			deleteBlock(blockHash);
+		} finally {
+			writeLock.unlock();
 		}
-		deleteBlock(blockHash);
 	}
 
 	@Override
@@ -209,38 +219,43 @@ public class BlockServiceImpl implements BlockService {
 	@Override
 	public Result checkBlock(Block block) throws Exception
 	{
-		if (isBlockValidated(block.getHeader().getHash())) {
-			return Result.OK;
-		}
-
-		// @TODO: check the genesis block?
-		if (block.getHeader().getHeight() == 0) {
-			return Result.OK;
-		}
-
-		// check the proof of work nonce
-		ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block.getHeader());
-		if (!proofOfWork.validate()) {
-			return new Result(false, "Invalid Pow result");
-		}
-
-		// check the prev block
-		if (block.getHeader().getHeight() > 1) {
-			Block prevBlock = getBlockByHeight(block.getHeader().getHeight() - 1);
-			if (prevBlock == null) {
-				return new Result(false, "previous block is not exists");
+		try {
+			readLock.lock();
+			if (isBlockValidated(block.getHeader().getHash())) {
+				return Result.OK;
 			}
-			if (!StringUtils.equals(prevBlock.getHeader().getHash(), block.getHeader().getPreviousHash())) {
-				return new Result(false, "Invalid previous hash");
-			}
-		}
 
-		// check the block signature
-		boolean verify = Sign.verify(Keys.publicKeyDecode(block.getPubKey()), block.getBlockSign(), block.genCid());
-		if (verify) {
-			return Result.OK;
-		} else {
-			return new Result(false, "Invalid block signature");
+			// @TODO: check the genesis block?
+			if (block.getHeader().getHeight() == 0) {
+				return Result.OK;
+			}
+
+			// check the proof of work nonce
+			ProofOfWork proofOfWork = ProofOfWork.newProofOfWork(block.getHeader());
+			if (!proofOfWork.validate()) {
+				return new Result(false, "Invalid Pow result");
+			}
+
+			// check the prev block
+			if (block.getHeader().getHeight() > 1) {
+				Block prevBlock = getBlockByHeight(block.getHeader().getHeight() - 1);
+				if (prevBlock == null) {
+					return new Result(false, "previous block is not exists");
+				}
+				if (!StringUtils.equals(prevBlock.getHeader().getHash(), block.getHeader().getPreviousHash())) {
+					return new Result(false, "Invalid previous hash");
+				}
+			}
+
+			// check the block signature
+			boolean verify = Sign.verify(Keys.publicKeyDecode(block.getPubKey()), block.getBlockSign(), block.genCid());
+			if (verify) {
+				return Result.OK;
+			} else {
+				return new Result(false, "Invalid block signature");
+			}
+		} finally {
+			readLock.unlock();
 		}
 	}
 }

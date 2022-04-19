@@ -41,28 +41,25 @@ public class AppClient {
 		ReconnConf reconnConf = new ReconnConf(5000L, 20);
 		// init client config
 		TioClientConfig clientConfig = new TioClientConfig(clientHandler, clientListener, reconnConf);
-		clientConfig.setHeartbeatTimeout(NetConfig.HEART_TIMEOUT);
+		// disable heartbeat from tio framework
+		clientConfig.setHeartbeatTimeout(0);
 		this.clientConfig = clientConfig;
 		this.netConfig = netConfig;
 	}
 
 	@PostConstruct
-	public void run()
+	public void run() throws Exception
 	{
-		new Thread(() -> {
-			try {
-				this.client = new TioClient(clientConfig);
-				// try to connect the genesis node
-				connect(new Peer(netConfig.getGenesisAddress(), netConfig.getGenesisPort()));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}).start();
+		this.client = new TioClient(clientConfig);
+		// try to connect the genesis node
+		connect(new Peer(netConfig.getGenesisAddress(), netConfig.getGenesisPort()));
 	}
 
 	public void sendGroup(MessagePacket messagePacket)
 	{
-		Tio.sendToGroup(clientConfig, NetConfig.CLIENT_GROUP_NAME, messagePacket);
+		if (connectedPeers.size() > 0) {
+			Tio.sendToGroup(clientConfig, NetConfig.CLIENT_GROUP_NAME, messagePacket);
+		}
 	}
 
 	// connect a new node

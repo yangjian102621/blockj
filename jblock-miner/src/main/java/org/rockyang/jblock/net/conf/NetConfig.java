@@ -11,7 +11,6 @@ public class NetConfig {
 
 	public static final String SERVER_GROUP_NAME = "jblock-server";
 	public static final String CLIENT_GROUP_NAME = "jblock-client";
-	public static final int HEART_TIMEOUT = 5000;
 
 	@Value("${tio.server.address}")
 	private String serverAddress;

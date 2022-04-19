@@ -38,7 +38,12 @@ public class AppClientHandler extends BaseHandler implements TioClientHandler {
 				case MessagePacketType.RES_BLOCK_SYNC -> handler.syncBlock(body);
 				case MessagePacketType.RES_NEW_BLOCK -> handler.newBlock(body);
 			} //end of switch
-
 		}
+	}
+
+	public Packet heartbeatPacket(ChannelContext context)
+	{
+		// disable heartbeat from tio framework
+		return null;
 	}
 }

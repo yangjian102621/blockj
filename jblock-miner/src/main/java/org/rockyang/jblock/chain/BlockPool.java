@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class BlockPool {
 
 	private final static Logger logger = LoggerFactory.getLogger(BlockPool.class);
-	private final Map<String, Block> blocks = new ConcurrentHashMap<>();
+	private final Map<Long, Block> blocks = new ConcurrentHashMap<>();
 	private final AtomicLong head = new AtomicLong();
 	private final BlockService blockService;
 
@@ -44,14 +44,14 @@ public class BlockPool {
 			while (true) {
 				long head = blockService.chainHead();
 				Block headBlock = blockService.getBlockByHeight(head);
+				if (headBlock == null) {
+					logger.info("Can not find the head block");
+					ThreadUtils.niceSleep(1);
+					continue;
+				}
 				for (Block block : getBlocks()) {
-					if (headBlock == null) {
-						logger.info("Can not find the head block");
-						break;
-					}
 					long diff = block.getHeader().getHeight() - head;
 					long now = System.currentTimeMillis() / 1000;
-					logger.debug("diff: {}, headTimestamp: {}", diff, headBlock.getHeader().getTimestamp());
 					if (now < headBlock.getHeader().getTimestamp() + diff * Miner.BLOCK_DELAY_SECS) {
 						continue;
 					}
@@ -61,22 +61,21 @@ public class BlockPool {
 						if (result.isOk()) {
 							blockService.markBlockAsValidated(block);
 						} else {
-							logger.warn("Invalid block, {}", result.getMessage());
+							logger.warn("Invalid block, height: {}, message: {}", block.getHeader().getHeight(), result.getMessage());
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					} finally {
-						removeBlock(block.getHeader().getHash());
+						removeBlock(block.getHeader().getHeight());
 					}
 				}
-				ThreadUtils.niceSleep(1);
 			}
 		}).start();
 	}
 
 	public void putBlock(Block block)
 	{
-		blocks.put(block.getHeader().getHash(), block);
+		blocks.put(block.getHeader().getHeight(), block);
 		while (true) {
 			long h = head.get();
 			if (block.getHeader().getHeight() > h) {
@@ -87,10 +86,11 @@ public class BlockPool {
 		}
 	}
 
-	public Block getBlock(String blockHash)
+	public boolean hasBlock(Block block)
 	{
-		return blocks.get(blockHash);
+		return blocks.containsKey(block.getHeader().getHeight());
 	}
+
 
 	public List<Block> getBlocks()
 	{
@@ -103,9 +103,9 @@ public class BlockPool {
 	}
 
 	// remove message from the message pool
-	public void removeBlock(String blockHash)
+	public void removeBlock(Long height)
 	{
-		blocks.remove(blockHash);
+		blocks.remove(height);
 	}
 
 }

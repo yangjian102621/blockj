@@ -5,13 +5,11 @@ import org.rockyang.jblock.base.utils.SerializeUtils;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
 import org.rockyang.jblock.chain.event.SyncBlockEvent;
 import org.rockyang.jblock.chain.service.BlockService;
-import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.net.client.AppClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -32,8 +30,15 @@ public class BlockEventListener {
 		this.blockService = blockService;
 	}
 
+//	@EventListener(ApplicationReadyEvent.class)
+//	public void appReady()
+//	{
+//		ApplicationContextProvider.publishEvent(new SyncBlockEvent(0));
+//	}
+
 	// mine a new block event
 	@EventListener(NewBlockEvent.class)
+
 	public void newBlock(NewBlockEvent event)
 	{
 		Block block = (Block) event.getSource();
@@ -42,12 +47,6 @@ public class BlockEventListener {
 		messagePacket.setType(MessagePacketType.REQ_NEW_BLOCK);
 		messagePacket.setBody(SerializeUtils.serialize(block));
 		client.sendGroup(messagePacket);
-	}
-
-	@EventListener(ApplicationReadyEvent.class)
-	public void appReady(ApplicationReadyEvent event)
-	{
-		ApplicationContextProvider.publishEvent(new SyncBlockEvent(0));
 	}
 
 	// sync the specified height block

@@ -26,14 +26,17 @@ public class ClientHandler {
 	private final BlockService blockService;
 	private final MessagePool messagePool;
 	private final BlockPool blockPool;
+	private final Syncer syncer;
 
 	public ClientHandler(BlockService blockService,
 	                     MessagePool messagePool,
-	                     BlockPool blockPool)
+	                     BlockPool blockPool,
+	                     Syncer syncer)
 	{
 		this.blockService = blockService;
 		this.messagePool = messagePool;
 		this.blockPool = blockPool;
+		this.syncer = syncer;
 	}
 
 	public void syncBlock(byte[] body) throws Exception
@@ -41,6 +44,12 @@ public class ClientHandler {
 		PacketVo packetVo = (PacketVo) SerializeUtils.unSerialize(body);
 		if (!packetVo.isSuccess()) {
 			logger.warn("failed to sync block, {}", packetVo.getMessage());
+			// @TODO: retry it later?
+			syncer.start();
+			return;
+		}
+		if (packetVo.getItem() == null) {
+			logger.info("chain sync complete");
 			return;
 		}
 		Block block = (Block) packetVo.getItem();
@@ -55,6 +64,7 @@ public class ClientHandler {
 		if (result.isOk()) {
 			blockService.markBlockAsValidated(block);
 			logger.info("sync block {} successfully, hash: {}", block.getHeader().getHeight(), block.getHeader().getHash());
+			syncer.stop();
 			ApplicationContextProvider.publishEvent(new SyncBlockEvent(block.getHeader().getHeight() + 1));
 		} else {
 			logger.warn("Invalid block, height: {}, message: {}", block.getHeader().getHeight(), result.getMessage());
@@ -65,11 +75,12 @@ public class ClientHandler {
 	public void newBlock(byte[] body)
 	{
 		PacketVo packetVo = (PacketVo) SerializeUtils.unSerialize(body);
-		String blockHash = (String) packetVo.getItem();
+		Block block = (Block) packetVo.getItem();
 
 		// if confirm failed, remove the block from pool
 		if (!packetVo.isSuccess()) {
-			blockPool.removeBlock(blockHash);
+			logger.info("block confirm failed, {}", packetVo.getMessage());
+			blockPool.removeBlock(block.getHeader().getHeight());
 		}
 	}
 

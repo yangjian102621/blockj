@@ -22,22 +22,16 @@ public class AppServer {
 	public AppServer(NetConfig netConfig, AppServerHandler serverHandler, AppServerListener serverListener)
 	{
 		TioServerConfig serverConfig = new TioServerConfig(NetConfig.SERVER_GROUP_NAME, serverHandler, serverListener);
-		serverConfig.setHeartbeatTimeout(NetConfig.HEART_TIMEOUT);
+		// disable heartbeat from tio framework
+		serverConfig.setHeartbeatTimeout(0);
 		this.serverConfig = serverConfig;
 		this.netConfig = netConfig;
 	}
 
 	@PostConstruct
-	public void start()
+	public void start() throws IOException
 	{
-		new Thread(() -> {
-			try {
-				TioServer server = new TioServer(serverConfig);
-				server.start(netConfig.getServerAddress(), netConfig.getServerPort());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}).start();
-
+		TioServer server = new TioServer(serverConfig);
+		server.start(netConfig.getServerAddress(), netConfig.getServerPort());
 	}
 }

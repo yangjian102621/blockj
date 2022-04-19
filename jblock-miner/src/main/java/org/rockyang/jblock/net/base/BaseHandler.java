@@ -8,14 +8,11 @@ import org.tio.core.intf.Packet;
 import java.nio.ByteBuffer;
 
 /**
- * 抽象的  AioHandler, 消息编码，解码的通用实现
+ * Tio handler 抽象类, 消息编码，解码的通用实现
  *
  * @author yangjian
- * @since 18-4-17
  */
 public abstract class BaseHandler {
-
-	public static MessagePacket heartbeatPacket = new MessagePacket(MessagePacketType.HELLO_MESSAGE);
 
 	/**
 	 * 解码：把接收到的ByteBuffer，解码成应用可以识别的业务消息包
@@ -94,11 +91,6 @@ public abstract class BaseHandler {
 			buffer.put(body);
 		}
 		return buffer;
-	}
-
-	public Packet heartbeatPacket(ChannelContext context)
-	{
-		return heartbeatPacket;
 	}
 
 }

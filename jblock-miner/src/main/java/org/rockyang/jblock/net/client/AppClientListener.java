@@ -24,8 +24,6 @@ public class AppClientListener implements TioClientListener {
 			logger.info("connect {} successfully", channelContext.getServerNode());
 			// bind peer to group
 			Tio.bindGroup(channelContext, NetConfig.CLIENT_GROUP_NAME);
-		} else {
-			logger.warn("connect {} successfully", channelContext.getServerNode());
 		}
 	}
 

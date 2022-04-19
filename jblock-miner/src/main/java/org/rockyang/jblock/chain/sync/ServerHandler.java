@@ -17,7 +17,6 @@ import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.net.base.Peer;
 import org.rockyang.jblock.net.client.AppClient;
 import org.rockyang.jblock.vo.PacketVo;
-import org.rockyang.jblock.vo.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -83,39 +82,34 @@ public class ServerHandler {
 		long height = (long) SerializeUtils.unSerialize(body);
 		logger.info("receive a block sync request, height: {}", height);
 		Block block = blockService.getBlockByHeight(height);
+		String message = null;
 		if (block == null) {
-			String message = String.format("block not exists, height: %d", height);
-			return buildPacket(MessagePacketType.RES_BLOCK_SYNC, null, false, message);
-		} else {
-			return buildPacket(MessagePacketType.RES_BLOCK_SYNC, block, true, null);
+			message = String.format("block not exists, height: %d", height);
+
 		}
+		return buildPacket(MessagePacketType.RES_BLOCK_SYNC, block, true, message);
 	}
 
 	/**
 	 * new block event handler
 	 */
-	public synchronized MessagePacket newBlock(byte[] body) throws Exception
+	public synchronized MessagePacket newBlock(byte[] body)
 	{
 		Block block = (Block) SerializeUtils.unSerialize(body);
 		logger.info("receive new block confirm request, height: {}, hash: {}", block.getHeader().getHeight(), block.getHeader().getHash());
 		if (blockService.isBlockValidated(block)) {
 			logger.info("block exists {}, {}", block.getHeader().getHeight(), block.getHeader().getHash());
-			return buildPacket(MessagePacketType.RES_NEW_BLOCK, block.getHeader().getHash(), false, null);
+			return buildPacket(MessagePacketType.RES_NEW_BLOCK, block, false, "block exists");
 		}
-		Result result = blockService.checkBlock(block);
-		if (result.isOk()) {
+		if (!blockPool.hasBlock(block)) {
 			// put it to block pool
 			blockPool.putBlock(block);
-			//blockService.markBlockAsValidated(block);
-			logger.info("block validate successfully, height: {}, hash：{}", block.getHeader().getHeight(), block.getHeader().getHash());
 
 			// if we receive this block for the first time,
 			// we need to forward it to the other nodes
 			ApplicationContextProvider.publishEvent(new NewBlockEvent(block));
-			return buildPacket(MessagePacketType.RES_NEW_BLOCK, block.getHeader().getHash(), true, null);
-		} else {
-			return buildPacket(MessagePacketType.RES_NEW_BLOCK, block.getHeader().getHash(), false, result.getMessage());
 		}
+		return buildPacket(MessagePacketType.RES_NEW_BLOCK, block, true, null);
 	}
 
 	public synchronized MessagePacket newPeer(byte[] body) throws Exception
