@@ -81,9 +81,7 @@ public class AppClient {
 		MessagePacket packet = new MessagePacket();
 		packet.setType(MessagePacketType.REQ_NEW_PEER);
 		packet.setBody(SerializeUtils.serialize(server));
-		if (Tio.send(channelContext, packet)) {
-			Tio.bindGroup(channelContext, NetConfig.CLIENT_GROUP_NAME);
-		}
+		Tio.send(channelContext, packet);
 		return true;
 	}
 
