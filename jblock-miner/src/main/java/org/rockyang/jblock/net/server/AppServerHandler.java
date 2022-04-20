@@ -39,6 +39,7 @@ public class AppServerHandler extends BaseHandler implements TioServerHandler {
 			logger.debug("Invalid message, client: {}, drop it.", channelContext.getClientNode());
 			return;
 		}
+
 		MessagePacket resPacket = null;
 		switch (type) {
 			case MessagePacketType.HELLO_MESSAGE -> logger.info("hello message: {}", SerializeUtils.unSerialize(body));
@@ -46,7 +47,7 @@ public class AppServerHandler extends BaseHandler implements TioServerHandler {
 			case MessagePacketType.REQ_NEW_BLOCK -> resPacket = handler.newBlock(body);
 			case MessagePacketType.REQ_NEW_MESSAGE -> resPacket = handler.newMessage(body);
 			case MessagePacketType.REQ_NEW_PEER -> resPacket = handler.newPeer(body);
-		} //end of switch
+		}
 
 		if (resPacket != null) {
 			Tio.send(channelContext, resPacket);

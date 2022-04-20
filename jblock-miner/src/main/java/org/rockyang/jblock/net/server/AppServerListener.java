@@ -1,7 +1,5 @@
 package org.rockyang.jblock.net.server;
 
-import org.rockyang.jblock.chain.event.SyncBlockEvent;
-import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,9 +18,9 @@ public class AppServerListener implements TioServerListener {
 	@Override
 	public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect)
 	{
-		logger.info("New node connected: {}", channelContext.getClientNode());
-		// start to sync block
-		ApplicationContextProvider.publishEvent(new SyncBlockEvent(0));
+		if (isConnected) {
+			logger.info("New client connected: {}", channelContext.getClientNode());
+		}
 	}
 
 	@Override
@@ -58,6 +56,6 @@ public class AppServerListener implements TioServerListener {
 	@Override
 	public boolean onHeartbeatTimeout(ChannelContext channelContext, Long aLong, int i)
 	{
-		return false;
+		return true;
 	}
 }
