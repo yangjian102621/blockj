@@ -21,9 +21,9 @@ public class AppClientListener implements TioClientListener {
 	public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect)
 	{
 		if (isConnected) {
-			logger.info("connect {} successfully", channelContext.getServerNode());
+			logger.info("Connect server {} successfully", channelContext.getServerNode());
 			// bind peer to group
-			Tio.bindGroup(channelContext, NetConfig.CLIENT_GROUP_NAME);
+			Tio.bindGroup(channelContext, NetConfig.NODE_GROUP_NAME);
 		}
 	}
 
@@ -55,6 +55,6 @@ public class AppClientListener implements TioClientListener {
 	@Override
 	public void onBeforeClose(ChannelContext channelContext, Throwable throwable, String s, boolean b)
 	{
-		Tio.unbindGroup(NetConfig.CLIENT_GROUP_NAME, channelContext);
+		Tio.unbindGroup(NetConfig.NODE_GROUP_NAME, channelContext);
 	}
 }

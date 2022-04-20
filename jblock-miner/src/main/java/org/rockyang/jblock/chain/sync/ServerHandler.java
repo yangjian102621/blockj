@@ -2,6 +2,7 @@ package org.rockyang.jblock.chain.sync;
 
 import org.rockyang.jblock.base.model.Block;
 import org.rockyang.jblock.base.model.Message;
+import org.rockyang.jblock.base.model.Peer;
 import org.rockyang.jblock.base.utils.SerializeUtils;
 import org.rockyang.jblock.chain.BlockPool;
 import org.rockyang.jblock.chain.MessagePool;
@@ -14,12 +15,12 @@ import org.rockyang.jblock.chain.service.PeerService;
 import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
-import org.rockyang.jblock.net.base.Peer;
 import org.rockyang.jblock.net.client.AppClient;
 import org.rockyang.jblock.vo.PacketVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.tio.core.Node;
 
 /**
  * message response handler
@@ -96,7 +97,7 @@ public class ServerHandler {
 	public synchronized MessagePacket newBlock(byte[] body)
 	{
 		Block block = (Block) SerializeUtils.unSerialize(body);
-		logger.info("receive new block confirm request, height: {}, hash: {}", block.getHeader().getHeight(), block.getHeader().getHash());
+		logger.info("receive new block confirm request, height: {}", block.getHeader().getHeight());
 		if (blockService.isBlockValidated(block)) {
 			logger.info("block exists {}, {}", block.getHeader().getHeight(), block.getHeader().getHash());
 			return buildPacket(MessagePacketType.RES_NEW_BLOCK, block, false, "block exists");
@@ -120,7 +121,7 @@ public class ServerHandler {
 			peerService.addPeer(peer);
 		}
 		// try to connect peer
-		if (client.connect(peer)) {
+		if (client.connect(new Node(peer.getIp(), peer.getPort()))) {
 			// fire new peer connected event
 			ApplicationContextProvider.publishEvent(new NewPeerEvent(peer));
 		}

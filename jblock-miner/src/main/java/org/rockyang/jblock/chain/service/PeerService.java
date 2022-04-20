@@ -1,6 +1,6 @@
 package org.rockyang.jblock.chain.service;
 
-import org.rockyang.jblock.net.base.Peer;
+import org.rockyang.jblock.base.model.Peer;
 
 import java.util.List;
 

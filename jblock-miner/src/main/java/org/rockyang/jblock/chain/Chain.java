@@ -79,7 +79,7 @@ public class Chain {
 				try {
 					Block block = miner.mineOne(preBlock);
 
-					logger.info("Mined a new block, Height: {}, Hash: {}", block.getHeader().getHeight(), block.getHeader().getHash());
+					logger.info("Mined a new block, Height: {}", block.getHeader().getHeight());
 					// package the messages in block from message pool
 					// @TODO: Should we limit the number of messages in each block?
 					// @TODO: Should we sort the message by message nonce?

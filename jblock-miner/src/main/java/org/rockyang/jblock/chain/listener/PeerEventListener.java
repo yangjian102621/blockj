@@ -1,10 +1,10 @@
 package org.rockyang.jblock.chain.listener;
 
+import org.rockyang.jblock.base.model.Peer;
 import org.rockyang.jblock.base.utils.SerializeUtils;
 import org.rockyang.jblock.chain.event.NewPeerEvent;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
-import org.rockyang.jblock.net.base.Peer;
 import org.rockyang.jblock.net.client.AppClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

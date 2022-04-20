@@ -21,7 +21,7 @@ public class AppServer {
 
 	public AppServer(NetConfig netConfig, AppServerHandler serverHandler, AppServerListener serverListener)
 	{
-		TioServerConfig serverConfig = new TioServerConfig(NetConfig.SERVER_GROUP_NAME, serverHandler, serverListener);
+		TioServerConfig serverConfig = new TioServerConfig(NetConfig.SERVER_NAME, serverHandler, serverListener);
 		// disable heartbeat from tio framework
 		serverConfig.setHeartbeatTimeout(0);
 		this.serverConfig = serverConfig;

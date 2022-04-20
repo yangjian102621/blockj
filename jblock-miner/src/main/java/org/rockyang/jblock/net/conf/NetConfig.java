@@ -2,6 +2,10 @@ package org.rockyang.jblock.net.conf;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.tio.core.Node;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author yangjian
@@ -9,8 +13,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class NetConfig {
 
-	public static final String SERVER_GROUP_NAME = "jblock-server";
-	public static final String CLIENT_GROUP_NAME = "jblock-client";
+	public static final String SERVER_NAME = "jblock-tio-server";
+	public static final String NODE_GROUP_NAME = "jblock-nodes";
+	public static final Map<Node, Boolean> SERVERS = new ConcurrentHashMap<>(16);
 
 	@Value("${tio.server.address}")
 	private String serverAddress;

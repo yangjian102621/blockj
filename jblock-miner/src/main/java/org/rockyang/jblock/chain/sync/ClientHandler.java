@@ -26,17 +26,14 @@ public class ClientHandler {
 	private final BlockService blockService;
 	private final MessagePool messagePool;
 	private final BlockPool blockPool;
-	private final Syncer syncer;
 
 	public ClientHandler(BlockService blockService,
 	                     MessagePool messagePool,
-	                     BlockPool blockPool,
-	                     Syncer syncer)
+	                     BlockPool blockPool)
 	{
 		this.blockService = blockService;
 		this.messagePool = messagePool;
 		this.blockPool = blockPool;
-		this.syncer = syncer;
 	}
 
 	public void syncBlock(byte[] body) throws Exception
@@ -45,7 +42,6 @@ public class ClientHandler {
 		if (!packetVo.isSuccess()) {
 			logger.warn("failed to sync block, {}", packetVo.getMessage());
 			// @TODO: retry it later?
-			syncer.start();
 			return;
 		}
 		if (packetVo.getItem() == null) {
@@ -63,8 +59,7 @@ public class ClientHandler {
 		Result result = blockService.checkBlock(block);
 		if (result.isOk()) {
 			blockService.markBlockAsValidated(block);
-			logger.info("sync block {} successfully, hash: {}", block.getHeader().getHeight(), block.getHeader().getHash());
-			syncer.stop();
+			logger.info("sync block successfully, height: {}", block.getHeader().getHeight());
 			ApplicationContextProvider.publishEvent(new SyncBlockEvent(block.getHeader().getHeight() + 1));
 		} else {
 			logger.warn("Invalid block, height: {}, message: {}", block.getHeader().getHeight(), result.getMessage());

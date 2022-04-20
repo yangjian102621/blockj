@@ -1,8 +1,8 @@
 package org.rockyang.jblock.chain.service.impl;
 
+import org.rockyang.jblock.base.model.Peer;
 import org.rockyang.jblock.base.store.Datastore;
 import org.rockyang.jblock.chain.service.PeerService;
-import org.rockyang.jblock.net.base.Peer;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

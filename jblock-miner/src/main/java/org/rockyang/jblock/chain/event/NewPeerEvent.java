@@ -1,6 +1,6 @@
 package org.rockyang.jblock.chain.event;
 
-import org.rockyang.jblock.net.base.Peer;
+import org.rockyang.jblock.base.model.Peer;
 import org.springframework.context.ApplicationEvent;
 
 /**
