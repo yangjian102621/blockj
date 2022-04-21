@@ -1,52 +1,60 @@
-# jblock
+# JBlock
 
-Java实现的一个简易区块链（联盟链）项目，包括加密工具，钱包，P2P 传输，区块同步，POW 共识等基础实现。
+> Java 实现的一个简易区块链（联盟链）项目，包括加密工具，钱包，P2P 传输，区块同步，网络共识等基础实现。
+> 它使用 SpringBoot + Tio 网络框架实现，是一个非常好的区块链学习项目，目前只实现了 POW 共识算法，如果要用于生产项目需要根据自己的项目需求修改共识。
 
 -----------------------------------------------
 
+## 项目架构
 
-## 单节点部署
-__这个很简单, 直接像运行普通的 SpringBoot 项目一样运行就好了，单节点默认使用的 node1 节点的配置__
+主程序使用 SpringBoot 实现， P2P 传输这块使用的是 [t-io 网络框架](https://github.com/tywo45/t-io)。
 
-## 多节点部署
-项目默认部署3个节点，创建了3个配置文件 application-{env}.yml， 
-如果想要部署更多的节点，再创建更多的配置文件就 OK 了。
+## 项目模块
+* jblock-base 基础公共的工具包，如加密，区块，消息等数据模型，数据存储等。
+* jblock-miner 区块链主程序，如矿工，区块同步，P2P 网络，RPC API 等。
+* jblock-client 客户端命令行工具，主要就是调用 Miner 的相关 API，用户跟链交互。
+  
+## 快速开始
 
-使用 idea 部署测试非常简单，按照下面的方法添加多个 springBoot 启动配置。
+创建一条链的操作流程如下：
 
-![](imgs/install.png)
+1. 创建创世节点（创建一个网络）
+2. 启动创世节点（Genesis Miner）
+3. 其他节点要加入网络的话，只需要以创世区块初始化 Miner，然后再启动 Miner 即可。
 
-然后分别启动 3 个节点就好了。启动之后节点之间自动连接成 P2P 网络，随后你就可以使用 postman 工具进行测试了，如果没有安装 postman 的话请自行安装，或者和我一样使用 chrome 浏览器的 postman 扩展。
+### 创建创世节点
 
-## 简单测试
-首先依次启动 node1 - node3 3个节点，由于在启动的时候会自动链接初始化的节点，各自连接成为一个 P2P 的网络，所以被链接的节点没有启动的时候会抛出网络异常，不用管它，等其他节点启动好了之后又会自动连接上的。
+首先我们需要编译打包程序：
 
-你可以使用 PostMan 工具对上面的 RESTFUL api 进行一一测试。不过从 v1.2 之后我在项目中集成了 swagger2，所以现在更好的测试是直接使用 swagger 
-的 api ui 页面进行测试： http://localhost:8081/swagger-ui.html
+```bash
+git clone https://gitee.com/blackfox/jblock.git
+cd jblock
+mvn clean package
+```
 
- ![](imgs/api.png)
- 
- 直接点击相应的 api 进行测试就 OK 了。
- 
- ## Web 测试 API
- 
- API名称 | 请求方式 | URL 
- --------|---------|------
- 生成钱包 | POST | /api/wallet/new_account
- 查看钱包列表 | GET | /api/wallet/list
- 获取挖矿账号 | GET | /api/wallet/get_miner_address
- 启动挖矿 | GET | /api/chain/mining
- 发送交易 | POST | /api/chain/send_transactions
- 查看最后一个区块 | GET | /api/chain/block/head
- 添加节点 | POST | /api/chain/peer/add
- 查看节点 | GET | /api/chain/peer/view
- 
- > 注意：凡是 POST 请求都是使用 RequestBody 的方式传参的， 不是用表单的 form-data 形式， 比如发送交易的参数形式如下：
- 
- ```
- {
-     "name" : "value",
-     "name2" : "value2"
- }
- ```
+然后创建创世节点：
 
+```bash
+./jblock genesis
+```
+
+启动创世 Miner：
+
+```bash
+./jblock run 
+```
+
+### 启动新 Miner
+由于客户端参数这块配置还没有完善，所以新节点的配置信息暂时通过 application-node2.properties 文件配置了，后续会支持直接命令行传参来生成 Miner 配置文档：
+
+首先需要初始化 miner
+
+```bash
+./jblock init --spring.profiles.active=node2 --genesis=genesis.car
+```
+
+启动 Miner 
+
+```bash
+./jblock run --spring.profiles.active=node2
+```

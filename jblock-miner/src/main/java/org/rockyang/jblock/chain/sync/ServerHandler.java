@@ -9,7 +9,6 @@ import org.rockyang.jblock.chain.MessagePool;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
 import org.rockyang.jblock.chain.event.NewMessageEvent;
 import org.rockyang.jblock.chain.event.NewPeerEvent;
-import org.rockyang.jblock.chain.event.SyncBlockEvent;
 import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.chain.service.MessageService;
 import org.rockyang.jblock.chain.service.PeerService;
@@ -125,8 +124,6 @@ public class ServerHandler {
 		if (client.connect(new Node(peer.getIp(), peer.getPort()))) {
 			// fire new peer connected event
 			ApplicationContextProvider.publishEvent(new NewPeerEvent(peer));
-			// start to sync block
-			ApplicationContextProvider.publishEvent(new SyncBlockEvent(0));
 		}
 		return null;
 	}

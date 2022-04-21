@@ -111,6 +111,8 @@ public class ApplicationRunner implements org.springframework.boot.ApplicationRu
 				// validate genesis block
 				blockService.markBlockAsValidated(block);
 				logger.info("init miner successfully, repo: {}", repo);
+				// update chain head
+				blockService.setChainHead(block.getHeader().getHeight());
 			}
 			System.exit(0);
 		}
