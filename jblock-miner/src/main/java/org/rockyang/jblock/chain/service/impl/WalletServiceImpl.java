@@ -13,10 +13,7 @@ import java.util.Optional;
  */
 @Service
 public class WalletServiceImpl implements WalletService {
-
-	private final String WALLET_PREFIX = "/wallets/";
-	private final String MINER_ADDR_KEY = "/wallets/miner";
-	private final String DEFAULT_ADDR_KEY = "/wallets/default";
+	
 	private final Datastore datastore;
 
 	public WalletServiceImpl(Datastore datastore)

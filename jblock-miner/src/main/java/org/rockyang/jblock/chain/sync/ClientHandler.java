@@ -6,7 +6,7 @@ import org.rockyang.jblock.chain.BlockPool;
 import org.rockyang.jblock.chain.MessagePool;
 import org.rockyang.jblock.chain.event.SyncBlockEvent;
 import org.rockyang.jblock.chain.service.BlockService;
-import org.rockyang.jblock.net.ApplicationContextProvider;
+import org.rockyang.jblock.conf.ApplicationContextProvider;
 import org.rockyang.jblock.vo.PacketVo;
 import org.rockyang.jblock.vo.Result;
 import org.slf4j.Logger;

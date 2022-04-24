@@ -8,6 +8,8 @@ import java.util.List;
  * @author yangjian
  */
 public interface PeerService {
+	String PEER_PREFIX = "/peers/";
+
 	void addPeer(Peer peer);
 
 	List<Peer> getPeers();

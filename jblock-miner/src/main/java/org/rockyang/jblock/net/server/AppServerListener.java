@@ -1,7 +1,7 @@
 package org.rockyang.jblock.net.server;
 
 import org.rockyang.jblock.chain.event.SyncBlockEvent;
-import org.rockyang.jblock.net.ApplicationContextProvider;
+import org.rockyang.jblock.conf.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

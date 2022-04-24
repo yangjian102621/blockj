@@ -8,6 +8,8 @@ import java.math.BigDecimal;
  * @author yangjian
  */
 public interface AccountService {
+	String ACCOUNT_PREFIX = "/accounts/";
+	
 	BigDecimal getBalance(String address);
 
 	void addBalance(String address, BigDecimal value);

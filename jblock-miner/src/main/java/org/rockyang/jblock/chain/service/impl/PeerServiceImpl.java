@@ -14,7 +14,6 @@ import java.util.List;
 public class PeerServiceImpl implements PeerService {
 
 	private final Datastore datastore;
-	private final String PEER_PREFIX = "/peers/";
 
 	public PeerServiceImpl(Datastore datastore)
 	{

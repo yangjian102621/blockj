@@ -12,7 +12,7 @@ import org.rockyang.jblock.chain.event.NewPeerEvent;
 import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.chain.service.MessageService;
 import org.rockyang.jblock.chain.service.PeerService;
-import org.rockyang.jblock.net.ApplicationContextProvider;
+import org.rockyang.jblock.conf.ApplicationContextProvider;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.net.client.AppClient;

@@ -6,12 +6,12 @@ import org.rockyang.jblock.base.model.Message;
 import org.rockyang.jblock.base.utils.ThreadUtils;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
 import org.rockyang.jblock.chain.service.BlockService;
+import org.rockyang.jblock.conf.ApplicationContextProvider;
+import org.rockyang.jblock.conf.MinerConfig;
 import org.rockyang.jblock.miner.Miner;
-import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -30,22 +30,22 @@ public class Chain {
 	private final MessagePool messagePool;
 	private final BlockPool blockPool;
 	private final BlockService blockService;
-	@Value("${run-mining}")
-	private boolean isRunMining;
+	private final MinerConfig minerConfig;
 
-	public Chain(Miner miner, MessagePool messagePool, BlockPool blockPool, BlockService blockService)
+	public Chain(Miner miner, MessagePool messagePool, BlockPool blockPool, BlockService blockService, MinerConfig minerConfig)
 	{
 		this.miner = miner;
 		this.messagePool = messagePool;
 		this.blockPool = blockPool;
 		this.blockService = blockService;
+		this.minerConfig = minerConfig;
 	}
 
 	@PostConstruct
 	public void run()
 	{
 		new Thread(() -> {
-			if (!isRunMining) {
+			if (!minerConfig.isEnabledMining()) {
 				return;
 			}
 			logger.info("JBlock Miner started");

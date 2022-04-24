@@ -8,9 +8,20 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class MinerConfig {
-
 	@Value("${jblock.repo}")
 	private String repo;
+	@Value("${jblock.enabled-mining}")
+	private boolean enabledMining;
+
+	public boolean isEnabledMining()
+	{
+		return enabledMining;
+	}
+
+	public void setEnabledMining(boolean enabledMining)
+	{
+		this.enabledMining = enabledMining;
+	}
 
 	public String getRepo()
 	{
@@ -19,7 +30,7 @@ public class MinerConfig {
 		}
 		String path = System.getProperty("JBLOCK_PATH");
 		if (path == null) {
-			return System.getProperty("user.home")+"/.jblock";
+			return System.getProperty("user.home") + "/.jblock";
 		}
 		return null;
 	}

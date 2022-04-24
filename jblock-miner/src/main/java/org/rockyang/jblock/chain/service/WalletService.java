@@ -8,6 +8,9 @@ import java.util.List;
  * @author yangjian
  */
 public interface WalletService {
+	String WALLET_PREFIX = "/wallets/";
+	String MINER_ADDR_KEY = "/wallets/miner";
+	String DEFAULT_ADDR_KEY = "/wallets/default";
 
 	void addWallet(Wallet wallet);
 

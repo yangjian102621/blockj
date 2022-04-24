@@ -17,7 +17,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class AccountServiceImpl implements AccountService {
 
 	private final Datastore datastore;
-	private final String ACCOUNT_PREFIX = "/accounts/";
 
 	private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 	private final Lock readLock = rwl.readLock();

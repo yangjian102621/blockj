@@ -8,6 +8,11 @@ import org.rockyang.jblock.vo.Result;
  */
 public interface BlockService {
 
+	String CHAIN_HEAD_KEY = "block/head";
+	String BLOCK_PREFIX = "/blocks/";
+	String BLOCK_HEIGHT_PREFIX = "/blocks/height/";
+	String BLOCK_MESSAGE_PREFIX = "/block/message/";
+
 	// get chain head block hash
 	long chainHead();
 

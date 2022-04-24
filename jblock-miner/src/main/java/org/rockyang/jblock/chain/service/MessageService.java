@@ -8,6 +8,7 @@ import java.math.BigDecimal;
  * @author yangjian
  */
 public interface MessageService {
+	String MESSAGE_PREFIX = "/messages/";
 
 	void addMessage(Message message);
 

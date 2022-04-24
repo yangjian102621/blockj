@@ -28,11 +28,6 @@ public class BlockServiceImpl implements BlockService {
 
 	private final static Logger logger = LoggerFactory.getLogger(BlockService.class);
 
-	private final static String CHAIN_HEAD_KEY = "block/head";
-	private final static String BLOCK_PREFIX = "/blocks/";
-	private final static String BLOCK_HEIGHT_PREFIX = "/blocks/height/";
-	private final static String BLOCK_MESSAGE_PREFIX = "/block/message/";
-
 	private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 	private final Lock readLock = rwl.readLock();
 	private final Lock writeLock = rwl.writeLock();
@@ -81,9 +76,7 @@ public class BlockServiceImpl implements BlockService {
 			datastore.put(BLOCK_HEIGHT_PREFIX + block.getHeader().getHeight(), block.getHeader().getHash());
 
 			// add index for messages in block
-			block.getMessages().forEach(message -> {
-				datastore.put(BLOCK_MESSAGE_PREFIX + message.getCid(), message);
-			});
+			block.getMessages().forEach(message -> datastore.put(BLOCK_MESSAGE_PREFIX + message.getCid(), message));
 		} finally {
 			writeLock.unlock();
 		}

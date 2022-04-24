@@ -15,8 +15,8 @@ import org.rockyang.jblock.chain.service.AccountService;
 import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.chain.service.MessageService;
 import org.rockyang.jblock.chain.service.WalletService;
+import org.rockyang.jblock.conf.ApplicationContextProvider;
 import org.rockyang.jblock.miner.Miner;
-import org.rockyang.jblock.net.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,8 +30,6 @@ import java.math.BigDecimal;
 public class MessageServiceImpl implements MessageService {
 
 	private final static Logger logger = LoggerFactory.getLogger(BlockService.class);
-
-	public final static String MESSAGE_PREFIX = "/messages/";
 
 	private final Datastore datastore;
 	private final AccountService accountService;

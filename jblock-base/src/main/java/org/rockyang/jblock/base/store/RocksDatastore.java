@@ -24,10 +24,8 @@ public class RocksDatastore implements Datastore {
 		String dataPath = String.format("%s/datastore", repo);
 		try {
 			File directory = new File(dataPath);
-			if (!directory.exists()) {
-				if (!directory.mkdirs()) {
-					throw new FileNotFoundException(dataPath);
-				}
+			if (!directory.exists() && !directory.mkdirs()) {
+				throw new FileNotFoundException(dataPath);
 			}
 			datastore = RocksDB.open(new Options().setCreateIfMissing(true), dataPath);
 		} catch (RocksDBException | FileNotFoundException e) {
