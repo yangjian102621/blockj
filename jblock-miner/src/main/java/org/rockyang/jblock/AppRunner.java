@@ -7,9 +7,9 @@ import org.rockyang.jblock.base.store.Datastore;
 import org.rockyang.jblock.base.store.RocksDatastore;
 import org.rockyang.jblock.base.utils.CmdArgsParser;
 import org.rockyang.jblock.base.utils.SerializeUtils;
-import org.rockyang.jblock.chain.service.AccountService;
-import org.rockyang.jblock.chain.service.BlockService;
-import org.rockyang.jblock.chain.service.WalletService;
+import org.rockyang.jblock.service.AccountService;
+import org.rockyang.jblock.service.BlockService;
+import org.rockyang.jblock.service.WalletService;
 import org.rockyang.jblock.miner.Miner;
 import org.rockyang.jblock.miner.pow.PowMiner;
 import org.rockyang.jblock.miner.pow.ProofOfWork;
@@ -24,7 +24,7 @@ public class AppRunner {
 
 	static final Logger logger = LoggerFactory.getLogger(AppRunner.class);
 	private String repo;
-	private CmdArgsParser parser;
+	private final CmdArgsParser parser;
 	private Datastore datastore;
 
 	public AppRunner(String[] args)
@@ -34,8 +34,7 @@ public class AppRunner {
 		if (StringUtils.isEmpty(repo)) {
 			repo = System.getProperty("JBLOCK_PATH");
 			if (StringUtils.isEmpty(repo)) {
-//				repo = System.getProperty("user.home") + "/.jblock";
-				repo = "/tmp/jblock1";
+				repo = System.getProperty("user.home") + "/.jblock";
 			}
 		}
 	}

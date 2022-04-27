@@ -1,8 +1,8 @@
-package org.rockyang.jblock.chain.service.impl;
+package org.rockyang.jblock.service.impl;
 
 import org.rockyang.jblock.base.model.Account;
 import org.rockyang.jblock.base.store.Datastore;
-import org.rockyang.jblock.chain.service.AccountService;
+import org.rockyang.jblock.service.AccountService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -37,50 +37,62 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public void addBalance(String address, BigDecimal value)
+	public boolean addBalance(String address, BigDecimal value)
 	{
 		writeLock.lock();
-		Account account = getAccount(address);
-		if (account == null) {
-			return;
+		try {
+			Account account = getAccount(address);
+			if (account == null) {
+				return false;
+			}
+			account.setBalance(account.getBalance().add(value));
+			return setAccount(account);
+		} finally {
+			writeLock.unlock();
 		}
-		account.setBalance(account.getBalance().add(value));
-		writeLock.unlock();
-
 	}
 
 	@Override
-	public void subBalance(String address, BigDecimal value)
+	public boolean subBalance(String address, BigDecimal value)
 	{
 		writeLock.lock();
-		Account account = getAccount(address);
-		if (account == null) {
-			return;
+		try {
+			Account account = getAccount(address);
+			if (account == null) {
+				return false;
+			}
+			account.setBalance(account.getBalance().subtract(value));
+			return setAccount(account);
+		} finally {
+			writeLock.unlock();
 		}
-		account.setBalance(account.getBalance().subtract(value));
-		writeLock.unlock();
 	}
 
 	@Override
-	public void addMessageNonce(String address, long value)
+	public boolean addMessageNonce(String address, long value)
 	{
 		writeLock.lock();
 		Account account = getAccount(address);
 		account.setMessageNonce(account.getMessageNonce() + value);
+		boolean r = setAccount(account);
 		writeLock.unlock();
+		return r;
 	}
 
 	@Override
-	public void setAccount(Account account)
+	public boolean setAccount(Account account)
 	{
 		writeLock.lock();
-		// @Note: we should not to set the balance directly, it should ONLY to be add or subtract
-		Account old = getAccount(account.getAddress());
-		if (old != null) {
-			account.setBalance(old.getBalance());
+		try {
+			// @Note: we should not to set the balance directly, it should ONLY to be add or subtract
+			Account old = getAccount(account.getAddress());
+			if (old != null) {
+				account.setBalance(old.getBalance());
+			}
+			return datastore.put(ACCOUNT_PREFIX + account.getAddress(), account);
+		} finally {
+			writeLock.unlock();
 		}
-		datastore.put(ACCOUNT_PREFIX + account.getAddress(), account);
-		writeLock.unlock();
 	}
 
 	@Override

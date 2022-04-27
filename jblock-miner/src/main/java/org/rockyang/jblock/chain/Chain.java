@@ -5,7 +5,7 @@ import org.rockyang.jblock.base.model.BlockHeader;
 import org.rockyang.jblock.base.model.Message;
 import org.rockyang.jblock.base.utils.ThreadUtils;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
-import org.rockyang.jblock.chain.service.BlockService;
+import org.rockyang.jblock.service.BlockService;
 import org.rockyang.jblock.conf.ApplicationContextProvider;
 import org.rockyang.jblock.conf.MinerConfig;
 import org.rockyang.jblock.miner.Miner;

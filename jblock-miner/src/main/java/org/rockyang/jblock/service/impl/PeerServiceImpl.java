@@ -1,8 +1,8 @@
-package org.rockyang.jblock.chain.service.impl;
+package org.rockyang.jblock.service.impl;
 
 import org.rockyang.jblock.base.model.Peer;
 import org.rockyang.jblock.base.store.Datastore;
-import org.rockyang.jblock.chain.service.PeerService;
+import org.rockyang.jblock.service.PeerService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,9 +21,9 @@ public class PeerServiceImpl implements PeerService {
 	}
 
 	@Override
-	public void addPeer(Peer peer)
+	public boolean addPeer(Peer peer)
 	{
-		datastore.put(PEER_PREFIX + peer.toString(), peer);
+		return datastore.put(PEER_PREFIX + peer.toString(), peer);
 	}
 
 	@Override
@@ -33,9 +33,9 @@ public class PeerServiceImpl implements PeerService {
 	}
 
 	@Override
-	public void removePeer(Peer peer)
+	public boolean removePeer(Peer peer)
 	{
-		datastore.delete(peer.toString());
+		return datastore.delete(peer.toString());
 	}
 
 	@Override

@@ -14,25 +14,17 @@ public class TempTest {
 	@Test
 	public void run() throws InterruptedException
 	{
-		new Thread(() -> {
-			try {
-				m1();
-				m2();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		boolean b = true;
+		try {
+			lock.lock();
+			if (b) {
+				System.out.println("returned");
+				return;
 			}
-		}).start();
-
-		new Thread(() -> {
-			try {
-				m2();
-				m1();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}).start();
-
-		Thread.sleep(20000);
+		} finally {
+			System.out.println("release");
+			lock.unlock();
+		}
 	}
 
 	public synchronized void m1() throws InterruptedException

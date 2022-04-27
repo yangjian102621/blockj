@@ -4,7 +4,7 @@ import org.rockyang.jblock.base.model.Block;
 import org.rockyang.jblock.base.utils.SerializeUtils;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
 import org.rockyang.jblock.chain.event.SyncBlockEvent;
-import org.rockyang.jblock.chain.service.BlockService;
+import org.rockyang.jblock.service.BlockService;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.net.client.AppClient;

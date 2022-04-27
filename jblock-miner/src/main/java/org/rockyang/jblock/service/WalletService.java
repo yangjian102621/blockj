@@ -1,4 +1,4 @@
-package org.rockyang.jblock.chain.service;
+package org.rockyang.jblock.service;
 
 import org.rockyang.jblock.base.model.Wallet;
 
@@ -12,7 +12,7 @@ public interface WalletService {
 	String MINER_ADDR_KEY = "/wallets/miner";
 	String DEFAULT_ADDR_KEY = "/wallets/default";
 
-	void addWallet(Wallet wallet);
+	boolean addWallet(Wallet wallet);
 
 	List<Wallet> getWallets();
 
@@ -20,9 +20,9 @@ public interface WalletService {
 
 	Wallet getMinerWallet();
 
-	void setMinerWallet(Wallet wallet);
+	boolean setMinerWallet(Wallet wallet);
 
 	String getDefaultWallet();
 
-	void setDefaultWallet(String address);
+	boolean setDefaultWallet(String address);
 }

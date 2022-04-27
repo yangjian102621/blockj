@@ -5,8 +5,8 @@ import org.rockyang.jblock.base.utils.SerializeUtils;
 import org.rockyang.jblock.chain.BlockPool;
 import org.rockyang.jblock.chain.MessagePool;
 import org.rockyang.jblock.chain.event.SyncBlockEvent;
-import org.rockyang.jblock.chain.service.BlockService;
 import org.rockyang.jblock.conf.ApplicationContextProvider;
+import org.rockyang.jblock.service.BlockService;
 import org.rockyang.jblock.vo.PacketVo;
 import org.rockyang.jblock.vo.Result;
 import org.slf4j.Logger;
@@ -49,7 +49,7 @@ public class ClientHandler {
 			return;
 		}
 		Block block = (Block) packetVo.getItem();
-		if (blockService.isBlockValidated(block)) {
+		if (blockService.isBlockValidated(block.getHeader().getHeight())) {
 			logger.info("block {} is already validate, skip it.", block.getHeader().getHeight());
 			// sync the next block
 			ApplicationContextProvider.publishEvent(new SyncBlockEvent(block.getHeader().getHeight() + 1));

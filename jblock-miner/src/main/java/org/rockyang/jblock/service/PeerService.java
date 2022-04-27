@@ -1,4 +1,4 @@
-package org.rockyang.jblock.chain.service;
+package org.rockyang.jblock.service;
 
 import org.rockyang.jblock.base.model.Peer;
 
@@ -10,11 +10,11 @@ import java.util.List;
 public interface PeerService {
 	String PEER_PREFIX = "/peers/";
 
-	void addPeer(Peer peer);
+	boolean addPeer(Peer peer);
 
 	List<Peer> getPeers();
 
-	void removePeer(Peer peer);
+	boolean removePeer(Peer peer);
 
 	boolean hasPeer(Peer peer);
 }

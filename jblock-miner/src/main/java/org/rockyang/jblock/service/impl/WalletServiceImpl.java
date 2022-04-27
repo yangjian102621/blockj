@@ -1,8 +1,8 @@
-package org.rockyang.jblock.chain.service.impl;
+package org.rockyang.jblock.service.impl;
 
 import org.rockyang.jblock.base.model.Wallet;
 import org.rockyang.jblock.base.store.Datastore;
-import org.rockyang.jblock.chain.service.WalletService;
+import org.rockyang.jblock.service.WalletService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.Optional;
  */
 @Service
 public class WalletServiceImpl implements WalletService {
-	
+
 	private final Datastore datastore;
 
 	public WalletServiceImpl(Datastore datastore)
@@ -22,9 +22,9 @@ public class WalletServiceImpl implements WalletService {
 	}
 
 	@Override
-	public void addWallet(Wallet wallet)
+	public boolean addWallet(Wallet wallet)
 	{
-		datastore.put(WALLET_PREFIX + wallet.getAddress(), wallet);
+		return datastore.put(WALLET_PREFIX + wallet.getAddress(), wallet);
 	}
 
 	@Override
@@ -47,10 +47,12 @@ public class WalletServiceImpl implements WalletService {
 	}
 
 	@Override
-	public void setMinerWallet(Wallet wallet)
+	public boolean setMinerWallet(Wallet wallet)
 	{
-		addWallet(wallet);
-		datastore.put(MINER_ADDR_KEY, wallet.getAddress());
+		if (!addWallet(wallet)) {
+			return false;
+		}
+		return datastore.put(MINER_ADDR_KEY, wallet.getAddress());
 	}
 
 	@Override
@@ -60,8 +62,8 @@ public class WalletServiceImpl implements WalletService {
 	}
 
 	@Override
-	public void setDefaultWallet(String address)
+	public boolean setDefaultWallet(String address)
 	{
-		datastore.put(DEFAULT_ADDR_KEY, address);
+		return datastore.put(DEFAULT_ADDR_KEY, address);
 	}
 }

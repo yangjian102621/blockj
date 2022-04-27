@@ -2,7 +2,7 @@ package org.rockyang.jblock.chain;
 
 import org.rockyang.jblock.base.model.Block;
 import org.rockyang.jblock.base.utils.ThreadUtils;
-import org.rockyang.jblock.chain.service.BlockService;
+import org.rockyang.jblock.service.BlockService;
 import org.rockyang.jblock.miner.Miner;
 import org.rockyang.jblock.vo.Result;
 import org.slf4j.Logger;

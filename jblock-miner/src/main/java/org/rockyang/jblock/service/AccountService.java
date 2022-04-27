@@ -1,4 +1,4 @@
-package org.rockyang.jblock.chain.service;
+package org.rockyang.jblock.service;
 
 import org.rockyang.jblock.base.model.Account;
 
@@ -12,13 +12,13 @@ public interface AccountService {
 	
 	BigDecimal getBalance(String address);
 
-	void addBalance(String address, BigDecimal value);
+	boolean addBalance(String address, BigDecimal value);
 
-	void subBalance(String address, BigDecimal value);
+	boolean subBalance(String address, BigDecimal value);
 
-	void addMessageNonce(String address, long value);
+	boolean addMessageNonce(String address, long value);
 
-	void setAccount(Account account);
+	boolean setAccount(Account account);
 
 	Account getAccount(String address);
 }

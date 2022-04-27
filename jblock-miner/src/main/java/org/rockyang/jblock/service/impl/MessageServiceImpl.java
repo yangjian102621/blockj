@@ -1,4 +1,4 @@
-package org.rockyang.jblock.chain.service.impl;
+package org.rockyang.jblock.service.impl;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
@@ -11,12 +11,12 @@ import org.rockyang.jblock.base.model.Wallet;
 import org.rockyang.jblock.base.store.Datastore;
 import org.rockyang.jblock.chain.MessagePool;
 import org.rockyang.jblock.chain.event.NewMessageEvent;
-import org.rockyang.jblock.chain.service.AccountService;
-import org.rockyang.jblock.chain.service.BlockService;
-import org.rockyang.jblock.chain.service.MessageService;
-import org.rockyang.jblock.chain.service.WalletService;
 import org.rockyang.jblock.conf.ApplicationContextProvider;
 import org.rockyang.jblock.miner.Miner;
+import org.rockyang.jblock.service.AccountService;
+import org.rockyang.jblock.service.BlockService;
+import org.rockyang.jblock.service.MessageService;
+import org.rockyang.jblock.service.WalletService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -48,9 +48,9 @@ public class MessageServiceImpl implements MessageService {
 	}
 
 	@Override
-	public void addMessage(Message message)
+	public boolean addMessage(Message message)
 	{
-		datastore.put(MESSAGE_PREFIX + message.getCid(), message);
+		return datastore.put(MESSAGE_PREFIX + message.getCid(), message);
 	}
 
 	@Override

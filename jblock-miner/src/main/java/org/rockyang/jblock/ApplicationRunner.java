@@ -1,8 +1,8 @@
 //package org.rockyang.jblock;
 //
-//import org.rockyang.jblock.chain.service.AccountService;
-//import org.rockyang.jblock.chain.service.BlockService;
-//import org.rockyang.jblock.chain.service.WalletService;
+//import org.rockyang.jblock.service.AccountService;
+//import org.rockyang.jblock.service.BlockService;
+//import org.rockyang.jblock.service.WalletService;
 //import org.rockyang.jblock.conf.MinerConfig;
 //import org.rockyang.jblock.miner.Miner;
 //import org.slf4j.Logger;

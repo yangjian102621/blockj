@@ -1,4 +1,4 @@
-package org.rockyang.jblock.chain.service;
+package org.rockyang.jblock.service;
 
 import org.rockyang.jblock.base.model.Message;
 
@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public interface MessageService {
 	String MESSAGE_PREFIX = "/messages/";
 
-	void addMessage(Message message);
+	boolean addMessage(Message message);
 
 	// get message with the specified message Cid
 	Message getMessage(String cid);

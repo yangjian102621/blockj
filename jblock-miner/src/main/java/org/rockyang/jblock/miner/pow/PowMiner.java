@@ -5,8 +5,8 @@ import org.rockyang.jblock.base.model.Block;
 import org.rockyang.jblock.base.model.BlockHeader;
 import org.rockyang.jblock.base.model.Message;
 import org.rockyang.jblock.base.model.Wallet;
-import org.rockyang.jblock.chain.service.AccountService;
-import org.rockyang.jblock.chain.service.WalletService;
+import org.rockyang.jblock.service.AccountService;
+import org.rockyang.jblock.service.WalletService;
 import org.rockyang.jblock.miner.Miner;
 import org.springframework.stereotype.Component;
 

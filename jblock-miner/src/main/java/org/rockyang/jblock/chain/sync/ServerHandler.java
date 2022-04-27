@@ -9,13 +9,13 @@ import org.rockyang.jblock.chain.MessagePool;
 import org.rockyang.jblock.chain.event.NewBlockEvent;
 import org.rockyang.jblock.chain.event.NewMessageEvent;
 import org.rockyang.jblock.chain.event.NewPeerEvent;
-import org.rockyang.jblock.chain.service.BlockService;
-import org.rockyang.jblock.chain.service.MessageService;
-import org.rockyang.jblock.chain.service.PeerService;
 import org.rockyang.jblock.conf.ApplicationContextProvider;
 import org.rockyang.jblock.net.base.MessagePacket;
 import org.rockyang.jblock.net.base.MessagePacketType;
 import org.rockyang.jblock.net.client.AppClient;
+import org.rockyang.jblock.service.BlockService;
+import org.rockyang.jblock.service.MessageService;
+import org.rockyang.jblock.service.PeerService;
 import org.rockyang.jblock.vo.PacketVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +98,7 @@ public class ServerHandler {
 	{
 		Block block = (Block) SerializeUtils.unSerialize(body);
 		logger.info("receive new block confirm request, height: {}", block.getHeader().getHeight());
-		if (blockService.isBlockValidated(block)) {
+		if (blockService.isBlockValidated(block.getHeader().getHeight())) {
 			logger.info("block exists {}, {}", block.getHeader().getHeight(), block.getHeader().getHash());
 			return buildPacket(MessagePacketType.RES_NEW_BLOCK, block, false, "block exists");
 		}

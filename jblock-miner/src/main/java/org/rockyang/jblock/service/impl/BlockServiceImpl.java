@@ -1,4 +1,4 @@
-package org.rockyang.jblock.chain.service.impl;
+package org.rockyang.jblock.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.rockyang.jblock.base.crypto.Keys;
@@ -7,10 +7,10 @@ import org.rockyang.jblock.base.enums.MessageStatus;
 import org.rockyang.jblock.base.model.Block;
 import org.rockyang.jblock.base.model.Message;
 import org.rockyang.jblock.base.store.Datastore;
-import org.rockyang.jblock.chain.service.AccountService;
-import org.rockyang.jblock.chain.service.BlockService;
-import org.rockyang.jblock.chain.service.MessageService;
 import org.rockyang.jblock.miner.pow.ProofOfWork;
+import org.rockyang.jblock.service.AccountService;
+import org.rockyang.jblock.service.BlockService;
+import org.rockyang.jblock.service.MessageService;
 import org.rockyang.jblock.vo.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,44 +55,52 @@ public class BlockServiceImpl implements BlockService {
 	}
 
 	@Override
-	public void setChainHead(long height)
+	public boolean setChainHead(long height)
 	{
 		writeLock.lock();
-		datastore.put(CHAIN_HEAD_KEY, height);
+		boolean r = datastore.put(CHAIN_HEAD_KEY, height);
 		writeLock.unlock();
+		return r;
 	}
 
 	@Override
-	public void addBlock(Block block)
+	public boolean addBlock(Block block)
 	{
+		writeLock.lock();
 		try {
-			writeLock.lock();
 			if (isBlockValidated(block.getHeader().getHash())) {
-				return;
+				return false;
 			}
 			logger.info("saved block {}, {}", block.getHeader().getHeight(), block.getHeader().getHash());
-			datastore.put(BLOCK_PREFIX + block.getHeader().getHash(), block);
+			if (!datastore.put(BLOCK_PREFIX + block.getHeader().getHash(), block)) {
+				return false;
+			}
 			// add search index for block height
-			datastore.put(BLOCK_HEIGHT_PREFIX + block.getHeader().getHeight(), block.getHeader().getHash());
+			if (!datastore.put(BLOCK_HEIGHT_PREFIX + block.getHeader().getHeight(), block.getHeader().getHash())) {
+				return false;
+			}
 
 			// add index for messages in block
 			block.getMessages().forEach(message -> datastore.put(BLOCK_MESSAGE_PREFIX + message.getCid(), message));
+			return true;
 		} finally {
 			writeLock.unlock();
 		}
 	}
 
 	@Override
-	public void deleteBlock(String blockHash)
+	public boolean deleteBlock(String blockHash)
 	{
+		writeLock.lock();
 		try {
-			writeLock.lock();
 			Block block = getBlock(blockHash);
 			if (block == null) {
-				return;
+				return true;
 			}
 			// remove block
-			datastore.delete(BLOCK_PREFIX + block.getHeader().getHash());
+			if (!datastore.delete(BLOCK_PREFIX + block.getHeader().getHash())) {
+				return false;
+			}
 			// we should check if this height of block hash is updated
 			Optional<Object> o = datastore.get(BLOCK_PREFIX + block.getHeader().getHeight());
 			if (o.isPresent()) {
@@ -103,9 +111,8 @@ public class BlockServiceImpl implements BlockService {
 			}
 
 			// delete messages in block
-			block.getMessages().forEach(message -> {
-				datastore.delete(BLOCK_MESSAGE_PREFIX + message.getCid());
-			});
+			block.getMessages().forEach(message -> datastore.delete(BLOCK_MESSAGE_PREFIX + message.getCid()));
+			return true;
 		} finally {
 			writeLock.unlock();
 		}
@@ -131,10 +138,10 @@ public class BlockServiceImpl implements BlockService {
 	}
 
 	// save block and execute messages in block
-	public void markBlockAsValidated(Block block)
+	public boolean markBlockAsValidated(Block block)
 	{
+		writeLock.lock();
 		try {
-			writeLock.lock();
 			for (Message message : block.getMessages()) {
 				if (!messageService.validateMessage(message)) {
 					continue;
@@ -151,7 +158,9 @@ public class BlockServiceImpl implements BlockService {
 				// update the message nonce for sender
 				accountService.addMessageNonce(message.getFrom(), 1);
 			}
-			addBlock(block);
+			if (!addBlock(block)) {
+				return false;
+			}
 			// update the chain head
 			if (block.getHeader().getHeight() > 0) {
 				long head = chainHead();
@@ -159,16 +168,17 @@ public class BlockServiceImpl implements BlockService {
 					setChainHead(block.getHeader().getHeight());
 				}
 			}
+			return true;
 		} finally {
 			writeLock.unlock();
 		}
 	}
 
 	@Override
-	public synchronized void unmarkBlockAsValidated(String blockHash)
+	public synchronized boolean unmarkBlockAsValidated(String blockHash)
 	{
+		writeLock.lock();
 		try {
-			writeLock.lock();
 			Block block = getBlock(blockHash);
 			for (Message message : block.getMessages()) {
 				if (!message.getStatus().equals(MessageStatus.SUCCESS)) {
@@ -181,17 +191,17 @@ public class BlockServiceImpl implements BlockService {
 				// update the message nonce for sender
 				accountService.addMessageNonce(message.getFrom(), -1);
 			}
-			deleteBlock(blockHash);
+			return deleteBlock(blockHash);
 		} finally {
 			writeLock.unlock();
 		}
 	}
 
 	@Override
-	public boolean isBlockValidated(Block block)
+	public boolean isBlockValidated(long height)
 	{
 		readLock.lock();
-		Block item = getBlockByHeight(block.getHeader().getHeight());
+		Block item = getBlockByHeight(height);
 		readLock.unlock();
 		return item != null;
 	}
@@ -212,8 +222,8 @@ public class BlockServiceImpl implements BlockService {
 	@Override
 	public Result checkBlock(Block block) throws Exception
 	{
+		readLock.lock();
 		try {
-			readLock.lock();
 			if (isBlockValidated(block.getHeader().getHash())) {
 				return Result.OK;
 			}
