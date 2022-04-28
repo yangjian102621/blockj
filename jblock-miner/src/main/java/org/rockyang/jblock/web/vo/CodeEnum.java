@@ -36,4 +36,9 @@ public enum CodeEnum {
 	{
 		this.value = value;
 	}
+
+	public boolean equals(CodeEnum other)
+	{
+		return getValue() == other.getValue();
+	}
 }
