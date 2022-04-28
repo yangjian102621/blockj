@@ -35,26 +35,26 @@ mvn clean package
 然后创建创世节点：
 
 ```bash
-./jblock genesis
+./jblock genesis --repo=/data/genesis --enable-mining=true
 ```
 
 启动创世 Miner：
 
 ```bash
-./jblock run 
+./jblock run --repo=/data/genesis 
 ```
 
 ### 启动新 Miner
-由于客户端参数这块配置还没有完善，所以新节点的配置信息暂时通过 application-node2.properties 文件配置了，后续会支持直接命令行传参来生成 Miner 配置文档：
 
-首先需要初始化 miner
+首先需要初始化 miner，需要导入创世区块（genesis.car）来加入网络：
 
 ```bash
-./jblock init --spring.profiles.active=node2 --genesis=genesis.car
+./jblock init --repo=/data/miner1 --genesis=genesis.car --api.port=8002 --p2p.port=3456
 ```
+
 
 启动 Miner 
 
 ```bash
-./jblock run --spring.profiles.active=node2
+./jblock run --repo=/data/miner1
 ```
