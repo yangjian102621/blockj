@@ -1,3 +1,18 @@
 #!/bin/bash 
-# --spring.profiles.active=node2
-java -jar ./jblock-miner/target/jblock-miner-2.0.0.jar $*
+#set -x
+
+repo=""
+for arg in `echo $*|awk '{print $0}'`
+do 
+	if [[ $arg == --repo* ]];
+	then
+		repo=`echo $arg|awk -F '=' '{print $2}'`
+	fi
+done
+
+if [[ -z $repo ]]; then
+	echo "must pass --repo arg"
+	exit 1
+fi
+
+java -jar ./jblock-miner/target/jblock-miner-2.0.0.jar --spring.config.location=file:$repo/node.properties $*

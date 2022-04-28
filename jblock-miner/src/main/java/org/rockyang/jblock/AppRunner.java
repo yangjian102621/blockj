@@ -7,18 +7,17 @@ import org.rockyang.jblock.base.store.Datastore;
 import org.rockyang.jblock.base.store.RocksDatastore;
 import org.rockyang.jblock.base.utils.CmdArgsParser;
 import org.rockyang.jblock.base.utils.SerializeUtils;
-import org.rockyang.jblock.service.AccountService;
-import org.rockyang.jblock.service.BlockService;
-import org.rockyang.jblock.service.WalletService;
 import org.rockyang.jblock.miner.Miner;
 import org.rockyang.jblock.miner.pow.PowMiner;
 import org.rockyang.jblock.miner.pow.ProofOfWork;
+import org.rockyang.jblock.service.AccountService;
+import org.rockyang.jblock.service.BlockService;
+import org.rockyang.jblock.service.WalletService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
+import java.util.Properties;
 
 public class AppRunner {
 
@@ -29,12 +28,12 @@ public class AppRunner {
 
 	public AppRunner(String[] args)
 	{
-		parser = new CmdArgsParser(args);
+		parser = CmdArgsParser.getInstance(args);
 		repo = parser.getOption("repo");
 		if (StringUtils.isEmpty(repo)) {
 			repo = System.getProperty("JBLOCK_PATH");
 			if (StringUtils.isEmpty(repo)) {
-				repo = System.getProperty("user.home") + "/.jblock";
+				throw new RuntimeException("You must pass the option '--repo'");
 			}
 		}
 	}
@@ -72,6 +71,9 @@ public class AppRunner {
 				fos.write(bytes);
 				fos.close();
 				logger.info("Generated the genesis file: {} successfully.", genesisFile);
+
+				// generate properties file
+				genPropertiesFile(parser);
 				break;
 
 			case "init":
@@ -101,7 +103,10 @@ public class AppRunner {
 				Wallet wallet = createMinerWallet();
 				saveBlock(block);
 				logger.info("Initialize miner successfully, repo: {}, miner: {}", repo, wallet.getAddress());
-				// @TODO: create properties file for repo
+
+				// generate properties file
+				genPropertiesFile(parser);
+
 				break;
 
 			case "run":
@@ -110,7 +115,7 @@ public class AppRunner {
 		return false;
 	}
 
-	public Wallet createMinerWallet() throws Exception
+	private Wallet createMinerWallet() throws Exception
 	{
 		// create the default wallet
 		Wallet wallet = new Wallet();
@@ -122,7 +127,7 @@ public class AppRunner {
 		return wallet;
 	}
 
-	public Block createGenesisBlock() throws Exception
+	private Block createGenesisBlock() throws Exception
 	{
 		Wallet wallet = createMinerWallet();
 
@@ -154,7 +159,7 @@ public class AppRunner {
 		return block;
 	}
 
-	public void saveBlock(Block block)
+	private void saveBlock(Block block)
 	{
 		// save the block
 		datastore.put(BlockService.BLOCK_PREFIX + block.getHeader().getHash(), block);
@@ -171,6 +176,28 @@ public class AppRunner {
 	{
 		File file = new File(repo);
 		file.delete();
+	}
+
+	private void genPropertiesFile(CmdArgsParser parser) throws IOException
+	{
+		Properties properties = new Properties();
+		properties.setProperty("server.address", parser.getOption("api.addr", "127.0.0.1"));
+		properties.setProperty("server.port", parser.getOption("api.port", "8001"));
+		properties.setProperty("jblock.repo", repo);
+		properties.setProperty("jblock.enable-mining", parser.getOption("enable-mining", "false"));
+		properties.setProperty("p2p.address", parser.getOption("p2p.addr", "127.0.0.1"));
+		properties.setProperty("p2p.port", parser.getOption("p2p.port", "2345"));
+
+		// load common properties
+		properties.setProperty("genesis.address", "127.0.0.1");
+		properties.setProperty("genesis.port", "2345");
+
+		// disable tio logs
+		properties.setProperty("logging.level.org.tio.server", "off");
+		properties.setProperty("logging.level.org.tio.client", "off");
+
+		properties.store(new FileWriter(repo + "/node.properties"), "Node config file");
+
 	}
 
 }

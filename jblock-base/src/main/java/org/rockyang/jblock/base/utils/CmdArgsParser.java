@@ -16,12 +16,21 @@ public class CmdArgsParser {
 
 	private final List<String> args;
 	private final Map<String, String> options;
+	private static volatile CmdArgsParser instance;
 
-	public CmdArgsParser(String[] args)
+	private CmdArgsParser(String[] args)
 	{
 		this.args = new ArrayList<>();
 		this.options = new HashMap<>(16);
 		parse(args);
+	}
+
+	public static synchronized CmdArgsParser getInstance(String[] args)
+	{
+		if (instance == null) {
+			instance = new CmdArgsParser(args);
+		}
+		return instance;
 	}
 
 	public void parse(String[] args)
@@ -67,15 +76,38 @@ public class CmdArgsParser {
 		return options.get(key);
 	}
 
+	public String getOption(String key, String defaultValue)
+	{
+		return options.get(key) == null ? defaultValue : options.get(key);
+	}
+
 	public Integer getIntOption(String key)
 	{
 		String s = getOption(key);
 		return Integer.parseInt(s);
 	}
 
+	public Integer getIntOption(String key, Integer defaultValue)
+	{
+		String s = getOption(key);
+		if (s == null) {
+			return defaultValue;
+		}
+		return Integer.parseInt(s);
+	}
+
 	public Boolean getBoolOption(String key)
 	{
 		String s = getOption(key);
+		return Boolean.getBoolean(s);
+	}
+
+	public Boolean getBoolOption(String key, boolean defaultValue)
+	{
+		String s = getOption(key);
+		if (s == null) {
+			return defaultValue;
+		}
 		return Boolean.getBoolean(s);
 	}
 }

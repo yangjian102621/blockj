@@ -17,9 +17,9 @@ public class NetConfig {
 	public static final String NODE_GROUP_NAME = "jblock-nodes";
 	public static final Map<Node, Boolean> SERVERS = new ConcurrentHashMap<>(16);
 
-	@Value("${tio.server.address}")
+	@Value("${p2p.address}")
 	private String serverAddress;
-	@Value("${tio.server.port}")
+	@Value("${p2p.port}")
 	private int serverPort;
 	@Value("${genesis.address}")
 	private String genesisAddress;
