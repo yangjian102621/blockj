@@ -58,3 +58,10 @@ mvn clean package
 ```bash
 ./jblock run --repo=/data/miner1
 ```
+
+## TODOLIST
+- [ ] jblock-miner api 实现
+- [ ] 消息同步和打包
+- [ ] jblock-client(客户端)功能实现：网络，钱包，转账
+- [ ] 文档完善
+- [ ] 添加 PBFT 共识支持
