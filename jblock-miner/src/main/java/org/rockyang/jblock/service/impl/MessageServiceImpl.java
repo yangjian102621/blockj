@@ -136,6 +136,9 @@ public class MessageServiceImpl implements MessageService {
 		if (messagePool.hasMessage(message)) {
 			throw new RuntimeException("message is exists, do not resend it");
 		}
+
+		// @TODO: check the wallet nonce > message nonce
+
 		// sign the message
 		String sign = Sign.sign(senderKeys.getPriKey(), message.toSigned());
 		message.setSign(sign);
