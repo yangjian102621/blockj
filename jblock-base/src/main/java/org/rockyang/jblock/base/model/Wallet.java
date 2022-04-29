@@ -15,9 +15,9 @@ import java.security.NoSuchProviderException;
  */
 public class Wallet implements Serializable {
 
-	protected String address;
+	private String address;
 	private String pubKey;
-	protected String priKey;
+	private String priKey;
 
 	public Wallet() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
 	{

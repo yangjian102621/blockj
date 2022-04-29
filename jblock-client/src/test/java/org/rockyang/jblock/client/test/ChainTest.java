@@ -11,8 +11,8 @@ public class ChainTest extends BaseTester {
 	@Test
 	public void chainHead()
 	{
-		String cid = JBlockServiceWrapper.chainHead();
-		System.out.println(cid);
-		Assert.assertNotNull(cid);
+		Long head = serviceWrapper.chainHead();
+		System.out.println(head);
+		Assert.assertNotNull(head);
 	}
 }

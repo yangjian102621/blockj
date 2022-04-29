@@ -1,4 +1,4 @@
-package org.rockyang.jblock.web.vo;
+package org.rockyang.jblock.base.vo;
 
 /**
  * 返回 Json 字符串 VO

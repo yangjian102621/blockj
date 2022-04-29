@@ -2,10 +2,9 @@ package org.rockyang.jblock.client.rpc;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+import org.rockyang.jblock.base.model.Message;
 import org.rockyang.jblock.client.exception.ApiError;
 import org.rockyang.jblock.client.exception.ApiException;
-import org.rockyang.jblock.client.vo.req.KeyInfoReq;
-import org.rockyang.jblock.client.vo.res.*;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author yangjian
@@ -44,11 +42,12 @@ public class JBlockServiceWrapper {
 		builder.client(httpClient.build());
 		builder.addConverterFactory(JacksonConverterFactory.create());
 		retrofit = builder.build();
-		rpcService =  retrofit.create(JBlockService.class);
+		rpcService = retrofit.create(JBlockService.class);
 	}
 
 	/**
 	 * Invoke the remote API Synchronously
+	 *
 	 * @param call
 	 * @param <T>
 	 * @return
@@ -70,6 +69,7 @@ public class JBlockServiceWrapper {
 
 	/**
 	 * get api error message
+	 *
 	 * @param response
 	 * @return
 	 * @throws IOException
@@ -81,50 +81,16 @@ public class JBlockServiceWrapper {
 		return (ApiError) retrofit.responseBodyConverter(ApiError.class, new Annotation[0]).convert(response.errorBody());
 	}
 
-	/**
-	 * get a new address
-	 * @return
-	 */
+	// create a new wallet
 	public String newWallet()
 	{
-		Map<String, String> map = executeSync(rpcService.newWallet());
-		return map.get("Address");
+		return executeSync(rpcService.newWallet());
 	}
 
-	/**
-	 * get all addresses of the filecoin daemon node
-	 * @return
-	 */
+	// get wallets list
 	public List walletList()
 	{
-		Map<String, List> map = executeSync(rpcService.walletList());
-		return map.get("Addresses");
-	}
-
-	public String getDefaultWallet()
-	{
-		Map<String, String> map = executeSync(rpcService.getDefaultWallet());
-		return map.get("Address");
-	}
-
-	public KeyInfo walletExport(String address)
-	{
-		WalletExportRes res = executeSync(rpcService.walletExport(address));
-		KeyInfo keyInfo = res.getKeyInfo().get(0);
-		keyInfo.setAddress(address);
-		return keyInfo;
-	}
-
-	public String walletImport(String privateKey)
-	{
-		KeyInfoReq keyInfoReq = new KeyInfoReq();
-		KeyInfoReq.KeyInfo keyInfo = new KeyInfoReq.KeyInfo(privateKey, "secp256k1");
-		keyInfoReq.addKeyInfo(keyInfo);
-		Map<String, List> map = executeSync(rpcService.walletImport(keyInfoReq));
-		if (map.get("Addresses") == null) {
-			return null;
-		}
-		return map.get("Addresses").get(0).toString();
+		return executeSync(rpcService.walletList());
 	}
 
 	public BigDecimal getBalance(String address)
@@ -132,26 +98,18 @@ public class JBlockServiceWrapper {
 		return executeSync(rpcService.getBalance(address));
 	}
 
-	public String sendMessage(String from, String to, BigDecimal value)
+	public String sendMessage(String from, String to, BigDecimal value, String param)
 	{
-		SendMessageRes res = executeSync(rpcService.sendMessage(to, from, value));
-		return res.getCid().getRoot();
+		return executeSync(rpcService.sendMessage(to, from, value, param));
 	}
 
-	public MessageStatusRes getMessage(String cid)
+	public Message getMessage(String cid)
 	{
-		MessageStatusRes res = executeSync(rpcService.getMessage(cid));
-		if (res.isOnChain()) {
-			res.getChainMsg().getMessage().getMeteredMessage().getMessage().setSuccess(true);
-		} else {
-			res.getChainMsg().getMessage().getMeteredMessage().getMessage().setSuccess(false);
-		}
-		return res;
+		return executeSync(rpcService.getMessage(cid));
 	}
 
-	public String chainHead()
+	public Long chainHead()
 	{
-		List<Cid> cids = executeSync(rpcService.chainHead());
-		return cids.get(0).getRoot();
+		return executeSync(rpcService.chainHead());
 	}
 }

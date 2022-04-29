@@ -10,11 +10,11 @@ import org.rockyang.jblock.client.rpc.JBlockServiceWrapper;
 public abstract class BaseTester {
 
 	protected static Logger logger = Logger.getLogger(BaseTester.class);
-	protected JBlockServiceWrapper JBlockServiceWrapper;
+	protected JBlockServiceWrapper serviceWrapper;
 
 	@Before
 	public void init()
 	{
-		JBlockServiceWrapper = new JBlockServiceWrapper("http://127.0.0.1:3453", true);
+		serviceWrapper = new JBlockServiceWrapper("http://127.0.0.1:8001", true);
 	}
 }

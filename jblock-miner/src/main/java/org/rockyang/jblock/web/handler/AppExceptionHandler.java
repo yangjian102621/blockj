@@ -19,6 +19,7 @@ public class AppExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public void handle(Exception e)
 	{
+		// @TODO: use different handler with the different exception
 		logger.error("Something is wrong, ", e);
 	}
 }

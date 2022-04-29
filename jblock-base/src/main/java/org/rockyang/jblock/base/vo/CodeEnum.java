@@ -1,4 +1,4 @@
-package org.rockyang.jblock.web.vo;
+package org.rockyang.jblock.base.vo;
 
 /**
  * @author yangjian
