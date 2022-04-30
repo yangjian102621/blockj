@@ -2,7 +2,10 @@ package org.rockyang.jblock.web.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.rockyang.jblock.base.model.Message;
+import org.rockyang.jblock.base.vo.JsonVo;
+import org.rockyang.jblock.chain.MessagePool;
 import org.rockyang.jblock.service.MessageService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,22 +22,33 @@ import java.math.BigDecimal;
 public class MessageController {
 
 	private final MessageService messageService;
+	private final MessagePool messagePool;
 
-	public MessageController(MessageService messageService)
+	public MessageController(MessageService messageService, MessagePool messagePool)
 	{
 		this.messageService = messageService;
+		this.messagePool = messagePool;
 	}
 
 	@GetMapping("/get")
-	public Message getMessage(@RequestBody JSONObject params)
+	public JsonVo getMessage(@RequestBody JSONObject params)
 	{
 		String cid = params.getString("cid");
-		Preconditions.checkNotNull(cid, "must pass the message cid");
-		return messageService.getMessage(cid);
+		Preconditions.checkArgument(StringUtils.isEmpty(cid), "Invalid message cid");
+		Message message = messageService.getMessage(cid);
+		if (message == null) {
+			message = messagePool.getMessage(cid);
+		}
+
+		if (message == null) {
+			return JsonVo.fail().setMessage("No message found");
+		} else {
+			return JsonVo.success().setData(message);
+		}
 	}
 
 	@GetMapping("/send")
-	public String sendMessage(@RequestBody JSONObject params) throws Exception
+	public JsonVo sendMessage(@RequestBody JSONObject params) throws Exception
 	{
 		String from = params.getString("from");
 		String to = params.getString("to");
@@ -45,6 +59,7 @@ public class MessageController {
 		Preconditions.checkNotNull(to, "must pass the to address");
 		Preconditions.checkArgument(value.compareTo(BigDecimal.ZERO) <= 0, "the value of send amount must > 0");
 
-		return messageService.sendMessage(from, to, value, data);
+		String cid = messageService.sendMessage(from, to, value, data);
+		return JsonVo.success().setData(cid);
 	}
 }

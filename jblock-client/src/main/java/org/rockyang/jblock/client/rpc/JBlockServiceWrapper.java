@@ -3,6 +3,8 @@ package org.rockyang.jblock.client.rpc;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.rockyang.jblock.base.model.Message;
+import org.rockyang.jblock.base.model.Wallet;
+import org.rockyang.jblock.base.vo.JsonVo;
 import org.rockyang.jblock.client.exception.ApiError;
 import org.rockyang.jblock.client.exception.ApiException;
 import retrofit2.Call;
@@ -84,32 +86,50 @@ public class JBlockServiceWrapper {
 	// create a new wallet
 	public String newWallet()
 	{
-		return executeSync(rpcService.newWallet());
+		JsonVo<Wallet> res = executeSync(rpcService.newWallet());
+		if (res.isOK()) {
+			return res.getData().getAddress();
+		}
+		return null;
 	}
 
 	// get wallets list
-	public List walletList()
+	public List<Wallet> walletList()
 	{
-		return executeSync(rpcService.walletList());
+		JsonVo<List<Wallet>> res = executeSync(rpcService.walletList());
+		if (res.isOK()) {
+			return res.getData();
+		}
+		return null;
 	}
 
 	public BigDecimal getBalance(String address)
 	{
-		return executeSync(rpcService.getBalance(address));
+		JsonVo<BigDecimal> res = executeSync(rpcService.getBalance(address));
+		return res.getData();
 	}
 
 	public String sendMessage(String from, String to, BigDecimal value, String param)
 	{
-		return executeSync(rpcService.sendMessage(to, from, value, param));
+		JsonVo<String> res = executeSync(rpcService.sendMessage(to, from, value, param));
+		return res.getData();
 	}
 
 	public Message getMessage(String cid)
 	{
-		return executeSync(rpcService.getMessage(cid));
+		JsonVo<Message> res = executeSync(rpcService.getMessage(cid));
+		if (res.isOK()) {
+			return res.getData();
+		}
+		return null;
 	}
 
 	public Long chainHead()
 	{
-		return executeSync(rpcService.chainHead());
+		JsonVo<Long> res = executeSync(rpcService.chainHead());
+		if (res.isOK()) {
+			return res.getData();
+		}
+		return null;
 	}
 }

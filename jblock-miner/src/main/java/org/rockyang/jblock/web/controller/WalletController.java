@@ -2,13 +2,13 @@ package org.rockyang.jblock.web.controller;
 
 import org.rockyang.jblock.base.model.Account;
 import org.rockyang.jblock.base.model.Wallet;
+import org.rockyang.jblock.base.vo.JsonVo;
 import org.rockyang.jblock.service.AccountService;
 import org.rockyang.jblock.service.WalletService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,34 +28,36 @@ public class WalletController {
 	}
 
 	@GetMapping("/new")
-	public String newWallet() throws Exception
+	public JsonVo newWallet() throws Exception
 	{
 		Wallet wallet = new Wallet();
 		walletService.addWallet(wallet);
-		return wallet.getAddress();
+		return JsonVo.success().setData(wallet);
 	}
 
 	@GetMapping("/new/mnemonic")
-	public String newMnemonicWallet()
+	public JsonVo newMnemonicWallet()
 	{
 		throw new RuntimeException("Not implemented");
 	}
 
 	@GetMapping("/list")
-	public List<Account> walletList()
+	public JsonVo walletList()
 	{
-		// @Note: we only return the local wallet account infos
+		// @Note: we only return the local wallet infos
 		// should not to export the private key
 		List<Wallet> wallets = walletService.getWallets();
-		List<Account> accounts = new ArrayList<>();
+		if (wallets.size() == 0) {
+			return JsonVo.fail().setMessage("No wallet found");
+		}
+
 		for (Wallet w : wallets) {
 			Account account = accountService.getAccount(w.getAddress());
-			if (account == null) {
-				continue;
+			if (account != null) {
+				w.setBalance(account.getBalance());
+				w.setMessageNonce(account.getMessageNonce());
 			}
-
-			accounts.add(account);
 		}
-		return accounts;
+		return JsonVo.success().setData(wallets);
 	}
 }

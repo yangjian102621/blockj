@@ -1,11 +1,14 @@
 package org.rockyang.jblock.base.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * 返回 Json 字符串 VO
  *
  * @author yangjian
  */
-public class JsonVo {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class JsonVo<T> {
 
 	// version
 	private int version = 1;
@@ -13,20 +16,20 @@ public class JsonVo {
 	private CodeEnum code;
 	// error message
 	private String message;
-	private Object data;
+	private T data;
 
 	public JsonVo()
 	{
 	}
 
-	public JsonVo(CodeEnum code, Object data)
+	public JsonVo(CodeEnum code, T data)
 	{
 		this.code = code;
 		this.message = code.getKey();
 		this.data = data;
 	}
 
-	public JsonVo(CodeEnum code, String message, Object data)
+	public JsonVo(CodeEnum code, String message, T data)
 	{
 		this.code = code;
 		this.message = message;
@@ -82,12 +85,12 @@ public class JsonVo {
 		return this;
 	}
 
-	public Object getData()
+	public T getData()
 	{
 		return data;
 	}
 
-	public JsonVo setData(Object data)
+	public JsonVo setData(T data)
 	{
 		this.data = data;
 		return this;

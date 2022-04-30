@@ -1,6 +1,5 @@
 package org.rockyang.jblock.client.test;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -12,7 +11,6 @@ public class ChainTest extends BaseTester {
 	public void chainHead()
 	{
 		Long head = serviceWrapper.chainHead();
-		System.out.println(head);
-		Assert.assertNotNull(head);
+		System.out.printf("Chain head: %d\n", head);
 	}
 }

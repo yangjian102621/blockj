@@ -1,7 +1,8 @@
 package org.rockyang.jblock.client.rpc;
 
-import org.rockyang.jblock.base.model.Account;
 import org.rockyang.jblock.base.model.Message;
+import org.rockyang.jblock.base.model.Wallet;
+import org.rockyang.jblock.base.vo.JsonVo;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -18,25 +19,25 @@ import java.util.List;
 public interface JBlockService {
 
 	@GET("/wallet/new")
-	Call<String> newWallet();
+	Call<JsonVo<Wallet>> newWallet();
 
 	@GET("/wallet/list")
-	Call<List<Account>> walletList();
+	Call<JsonVo<List<Wallet>>> walletList();
 
 	@GET("/wallet/balance")
-	Call<BigDecimal> getBalance(@Query("arg") String address);
+	Call<JsonVo<BigDecimal>> getBalance(@Query("arg") String address);
 
 	@POST("/message/send")
-	Call<String> sendMessage(
+	Call<JsonVo<String>> sendMessage(
 			@Query("to") String to,
 			@Query("from") String from,
 			@Query("value") BigDecimal value,
 			@Query("data") String data);
 
 	@GET("/message/get")
-	Call<Message> getMessage(@Query("cid") String cid);
+	Call<JsonVo<Message>> getMessage(@Query("cid") String cid);
 
 
 	@GET("/chain/head")
-	Call<Long> chainHead();
+	Call<JsonVo<Long>> chainHead();
 }

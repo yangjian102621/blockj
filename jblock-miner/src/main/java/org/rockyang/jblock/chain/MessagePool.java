@@ -51,4 +51,18 @@ public class MessagePool {
 		return false;
 	}
 
+	public Message getMessage(String cid)
+	{
+		if (StringUtils.isEmpty(cid)) {
+			return null;
+		}
+
+		for (Message msg : this.messages) {
+			if (msg.getCid().equals(cid)) {
+				return msg;
+			}
+		}
+		return null;
+	}
+
 }

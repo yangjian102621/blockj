@@ -1,6 +1,5 @@
 package org.rockyang.jblock.client.test;
 
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.rockyang.jblock.client.rpc.JBlockServiceWrapper;
 
@@ -9,7 +8,6 @@ import org.rockyang.jblock.client.rpc.JBlockServiceWrapper;
  */
 public abstract class BaseTester {
 
-	protected static Logger logger = Logger.getLogger(BaseTester.class);
 	protected JBlockServiceWrapper serviceWrapper;
 
 	@Before

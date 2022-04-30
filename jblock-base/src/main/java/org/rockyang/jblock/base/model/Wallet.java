@@ -4,6 +4,7 @@ import org.rockyang.jblock.base.crypto.ECKeyPair;
 import org.rockyang.jblock.base.crypto.Keys;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -18,6 +19,8 @@ public class Wallet implements Serializable {
 	private String address;
 	private String pubKey;
 	private String priKey;
+	private BigDecimal balance;
+	private long messageNonce;
 
 	public Wallet() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
 	{
@@ -25,6 +28,8 @@ public class Wallet implements Serializable {
 		this.priKey = keyPair.exportPrivateKey();
 		this.pubKey = Keys.publicKeyEncode(keyPair.getPublicKey().getEncoded());
 		this.address = keyPair.getAddress();
+		this.balance = BigDecimal.ZERO;
+		this.messageNonce = 0;
 	}
 
 	public String getAddress()
@@ -55,5 +60,25 @@ public class Wallet implements Serializable {
 	public void setPriKey(String priKey)
 	{
 		this.priKey = priKey;
+	}
+
+	public BigDecimal getBalance()
+	{
+		return balance;
+	}
+
+	public void setBalance(BigDecimal balance)
+	{
+		this.balance = balance;
+	}
+
+	public long getMessageNonce()
+	{
+		return messageNonce;
+	}
+
+	public void setMessageNonce(long messageNonce)
+	{
+		this.messageNonce = messageNonce;
 	}
 }
