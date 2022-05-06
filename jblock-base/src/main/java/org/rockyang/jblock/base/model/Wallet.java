@@ -32,6 +32,12 @@ public class Wallet implements Serializable {
 		this.messageNonce = 0;
 	}
 
+	public Wallet(String address, BigDecimal balance)
+	{
+		this.address = address;
+		this.balance = balance;
+	}
+
 	public String getAddress()
 	{
 		return address;

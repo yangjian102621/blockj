@@ -2,8 +2,8 @@ package org.rockyang.jblock.chain;
 
 import org.rockyang.jblock.base.model.Block;
 import org.rockyang.jblock.base.utils.ThreadUtils;
-import org.rockyang.jblock.service.BlockService;
 import org.rockyang.jblock.miner.Miner;
+import org.rockyang.jblock.service.BlockService;
 import org.rockyang.jblock.vo.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +75,12 @@ public class BlockPool {
 
 	public void putBlock(Block block)
 	{
+		if (hasBlock(block)) {
+			return;
+		}
+		
 		blocks.put(block.getHeader().getHeight(), block);
+		// update the chain head
 		while (true) {
 			long h = head.get();
 			if (block.getHeader().getHeight() > h) {

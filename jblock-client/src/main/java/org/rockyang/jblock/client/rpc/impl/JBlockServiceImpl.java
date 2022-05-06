@@ -1,4 +1,4 @@
-package org.rockyang.jblock.client.rpc;
+package org.rockyang.jblock.client.rpc.impl;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -7,6 +7,8 @@ import org.rockyang.jblock.base.model.Wallet;
 import org.rockyang.jblock.base.vo.JsonVo;
 import org.rockyang.jblock.client.exception.ApiError;
 import org.rockyang.jblock.client.exception.ApiException;
+import org.rockyang.jblock.client.rpc.JBlockRpcService;
+import org.rockyang.jblock.client.rpc.JBlockService;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -20,7 +22,7 @@ import java.util.List;
 /**
  * @author yangjian
  */
-public class JBlockServiceWrapper {
+public class JBlockServiceImpl implements JBlockService {
 
 	private static final OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
@@ -29,9 +31,9 @@ public class JBlockServiceWrapper {
 
 	private static Retrofit retrofit;
 
-	private static JBlockService rpcService;
+	private static JBlockRpcService rpcService;
 
-	public JBlockServiceWrapper(String baseUrl, boolean debug)
+	public JBlockServiceImpl(String baseUrl, boolean debug)
 	{
 		// open debug log model
 		if (debug) {
@@ -44,7 +46,7 @@ public class JBlockServiceWrapper {
 		builder.client(httpClient.build());
 		builder.addConverterFactory(JacksonConverterFactory.create());
 		retrofit = builder.build();
-		rpcService = retrofit.create(JBlockService.class);
+		rpcService = retrofit.create(JBlockRpcService.class);
 	}
 
 	/**

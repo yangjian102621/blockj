@@ -40,7 +40,7 @@ public class AppRunner {
 
 	public boolean preRun() throws Exception
 	{
-		String opt = parser.getArgs(0);
+		String opt = parser.getArgs().get(0);
 		if (StringUtils.isEmpty(opt)) {
 			System.out.println("No operation input");
 			return false;

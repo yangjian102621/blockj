@@ -35,6 +35,9 @@ public class MessageController {
 	{
 		String cid = params.getString("cid");
 		Preconditions.checkArgument(StringUtils.isEmpty(cid), "Invalid message cid");
+
+		// 1. search message in leveldb
+		// 2. search message in message pool
 		Message message = messageService.getMessage(cid);
 		if (message == null) {
 			message = messagePool.getMessage(cid);

@@ -36,6 +36,8 @@ public abstract class Command {
 
 	abstract public void action(CliContext context);
 
+	abstract public void showHelp();
+
 	public String getName()
 	{
 		return name;

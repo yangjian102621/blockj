@@ -42,7 +42,7 @@ public class CmdArgsParser {
 			if (StringUtils.isEmpty(item)) {
 				continue;
 			}
-			if (item.indexOf('=') == -1) {
+			if (item.indexOf('=') == -1 || item.indexOf('-') == -1) {
 				this.args.add(item);
 				continue;
 			}
@@ -63,12 +63,9 @@ public class CmdArgsParser {
 		return s.substring(i);
 	}
 
-	public String getArgs(int index)
+	public List<String> getArgs()
 	{
-		if (index >= args.size()) {
-			return null;
-		}
-		return args.get(index);
+		return args;
 	}
 
 	public String getOption(String key)

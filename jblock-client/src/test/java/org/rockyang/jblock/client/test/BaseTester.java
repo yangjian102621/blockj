@@ -1,18 +1,18 @@
 package org.rockyang.jblock.client.test;
 
 import org.junit.Before;
-import org.rockyang.jblock.client.rpc.JBlockServiceWrapper;
+import org.rockyang.jblock.client.rpc.impl.JBlockServiceImpl;
 
 /**
  * @author yangjian
  */
 public abstract class BaseTester {
 
-	protected JBlockServiceWrapper serviceWrapper;
+	protected JBlockServiceImpl serviceWrapper;
 
 	@Before
 	public void init()
 	{
-		serviceWrapper = new JBlockServiceWrapper("http://127.0.0.1:8001", true);
+		serviceWrapper = new JBlockServiceImpl("http://127.0.0.1:8001", true);
 	}
 }
