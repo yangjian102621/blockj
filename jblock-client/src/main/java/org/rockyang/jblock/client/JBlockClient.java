@@ -44,4 +44,8 @@ public class JBlockClient {
 		commands.get(args[index - 1]).action(context);
 	}
 
+	private void showHelp()
+	{
+	}
+
 }
