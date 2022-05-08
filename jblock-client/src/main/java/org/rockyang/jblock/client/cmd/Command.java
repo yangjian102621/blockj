@@ -1,5 +1,8 @@
 package org.rockyang.jblock.client.cmd;
 
+import org.rockyang.jblock.client.cmd.utils.CliContext;
+import org.rockyang.jblock.client.cmd.utils.Flag;
+
 import java.util.List;
 
 /**
@@ -36,7 +39,10 @@ public abstract class Command {
 
 	abstract public void action(CliContext context);
 
-	abstract public void showHelp();
+	public void showHelp(String usagePrefix)
+	{
+
+	}
 
 	public String getName()
 	{

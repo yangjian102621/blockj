@@ -5,17 +5,17 @@ import org.rockyang.jblock.client.cmd.utils.CliContext;
 /**
  * @author yangjian
  */
-public class Chain extends Command {
+public class Wallet extends Command {
 
-	public Chain()
+	public Wallet()
 	{
-		this.name = "chain";
-		this.usage = "Interact with jblock blockchain";
+		this.name = "wallet";
+		this.usage = "Manage wallet";
 	}
 
 	@Override
 	public void action(CliContext context)
 	{
-		
+
 	}
 }

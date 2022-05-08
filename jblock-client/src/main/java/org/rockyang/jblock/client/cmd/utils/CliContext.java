@@ -1,4 +1,4 @@
-package org.rockyang.jblock.client.cmd;
+package org.rockyang.jblock.client.cmd.utils;
 
 import org.rockyang.jblock.base.utils.CmdArgsParser;
 
