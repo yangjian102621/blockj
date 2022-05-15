@@ -4,8 +4,8 @@
 
 ## Version 2.0.0
 
-1. 将项目更名为 JBlock
-2. 重构项目，重写了 80% 的代码，将项目拆分成一个多模块的项目，分为 `jblock-base`, `jblock-miner`, `jblock-client`
+1. 将项目更名为 blockj
+2. 重构项目，重写了 80% 的代码，将项目拆分成一个多模块的项目，分为 `blockj-base`, `blockj-miner`, `blockj-client`
 3. 完全采用命令行的方式运行，不再依赖 IED
 4. 交互采用命令模式，不再通过浏览器调用 API 的形式
 5. 优化了区块同步和有以及存储服务

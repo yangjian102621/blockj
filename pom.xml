@@ -9,14 +9,14 @@
 	</parent>
 	
 	<groupId>org.rockyang</groupId>
-	<artifactId>jblock</artifactId>
+	<artifactId>blockj</artifactId>
 	<version>2.0.0</version>
 	<packaging>pom</packaging>
 	
-	<name>jblock</name>
+	<name>blockj</name>
 	<description>block chain implementation for Java</description>
 	
-	<url>https://gitee.com/blackfox/jblock</url>
+	<url>https://gitee.com/blackfox/blockj</url>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -25,9 +25,9 @@
 	</licenses>
 	
 	<modules>
-		<module>jblock-miner</module>
-		<module>jblock-client</module>
-		<module>jblock-base</module>
+		<module>blockj-miner</module>
+		<module>blockj-client</module>
+		<module>blockj-base</module>
 	</modules>
 	
 	<developers>
@@ -38,9 +38,9 @@
 	</developers>
 	
 	<scm>
-		<connection>scm:https://gitee.com/blackfox/jblock.git</connection>
-		<developerConnection>scm:https://gitee.com/blackfox/jblock.git</developerConnection>
-		<url>https://gitee.com/blackfox/jblock.git</url>
+		<connection>scm:https://gitee.com/blackfox/blockj.git</connection>
+		<developerConnection>scm:https://gitee.com/blackfox/blockj.git</developerConnection>
+		<url>https://gitee.com/blackfox/blockj.git</url>
 	</scm>
 
 </project>

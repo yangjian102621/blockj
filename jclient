@@ -1,3 +1,0 @@
-#!/bin/bash 
-
-java -jar jblock-client/target/jblock-client-2.0.0-jar-with-dependencies.jar $*
