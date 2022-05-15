@@ -1,12 +1,12 @@
 package org.rockyang.blockj.client.cmd;
 
 import org.rockyang.blockj.client.cmd.utils.CliContext;
-import org.rockyang.blockj.client.cmd.utils.Flag;
 import org.rockyang.blockj.client.cmd.utils.Printer;
 import org.rockyang.blockj.client.rpc.BlockjService;
+import org.rockyang.blockj.client.rpc.impl.BlockjServiceMock;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -37,30 +37,71 @@ public abstract class Command {
 
 	protected String name;
 	protected String usage;
-	protected String argsUsage;
-	protected List<Flag> flags;
-	protected Map<String, Command> subCommands;
-	protected BlockjService blockService;
+	protected String version = "1.0.0";
+	protected Map<String, Command> subCommands = new HashMap<>(8);
+	protected BlockjService blockService = new BlockjServiceMock();
+
+	public void init(String preUsage, String[] args)
+	{
+		if (args.length == 0) {
+			return;
+		}
+
+		if (!subCommands.containsKey(args[0])) {
+			showHelp(preUsage);
+			return;
+		}
+
+		// call the command
+		Command cmd = subCommands.get(args[0]);
+		if (cmd.subCommands.size() == 0) {
+			String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
+			CliContext context = new CliContext(subArgs);
+			if (context.getOption("help") != null) {
+				cmd.showHelp(preUsage);
+				return;
+			}
+
+			if (context.getOption("version") != null) {
+				System.out.println(cmd.version);
+				return;
+			}
+
+			cmd.preAction();
+			cmd.action(context);
+			return;
+		}
+
+		// go into the subcommands
+		String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
+		preUsage = String.format("%s %s", preUsage, cmd.getName());
+		cmd.init(preUsage, subArgs);
+	}
+
+	public void preAction()
+	{
+	}
 
 	abstract public void action(CliContext context);
 
 	public void showHelp(String usagePrefix)
 	{
 		System.out.println("NAME:");
-		Printer.printTabLine("%s - %s\n", usagePrefix, usage);
-	}
+		Printer.printTabLine("%s - %s\n\n", usagePrefix, usage);
+		System.out.println("USAGE:");
+		Printer.printTabLine("%s command [command options] [arguments...]\n\n", usagePrefix);
 
-	public void init(String preUsage, String[] args)
-	{
-		if (!subCommands.containsKey(args[0])) {
-			showHelp(preUsage);
-			return;
+		if (subCommands.size() > 0) {
+			System.out.println("COMMANDS:");
+			subCommands.forEach((key, cmd) -> Printer.printTabLine("%-10s %s", key, cmd.getUsage()));
+			System.out.println();
 		}
 
+		System.out.println("OPTIONS:");
+		Printer.printTabLine("%-10s %s\n", "--api", "blockchain backend api url (default: 127.0.0.1:2345)");
+		Printer.printTabLine("%-10s %s\n", "--help", "show help (default: false)");
+		Printer.printTabLine("%-10s %s\n", "--version", "print the version (default: false)");
 
-		String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
-		CliContext context = new CliContext(subArgs);
-		this.action(context);
 	}
 
 	public String getName()
@@ -68,39 +109,9 @@ public abstract class Command {
 		return name;
 	}
 
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
 	public String getUsage()
 	{
 		return usage;
-	}
-
-	public void setUsage(String usage)
-	{
-		this.usage = usage;
-	}
-
-	public String getArgsUsage()
-	{
-		return argsUsage;
-	}
-
-	public void setArgsUsage(String argsUsage)
-	{
-		this.argsUsage = argsUsage;
-	}
-
-	public List<Flag> getFlags()
-	{
-		return flags;
-	}
-
-	public void setFlags(List<Flag> flags)
-	{
-		this.flags = flags;
 	}
 
 	public void addCommand(Command command)

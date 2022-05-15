@@ -1,13 +1,16 @@
 package org.rockyang.blockj.client.cmd.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.rockyang.blockj.base.utils.CmdArgsParser;
+
+import java.math.BigDecimal;
 
 /**
  * @author yangjian
  */
 public class CliContext {
 	private String[] args;
-	private CmdArgsParser parser;
+	private final CmdArgsParser parser;
 
 	public CliContext(String[] args)
 	{
@@ -40,23 +43,67 @@ public class CliContext {
 		return parser.getOption(key, defaultValue);
 	}
 
-	public Integer getIntOption(String key)
+	public Integer getInt(String key)
 	{
 		return parser.getIntOption(key);
 	}
 
-	public Integer getIntOption(String key, Integer defaultValue)
+	public Integer getInt(String key, Integer defaultValue)
 	{
 		return parser.getIntOption(key, defaultValue);
 	}
 
-	public Boolean getBoolOption(String key)
+	public Boolean getBool(String key)
 	{
 		return parser.getBoolOption(key);
 	}
 
-	public Boolean getBoolOption(String key, boolean defaultValue)
+	public Boolean getBool(String key, boolean defaultValue)
 	{
 		return parser.getBoolOption(key, defaultValue);
+	}
+
+	public BigDecimal getBigDecimal(String key)
+	{
+		String option = getOption(key);
+		if (StringUtils.isBlank(option)) {
+			return null;
+		}
+
+		return BigDecimal.valueOf(Long.valueOf(option));
+	}
+
+	public BigDecimal getBigDecimal(String key, BigDecimal defaultValue)
+	{
+		String option = getOption(key);
+		if (StringUtils.isBlank(option)) {
+			return defaultValue;
+		}
+
+		try {
+			return BigDecimal.valueOf(Long.valueOf(option));
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+
+	public Long getLong(String key)
+	{
+		String option = getOption(key);
+		if (StringUtils.isBlank(option)) {
+			return null;
+		}
+
+		return Long.valueOf(option);
+	}
+
+	public Long getLong(String key, Long defaultValue)
+	{
+		String option = getOption(key);
+		if (StringUtils.isBlank(option)) {
+			return null;
+		}
+
+		return Long.valueOf(option);
 	}
 }

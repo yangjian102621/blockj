@@ -51,6 +51,6 @@ public class BlockjServiceMock implements BlockjService {
 	@Override
 	public Long chainHead()
 	{
-		return null;
+		return Long.valueOf("12345678");
 	}
 }

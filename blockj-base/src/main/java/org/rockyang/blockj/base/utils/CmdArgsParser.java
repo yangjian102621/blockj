@@ -42,12 +42,17 @@ public class CmdArgsParser {
 			if (StringUtils.isEmpty(item)) {
 				continue;
 			}
-			if (item.indexOf('=') == -1 || item.indexOf('-') == -1) {
+			if (item.indexOf('-') == -1) {
 				this.args.add(item);
 				continue;
 			}
 			String[] split = StringUtils.split(item, '=');
-			options.put(optionKey(split[0]), split[1]);
+			if (split.length == 2) {
+				options.put(optionKey(split[0]), split[1]);
+			} else {
+				options.put(optionKey(split[0]), "");
+			}
+
 		}
 	}
 

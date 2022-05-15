@@ -7,10 +7,17 @@ import org.rockyang.blockj.client.cmd.utils.CliContext;
  * @author yangjian
  */
 public class Head extends Command {
+
+	public Head()
+	{
+		this.name = "head";
+		this.usage = "Print chain head";
+	}
+
 	@Override
 	public void action(CliContext context)
 	{
-		System.out.println("hello");
-		return;
+		Long head = blockService.chainHead();
+		System.out.println(head);
 	}
 }

@@ -31,7 +31,7 @@ public class AppRunner {
 		parser = CmdArgsParser.getInstance(args);
 		repo = parser.getOption("repo");
 		if (StringUtils.isEmpty(repo)) {
-			repo = System.getProperty("blockj_PATH");
+			repo = System.getProperty("BLOCKJ_PATH");
 			if (StringUtils.isEmpty(repo)) {
 				throw new RuntimeException("You must pass the option '--repo'");
 			}
@@ -41,7 +41,7 @@ public class AppRunner {
 	public boolean preRun() throws Exception
 	{
 		String opt = parser.getArgs().get(0);
-		if (StringUtils.isEmpty(opt)) {
+		if (StringUtils.isBlank(opt)) {
 			System.out.println("No operation input");
 			return false;
 		}
@@ -82,7 +82,7 @@ public class AppRunner {
 				}
 				datastore = new RocksDatastore(repo);
 				String genesis = parser.getOption("genesis");
-				if (StringUtils.isEmpty(genesis)) {
+				if (StringUtils.isBlank(genesis)) {
 					logger.error("must pass genesis file path");
 					System.exit(0);
 				}
