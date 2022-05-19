@@ -3,7 +3,6 @@ package org.rockyang.blockj.client.cmd;
 import org.rockyang.blockj.client.cmd.utils.CliContext;
 import org.rockyang.blockj.client.cmd.utils.Printer;
 import org.rockyang.blockj.client.rpc.BlockjService;
-import org.rockyang.blockj.client.rpc.impl.BlockjServiceMock;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,7 +38,7 @@ public abstract class Command {
 	protected String usage;
 	protected String version = "1.0.0";
 	protected Map<String, Command> subCommands = new HashMap<>(8);
-	protected BlockjService blockService = new BlockjServiceMock();
+	protected BlockjService blockService = null;
 
 	public void init(String preUsage, String[] args)
 	{
@@ -67,7 +66,6 @@ public abstract class Command {
 				return;
 			}
 
-			cmd.preAction();
 			cmd.action(context);
 			return;
 		}
@@ -76,10 +74,6 @@ public abstract class Command {
 		String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
 		preUsage = String.format("%s %s", preUsage, cmd.getName());
 		cmd.init(preUsage, subArgs);
-	}
-
-	public void preAction()
-	{
 	}
 
 	abstract public void action(CliContext context);

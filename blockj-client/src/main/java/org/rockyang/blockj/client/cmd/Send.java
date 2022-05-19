@@ -1,6 +1,7 @@
 package org.rockyang.blockj.client.cmd;
 
 import org.rockyang.blockj.client.cmd.utils.CliContext;
+import org.rockyang.blockj.client.rpc.BlockjService;
 
 import java.math.BigDecimal;
 
@@ -9,10 +10,11 @@ import java.math.BigDecimal;
  */
 public class Send extends Command {
 
-	public Send()
+	public Send(BlockjService service)
 	{
 		this.name = "send";
 		this.usage = "Send funds between accounts";
+		this.blockService = service;
 	}
 
 	@Override

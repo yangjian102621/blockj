@@ -33,19 +33,19 @@ public class BlockjServiceMock implements BlockjService {
 	@Override
 	public BigDecimal getBalance(String address)
 	{
-		return null;
+		return BigDecimal.ZERO;
 	}
 
 	@Override
 	public String sendMessage(String from, String to, BigDecimal value, String param)
 	{
-		return null;
+		return new Message().getCid();
 	}
 
 	@Override
 	public Message getMessage(String cid)
 	{
-		return null;
+		return new Message();
 	}
 
 	@Override

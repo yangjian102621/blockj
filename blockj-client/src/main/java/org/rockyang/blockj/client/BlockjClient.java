@@ -1,11 +1,13 @@
 package org.rockyang.blockj.client;
 
 import org.apache.commons.lang3.StringUtils;
+import org.rockyang.blockj.base.utils.CmdArgsParser;
 import org.rockyang.blockj.client.cmd.Chain;
 import org.rockyang.blockj.client.cmd.Command;
 import org.rockyang.blockj.client.cmd.Send;
 import org.rockyang.blockj.client.cmd.Wallet;
 import org.rockyang.blockj.client.cmd.utils.Printer;
+import org.rockyang.blockj.client.rpc.impl.BlockjServiceMock;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,9 +25,14 @@ public class BlockjClient {
 
 	public static void main(String args[])
 	{
-		addCommand(new Chain());
-		addCommand(new Wallet());
-		addCommand(new Send());
+		// init BlockService
+		CmdArgsParser parser = CmdArgsParser.getInstance(args);
+		String api = parser.getOption("api", "http://127.0.0.1:8001");
+		Boolean debug = parser.getBoolOption("debug", false);
+		BlockjServiceMock blockService = new BlockjServiceMock();
+		addCommand(new Chain(blockService));
+		addCommand(new Wallet(blockService));
+		addCommand(new Send(blockService));
 
 		if (args.length == 0 || !commands.containsKey(args[0])) {
 			showHelp();
