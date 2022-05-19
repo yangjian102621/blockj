@@ -1,4 +1,4 @@
-package org.rockyang.blockj.client.cmd.wallet;
+package org.rockyang.blockj.client.cmd.net;
 
 import org.rockyang.blockj.client.cmd.Command;
 import org.rockyang.blockj.client.cmd.utils.CliContext;
@@ -7,19 +7,18 @@ import org.rockyang.blockj.client.rpc.BlockjService;
 /**
  * @author yangjian
  */
-public class CmdNew extends Command {
+public class NetPeers extends Command {
 
-	public CmdNew(BlockjService service)
+	public NetPeers(BlockjService service)
 	{
-		this.name = "new";
-		this.usage = "Generate a new key";
+		this.name = "peers";
+		this.usage = "Print peers";
 		this.blockService = service;
 	}
 
 	@Override
 	public void action(CliContext context)
 	{
-		String address = blockService.newWallet();
-		System.out.println(address);
+		// TODO: not implemented
 	}
 }

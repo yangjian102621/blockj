@@ -66,4 +66,10 @@ public class WalletServiceImpl implements WalletService {
 	{
 		return datastore.put(DEFAULT_ADDR_KEY, address);
 	}
+
+	@Override
+	public boolean deleteWallet(String address)
+	{
+		return datastore.delete(WALLET_PREFIX + address);
+	}
 }

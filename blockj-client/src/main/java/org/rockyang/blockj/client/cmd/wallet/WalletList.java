@@ -10,9 +10,9 @@ import java.util.List;
 /**
  * @author yangjian
  */
-public class CmdList extends Command {
+public class WalletList extends Command {
 
-	public CmdList(BlockjService service)
+	public WalletList(BlockjService service)
 	{
 		this.name = "list";
 		this.usage = "List wallet address";

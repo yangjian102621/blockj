@@ -25,4 +25,6 @@ public interface WalletService {
 	String getDefaultWallet();
 
 	boolean setDefaultWallet(String address);
+
+	boolean deleteWallet(String address);
 }

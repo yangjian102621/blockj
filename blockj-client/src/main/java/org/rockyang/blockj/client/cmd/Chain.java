@@ -1,6 +1,6 @@
 package org.rockyang.blockj.client.cmd;
 
-import org.rockyang.blockj.client.cmd.chain.Head;
+import org.rockyang.blockj.client.cmd.chain.ChainHead;
 import org.rockyang.blockj.client.cmd.utils.CliContext;
 import org.rockyang.blockj.client.rpc.BlockjService;
 
@@ -14,7 +14,7 @@ public class Chain extends Command {
 		this.name = "chain";
 		this.usage = "Interact with blockchain";
 		this.blockService = service;
-		this.addCommand(new Head(service));
+		this.addCommand(new ChainHead(service));
 	}
 
 	@Override

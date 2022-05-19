@@ -7,19 +7,18 @@ import org.rockyang.blockj.client.rpc.BlockjService;
 /**
  * @author yangjian
  */
-public class Head extends Command {
+public class ChainBlock extends Command {
 
-	public Head(BlockjService service)
+	public ChainBlock(BlockjService service)
 	{
-		this.name = "head";
-		this.usage = "Print chain head";
+		this.name = "getblock";
+		this.usage = "Get a block and print its details";
 		this.blockService = service;
 	}
 
 	@Override
 	public void action(CliContext context)
 	{
-		Long head = blockService.chainHead();
-		System.out.println(head);
+		// TODO: not implemented
 	}
 }
