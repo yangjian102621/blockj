@@ -21,7 +21,7 @@ import java.util.Map;
 public class BlockjClient {
 
 	private static Map<String, Command> commands = new HashMap(16);
-	private static final String ROOT_CMD = "client ";
+	private static final String ROOT_CMD = "blockj ";
 
 	public static void main(String args[])
 	{

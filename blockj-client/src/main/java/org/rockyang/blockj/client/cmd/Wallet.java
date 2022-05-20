@@ -1,6 +1,7 @@
 package org.rockyang.blockj.client.cmd;
 
 import org.rockyang.blockj.client.cmd.utils.CliContext;
+import org.rockyang.blockj.client.cmd.wallet.WalletBalance;
 import org.rockyang.blockj.client.cmd.wallet.WalletList;
 import org.rockyang.blockj.client.cmd.wallet.WalletNew;
 import org.rockyang.blockj.client.rpc.BlockjService;
@@ -17,6 +18,7 @@ public class Wallet extends Command {
 		this.blockService = service;
 		this.addCommand(new WalletNew(service));
 		this.addCommand(new WalletList(service));
+		this.addCommand(new WalletBalance(service));
 	}
 
 	@Override

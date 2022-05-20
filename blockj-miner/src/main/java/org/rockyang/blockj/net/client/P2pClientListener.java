@@ -13,9 +13,9 @@ import org.tio.core.intf.Packet;
  * @author yangjian
  */
 @Component
-public class AppClientListener implements TioClientListener {
+public class P2pClientListener implements TioClientListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(AppClientListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(P2pClientListener.class);
 
 	@Override
 	public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect)

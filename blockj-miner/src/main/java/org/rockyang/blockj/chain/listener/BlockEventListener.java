@@ -4,10 +4,10 @@ import org.rockyang.blockj.base.model.Block;
 import org.rockyang.blockj.base.utils.SerializeUtils;
 import org.rockyang.blockj.chain.event.NewBlockEvent;
 import org.rockyang.blockj.chain.event.SyncBlockEvent;
-import org.rockyang.blockj.service.BlockService;
 import org.rockyang.blockj.net.base.MessagePacket;
 import org.rockyang.blockj.net.base.MessagePacketType;
-import org.rockyang.blockj.net.client.AppClient;
+import org.rockyang.blockj.net.client.P2pClient;
+import org.rockyang.blockj.service.BlockService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -21,12 +21,12 @@ public class BlockEventListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(BlockEventListener.class);
 
-	private final AppClient client;
+	private final P2pClient client;
 	private final BlockService blockService;
 
-	public BlockEventListener(AppClient appClient, BlockService blockService)
+	public BlockEventListener(P2pClient p2pClient, BlockService blockService)
 	{
-		this.client = appClient;
+		this.client = p2pClient;
 		this.blockService = blockService;
 	}
 

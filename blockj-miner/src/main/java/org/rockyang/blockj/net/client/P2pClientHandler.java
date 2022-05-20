@@ -15,12 +15,12 @@ import org.tio.core.intf.Packet;
  * @author yangjian
  */
 @Component
-public class AppClientHandler extends BaseHandler implements TioClientHandler {
+public class P2pClientHandler extends BaseHandler implements TioClientHandler {
 
-	private static final Logger logger = LoggerFactory.getLogger(AppClientHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(P2pClientHandler.class);
 	private final ClientHandler handler;
 
-	public AppClientHandler(ClientHandler handler)
+	public P2pClientHandler(ClientHandler handler)
 	{
 		this.handler = handler;
 	}

@@ -1,7 +1,6 @@
 package org.rockyang.blockj.web.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.rockyang.blockj.base.model.Message;
 import org.rockyang.blockj.base.vo.JsonVo;
@@ -34,7 +33,9 @@ public class MessageController {
 	public JsonVo getMessage(@RequestBody JSONObject params)
 	{
 		String cid = params.getString("cid");
-		Preconditions.checkArgument(StringUtils.isEmpty(cid), "Invalid message cid");
+		if (StringUtils.isBlank(cid)) {
+			return JsonVo.fail().setMessage("Must pass message cid");
+		}
 
 		// 1. search message in leveldb
 		// 2. search message in message pool
@@ -58,9 +59,17 @@ public class MessageController {
 		BigDecimal value = params.getBigDecimal("amount");
 		String data = params.getString("param");
 
-		Preconditions.checkNotNull(from, "must pass the from address");
-		Preconditions.checkNotNull(to, "must pass the to address");
-		Preconditions.checkArgument(value.compareTo(BigDecimal.ZERO) <= 0, "the value of send amount must > 0");
+		if (StringUtils.isBlank(from)) {
+			return JsonVo.fail().setMessage("must pass the from address");
+		}
+
+		if (StringUtils.isBlank(to)) {
+			return JsonVo.fail().setMessage("must pass the to address");
+		}
+
+		if (value.compareTo(BigDecimal.ZERO) <= 0) {
+			return JsonVo.fail().setMessage("the value of send amount must > 0");
+		}
 
 		String cid = messageService.sendMessage(from, to, value, data);
 		return JsonVo.success().setData(cid);

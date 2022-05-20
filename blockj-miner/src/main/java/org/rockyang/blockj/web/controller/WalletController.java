@@ -6,6 +6,7 @@ import org.rockyang.blockj.base.vo.JsonVo;
 import org.rockyang.blockj.service.AccountService;
 import org.rockyang.blockj.service.WalletService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +29,9 @@ public class WalletController {
 	}
 
 	@GetMapping("/new")
-	public JsonVo newWallet() throws Exception
+	public JsonVo newWallet() throws
+
+			Exception
 	{
 		Wallet wallet = new Wallet();
 		walletService.addWallet(wallet);
@@ -59,5 +62,16 @@ public class WalletController {
 			}
 		}
 		return JsonVo.success().setData(wallets);
+	}
+
+	@GetMapping("/balance/{address}")
+	public JsonVo walletBalance(@PathVariable String address)
+	{
+		Wallet wallet = walletService.getWallet(address);
+		if (wallet == null) {
+			return JsonVo.fail().setMessage(String.format("key %s not found", address));
+		}
+
+		return JsonVo.success().setData(wallet.getBalance());
 	}
 }

@@ -5,7 +5,7 @@ import org.rockyang.blockj.base.utils.SerializeUtils;
 import org.rockyang.blockj.chain.event.NewPeerEvent;
 import org.rockyang.blockj.net.base.MessagePacket;
 import org.rockyang.blockj.net.base.MessagePacketType;
-import org.rockyang.blockj.net.client.AppClient;
+import org.rockyang.blockj.net.client.P2pClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -18,9 +18,9 @@ import org.springframework.stereotype.Component;
 public class PeerEventListener {
 	private static final Logger logger = LoggerFactory.getLogger(PeerEventListener.class);
 
-	private final AppClient client;
+	private final P2pClient client;
 
-	public PeerEventListener(AppClient client)
+	public PeerEventListener(P2pClient client)
 	{
 		this.client = client;
 	}

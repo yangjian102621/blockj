@@ -14,12 +14,12 @@ import java.io.IOException;
  * @author yangjian
  */
 @Component
-public class AppServer {
+public class P2pServer {
 
 	private final TioServerConfig serverConfig;
 	private final NetConfig netConfig;
 
-	public AppServer(NetConfig netConfig, AppServerHandler serverHandler, AppServerListener serverListener)
+	public P2pServer(NetConfig netConfig, P2pServerHandler serverHandler, P2pServerListener serverListener)
 	{
 		TioServerConfig serverConfig = new TioServerConfig(NetConfig.SERVER_NAME, serverHandler, serverListener);
 		// disable heartbeat from tio framework

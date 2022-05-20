@@ -24,15 +24,15 @@ import javax.annotation.PostConstruct;
  * @author yangjian
  */
 @Component
-public class AppClient {
+public class P2pClient {
 
-	private static final Logger logger = LoggerFactory.getLogger(AppClient.class);
+	private static final Logger logger = LoggerFactory.getLogger(P2pClient.class);
 
 	private TioClient client;
 	private final NetConfig netConfig;
 	private final TioClientConfig clientConfig;
 
-	public AppClient(NetConfig netConfig, AppClientHandler clientHandler, AppClientListener clientListener)
+	public P2pClient(NetConfig netConfig, P2pClientHandler clientHandler, P2pClientListener clientListener)
 	{
 		// set the auto reconnect
 		ReconnConf reconnConf = new ReconnConf(5000L, 20);

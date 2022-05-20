@@ -1,7 +1,6 @@
 package org.rockyang.blockj.web.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.rockyang.blockj.base.model.Block;
 import org.rockyang.blockj.base.vo.JsonVo;
@@ -29,12 +28,13 @@ public class ChainController {
 	{
 		Long head = blockService.chainHead();
 		if (head < 0) {
-			throw new RuntimeException("Invalid chain head found");
+			return JsonVo.fail().setMessage("Invalid chain head found");
 		}
+
 		return JsonVo.success().setData(head);
 	}
 
-	@GetMapping("/getBlock")
+	@GetMapping("/block/get")
 	public JsonVo getBlock(@RequestBody JSONObject params)
 	{
 		Block block;
@@ -43,7 +43,9 @@ public class ChainController {
 			block = blockService.getBlock(hash);
 		} else {
 			long height = params.getLongValue("height");
-			Preconditions.checkArgument(height >= 0, "Invalid block height");
+			if (height <= 0) {
+				return JsonVo.fail().setMessage("Invalid block height");
+			}
 			block = blockService.getBlockByHeight(height);
 		}
 		if (block == null) {

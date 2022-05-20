@@ -81,13 +81,13 @@ public abstract class Command {
 	public void showHelp(String usagePrefix)
 	{
 		System.out.println("NAME:");
-		Printer.printTabLine("%s - %s\n\n", usagePrefix, usage);
+		Printer.printTabLine("%s %s - %s\n\n", usagePrefix, getName(), usage);
 		System.out.println("USAGE:");
-		Printer.printTabLine("%s command [command options] [arguments...]\n\n", usagePrefix);
+		Printer.printTabLine("%s %s command [command options] [arguments...]\n\n", usagePrefix, getName());
 
 		if (subCommands.size() > 0) {
 			System.out.println("COMMANDS:");
-			subCommands.forEach((key, cmd) -> Printer.printTabLine("%-10s %s", key, cmd.getUsage()));
+			subCommands.forEach((key, cmd) -> Printer.printTabLine("%-10s %s\n", key, cmd.getUsage()));
 			System.out.println();
 		}
 

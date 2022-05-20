@@ -17,13 +17,13 @@ import org.tio.server.intf.TioServerHandler;
  * @author yangjian
  */
 @Component
-public class AppServerHandler extends BaseHandler implements TioServerHandler {
+public class P2pServerHandler extends BaseHandler implements TioServerHandler {
 
-	private static final Logger logger = LoggerFactory.getLogger(AppServerHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(P2pServerHandler.class);
 
 	private final ServerHandler handler;
 
-	public AppServerHandler(ServerHandler response)
+	public P2pServerHandler(ServerHandler response)
 	{
 		this.handler = response;
 	}

@@ -12,7 +12,7 @@ import org.rockyang.blockj.chain.event.NewPeerEvent;
 import org.rockyang.blockj.conf.ApplicationContextProvider;
 import org.rockyang.blockj.net.base.MessagePacket;
 import org.rockyang.blockj.net.base.MessagePacketType;
-import org.rockyang.blockj.net.client.AppClient;
+import org.rockyang.blockj.net.client.P2pClient;
 import org.rockyang.blockj.service.BlockService;
 import org.rockyang.blockj.service.MessageService;
 import org.rockyang.blockj.service.PeerService;
@@ -38,14 +38,14 @@ public class ServerHandler {
 	private final BlockPool blockPool;
 	private final MessageService messageService;
 	private final PeerService peerService;
-	private final AppClient client;
+	private final P2pClient client;
 
 	public ServerHandler(BlockService blockService,
 	                     MessagePool messagePool,
 	                     BlockPool blockPool,
 	                     MessageService messageService,
 	                     PeerService peerService,
-	                     AppClient client)
+	                     P2pClient client)
 	{
 		this.blockService = blockService;
 		this.messagePool = messagePool;
