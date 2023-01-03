@@ -10,24 +10,26 @@ import java.util.List;
 /**
  * @author yangjian
  */
-public class WalletList extends Command {
+public class WalletList extends Command
+{
 
-	public WalletList(BlockService service)
-	{
-		this.name = "list";
-		this.usage = "List wallet address";
-		this.blockService = service;
-	}
+    public WalletList(BlockService service)
+    {
+        this.name = "list";
+        this.desc = "List wallet address";
+        this.usage = "wallet list";
+        this.blockService = service;
+    }
 
-	@Override
-	public void action(CliContext context)
-	{
-		List<Wallet> wallets = blockService.walletList();
-		if (wallets.size() > 0) {
-			System.out.printf("%-45s%-15s%-5s\n", "Address", "Balance", "Nonce");
-		}
-		for (Wallet wallet : wallets) {
-			System.out.printf("%-45s%-15s%-5s\n", wallet.getAddress(), wallet.getBalance(), wallet.getMessageNonce());
-		}
-	}
+    @Override
+    public void action(CliContext context)
+    {
+        List<Wallet> wallets = blockService.walletList();
+        if (wallets.size() > 0) {
+            System.out.printf("%-45s%-15s%-5s\n", "Address", "Balance", "Nonce");
+        }
+        for (Wallet wallet : wallets) {
+            System.out.printf("%-45s%-15s%-5s\n", wallet.getAddress(), wallet.getBalance(), wallet.getMessageNonce());
+        }
+    }
 }

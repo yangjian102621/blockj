@@ -8,24 +8,26 @@ import java.math.BigDecimal;
 /**
  * @author yangjian
  */
-public class Send extends Command {
+public class Send extends Command
+{
 
-	public Send(BlockService service)
-	{
-		this.name = "send";
-		this.usage = "Send funds between accounts";
-		this.blockService = service;
-	}
+    public Send(BlockService service)
+    {
+        this.name = "send";
+        this.fullName = "send";
+        this.desc = "Send funds between accounts";
+        this.blockService = service;
+    }
 
-	@Override
-	public void action(CliContext context)
-	{
-		String from = context.getOption("from");
-		String to = context.getOption("to");
-		BigDecimal value = context.getBigDecimal("value");
-		String param = context.getOption("param");
+    @Override
+    public void action(CliContext context)
+    {
+        String from = context.getOption("from");
+        String to = context.getOption("to");
+        BigDecimal value = context.getBigDecimal("value");
+        String param = context.getOption("param");
 
-		String cid = blockService.sendMessage(from, to, value, param);
-		System.out.printf("Send message, CID: %s\n", cid);
-	}
+        String cid = blockService.sendMessage(from, to, value, param);
+        System.out.printf("Send message, CID: %s\n", cid);
+    }
 }

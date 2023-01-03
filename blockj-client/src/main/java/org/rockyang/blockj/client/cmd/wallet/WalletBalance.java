@@ -9,25 +9,28 @@ import java.math.BigDecimal;
 /**
  * @author yangjian
  */
-public class WalletBalance extends Command {
+public class WalletBalance extends Command
+{
 
-	public WalletBalance(BlockService service)
-	{
-		this.name = "balance";
-		this.usage = "Get account balance";
-		this.blockService = service;
-	}
+    public WalletBalance(BlockService service)
+    {
+        this.name = "balance";
+        this.fullName = "wallet balance";
+        this.desc = "Get account balance";
+        this.usage = "[address]";
+        this.blockService = service;
+    }
 
-	@Override
-	public void action(CliContext context)
-	{
-		String[] args = context.getArgs();
-		if (args.length == 0) {
-			System.out.println("Please input address");
-			return;
-		}
-		BigDecimal balance = blockService.getBalance(args[0]);
-		System.out.printf("%-45s%-15s\n", "Address", "Balance");
-		System.out.printf("%-45s%-15s\n", args[0], balance);
-	}
+    @Override
+    public void action(CliContext context)
+    {
+        String[] args = context.getArgs();
+        if (args.length == 0) {
+            System.out.println("Please input address");
+            return;
+        }
+        BigDecimal balance = blockService.getBalance(args[0]);
+        System.out.printf("%-45s%-15s\n", "Address", "Balance");
+        System.out.printf("%-45s%-15s\n", args[0], balance);
+    }
 }

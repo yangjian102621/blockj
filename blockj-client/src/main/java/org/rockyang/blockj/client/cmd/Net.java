@@ -9,20 +9,22 @@ import org.rockyang.blockj.client.rpc.BlockService;
 /**
  * @author yangjian
  */
-public class Net extends Command {
+public class Net extends Command
+{
 
-	public Net(BlockService service)
-	{
-		this.name = "net";
-		this.usage = "Manage P2P Network";
-		this.blockService = service;
-		this.addCommand(new NetPeers(service));
-		this.addCommand(new NetListen(service));
-		this.addCommand(new NetConnect(service));
-	}
+    public Net(BlockService service)
+    {
+        this.name = "net";
+        this.fullName = "net";
+        this.desc = "Manage P2P Network";
+        this.blockService = service;
+        this.addCommand(new NetPeers(service));
+        this.addCommand(new NetListen(service));
+        this.addCommand(new NetConnect(service));
+    }
 
-	@Override
-	public void action(CliContext context)
-	{
-	}
+    @Override
+    public void action(CliContext context)
+    {
+    }
 }

@@ -9,21 +9,23 @@ import org.rockyang.blockj.client.rpc.BlockService;
 /**
  * @author yangjian
  */
-public class Wallet extends Command {
+public class Wallet extends Command
+{
 
-	public Wallet(BlockService service)
-	{
-		this.name = "wallet";
-		this.usage = "Manage wallet";
-		this.blockService = service;
-		this.addCommand(new WalletNew(service));
-		this.addCommand(new WalletList(service));
-		this.addCommand(new WalletBalance(service));
-	}
+    public Wallet(BlockService service)
+    {
+        this.name = "wallet";
+        this.fullName = "wallet";
+        this.desc = "Manage wallet";
+        this.blockService = service;
+        this.addCommand(new WalletNew(service));
+        this.addCommand(new WalletList(service));
+        this.addCommand(new WalletBalance(service));
+    }
 
-	@Override
-	public void action(CliContext context)
-	{
+    @Override
+    public void action(CliContext context)
+    {
 
-	}
+    }
 }
