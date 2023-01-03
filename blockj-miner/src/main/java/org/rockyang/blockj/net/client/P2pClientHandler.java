@@ -38,9 +38,15 @@ public class P2pClientHandler extends BaseHandler implements TioClientHandler {
 		}
 
 		switch (type) {
-			case MessagePacketType.RES_NEW_MESSAGE -> handler.newMessage(body);
-			case MessagePacketType.RES_BLOCK_SYNC -> handler.syncBlock(body);
-			case MessagePacketType.RES_NEW_BLOCK -> handler.newBlock(body);
+			case MessagePacketType.RES_NEW_MESSAGE:
+				handler.newMessage(body);
+				break;
+			case MessagePacketType.RES_BLOCK_SYNC:
+				handler.syncBlock(body);
+				break;
+			case MessagePacketType.RES_NEW_BLOCK:
+				handler.newBlock(body);
+				break;
 		}
 	}
 

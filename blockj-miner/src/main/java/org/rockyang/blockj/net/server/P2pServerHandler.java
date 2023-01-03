@@ -42,11 +42,21 @@ public class P2pServerHandler extends BaseHandler implements TioServerHandler {
 
 		MessagePacket resPacket = null;
 		switch (type) {
-			case MessagePacketType.HELLO_MESSAGE -> logger.info("hello message: {}", SerializeUtils.unSerialize(body));
-			case MessagePacketType.REQ_BLOCK_SYNC -> resPacket = handler.syncBlock(body);
-			case MessagePacketType.REQ_NEW_BLOCK -> resPacket = handler.newBlock(body);
-			case MessagePacketType.REQ_NEW_MESSAGE -> resPacket = handler.newMessage(body);
-			case MessagePacketType.REQ_NEW_PEER -> resPacket = handler.newPeer(body);
+			case MessagePacketType.HELLO_MESSAGE:
+				logger.info("hello message: {}", SerializeUtils.unSerialize(body));
+				break;
+			case MessagePacketType.REQ_BLOCK_SYNC:
+				resPacket = handler.syncBlock(body);
+				break;
+			case MessagePacketType.REQ_NEW_BLOCK:
+				resPacket = handler.newBlock(body);
+				break;
+			case MessagePacketType.REQ_NEW_MESSAGE:
+				resPacket = handler.newMessage(body);
+				break;
+			case MessagePacketType.REQ_NEW_PEER:
+				resPacket = handler.newPeer(body);
+				break;
 		}
 
 		if (resPacket != null) {

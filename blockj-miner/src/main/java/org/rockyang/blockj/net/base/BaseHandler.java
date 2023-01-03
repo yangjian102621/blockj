@@ -4,6 +4,7 @@ import org.tio.core.ChannelContext;
 import org.tio.core.TioConfig;
 import org.tio.core.exception.TioDecodeException;
 import org.tio.core.intf.Packet;
+import org.tio.core.intf.TioHandler;
 
 import java.nio.ByteBuffer;
 
@@ -12,7 +13,7 @@ import java.nio.ByteBuffer;
  *
  * @author yangjian
  */
-public abstract class BaseHandler {
+public abstract class BaseHandler implements TioHandler {
 
 	/**
 	 * 解码：把接收到的ByteBuffer，解码成应用可以识别的业务消息包

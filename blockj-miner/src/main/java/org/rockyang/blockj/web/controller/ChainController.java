@@ -26,7 +26,7 @@ public class ChainController {
 	@GetMapping("/head")
 	public JsonVo head()
 	{
-		Long head = blockService.chainHead();
+		long head = blockService.chainHead();
 		if (head < 0) {
 			return JsonVo.fail().setMessage("Invalid chain head found");
 		}
