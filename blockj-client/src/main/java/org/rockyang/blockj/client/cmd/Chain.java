@@ -2,14 +2,14 @@ package org.rockyang.blockj.client.cmd;
 
 import org.rockyang.blockj.client.cmd.chain.ChainHead;
 import org.rockyang.blockj.client.cmd.utils.CliContext;
-import org.rockyang.blockj.client.rpc.BlockjService;
+import org.rockyang.blockj.client.rpc.BlockService;
 
 /**
  * @author yangjian
  */
 public class Chain extends Command {
 
-	public Chain(BlockjService service)
+	public Chain(BlockService service)
 	{
 		this.name = "chain";
 		this.usage = "Interact with blockchain";

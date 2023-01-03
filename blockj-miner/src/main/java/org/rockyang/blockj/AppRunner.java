@@ -121,6 +121,7 @@ public class AppRunner {
 		Wallet wallet = new Wallet();
 		datastore.put(WalletService.WALLET_PREFIX + wallet.getAddress(), wallet);
 		datastore.put(WalletService.MINER_ADDR_KEY, wallet.getAddress());
+
 		// init the reward address balance
 		Account rewardAccount = new Account(Miner.REWARD_ADDR, Miner.TOTAL_SUPPLY, null, 0);
 		datastore.put(AccountService.ACCOUNT_PREFIX + rewardAccount.getAddress(), rewardAccount);

@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author yangjian
  */
-public interface BlockjService {
+public interface BlockService {
 
 	String newWallet();
 

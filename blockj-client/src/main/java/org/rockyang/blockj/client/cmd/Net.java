@@ -4,14 +4,14 @@ import org.rockyang.blockj.client.cmd.net.NetConnect;
 import org.rockyang.blockj.client.cmd.net.NetListen;
 import org.rockyang.blockj.client.cmd.net.NetPeers;
 import org.rockyang.blockj.client.cmd.utils.CliContext;
-import org.rockyang.blockj.client.rpc.BlockjService;
+import org.rockyang.blockj.client.rpc.BlockService;
 
 /**
  * @author yangjian
  */
 public class Net extends Command {
 
-	public Net(BlockjService service)
+	public Net(BlockService service)
 	{
 		this.name = "net";
 		this.usage = "Manage P2P Network";

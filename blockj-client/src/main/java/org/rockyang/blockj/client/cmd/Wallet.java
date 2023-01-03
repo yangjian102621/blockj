@@ -4,14 +4,14 @@ import org.rockyang.blockj.client.cmd.utils.CliContext;
 import org.rockyang.blockj.client.cmd.wallet.WalletBalance;
 import org.rockyang.blockj.client.cmd.wallet.WalletList;
 import org.rockyang.blockj.client.cmd.wallet.WalletNew;
-import org.rockyang.blockj.client.rpc.BlockjService;
+import org.rockyang.blockj.client.rpc.BlockService;
 
 /**
  * @author yangjian
  */
 public class Wallet extends Command {
 
-	public Wallet(BlockjService service)
+	public Wallet(BlockService service)
 	{
 		this.name = "wallet";
 		this.usage = "Manage wallet";

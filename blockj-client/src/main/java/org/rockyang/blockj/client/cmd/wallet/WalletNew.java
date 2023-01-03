@@ -2,14 +2,14 @@ package org.rockyang.blockj.client.cmd.wallet;
 
 import org.rockyang.blockj.client.cmd.Command;
 import org.rockyang.blockj.client.cmd.utils.CliContext;
-import org.rockyang.blockj.client.rpc.BlockjService;
+import org.rockyang.blockj.client.rpc.BlockService;
 
 /**
  * @author yangjian
  */
 public class WalletNew extends Command {
 
-	public WalletNew(BlockjService service)
+	public WalletNew(BlockService service)
 	{
 		this.name = "new";
 		this.usage = "Generate a new key";

@@ -2,14 +2,14 @@ package org.rockyang.blockj.client.cmd.chain;
 
 import org.rockyang.blockj.client.cmd.Command;
 import org.rockyang.blockj.client.cmd.utils.CliContext;
-import org.rockyang.blockj.client.rpc.BlockjService;
+import org.rockyang.blockj.client.rpc.BlockService;
 
 /**
  * @author yangjian
  */
 public class ChainHead extends Command {
 
-	public ChainHead(BlockjService service)
+	public ChainHead(BlockService service)
 	{
 		this.name = "head";
 		this.usage = "Print chain head";

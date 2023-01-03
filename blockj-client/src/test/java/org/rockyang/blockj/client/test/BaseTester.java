@@ -1,18 +1,18 @@
 package org.rockyang.blockj.client.test;
 
 import org.junit.Before;
-import org.rockyang.blockj.client.rpc.impl.BlockjServiceImpl;
+import org.rockyang.blockj.client.rpc.impl.BlockServiceImpl;
 
 /**
  * @author yangjian
  */
 public abstract class BaseTester {
 
-	protected BlockjServiceImpl serviceWrapper;
+	protected BlockServiceImpl serviceWrapper;
 
 	@Before
 	public void init()
 	{
-		serviceWrapper = new BlockjServiceImpl("http://127.0.0.1:8001", true);
+		serviceWrapper = new BlockServiceImpl("http://127.0.0.1:8001", true);
 	}
 }

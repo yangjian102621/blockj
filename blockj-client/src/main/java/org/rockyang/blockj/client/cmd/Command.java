@@ -2,7 +2,7 @@ package org.rockyang.blockj.client.cmd;
 
 import org.rockyang.blockj.client.cmd.utils.CliContext;
 import org.rockyang.blockj.client.cmd.utils.Printer;
-import org.rockyang.blockj.client.rpc.BlockjService;
+import org.rockyang.blockj.client.rpc.BlockService;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,7 +38,7 @@ public abstract class Command {
 	protected String usage;
 	protected String version = "1.0.0";
 	protected Map<String, Command> subCommands = new HashMap<>(8);
-	protected BlockjService blockService = null;
+	protected BlockService blockService = null;
 
 	public void init(String preUsage, String[] args)
 	{

@@ -3,7 +3,7 @@ package org.rockyang.blockj.client.cmd.wallet;
 import org.rockyang.blockj.base.model.Wallet;
 import org.rockyang.blockj.client.cmd.Command;
 import org.rockyang.blockj.client.cmd.utils.CliContext;
-import org.rockyang.blockj.client.rpc.BlockjService;
+import org.rockyang.blockj.client.rpc.BlockService;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class WalletList extends Command {
 
-	public WalletList(BlockjService service)
+	public WalletList(BlockService service)
 	{
 		this.name = "list";
 		this.usage = "List wallet address";

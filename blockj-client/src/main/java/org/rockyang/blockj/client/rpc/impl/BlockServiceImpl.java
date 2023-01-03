@@ -7,8 +7,8 @@ import org.rockyang.blockj.base.model.Wallet;
 import org.rockyang.blockj.base.vo.JsonVo;
 import org.rockyang.blockj.client.exception.ApiError;
 import org.rockyang.blockj.client.exception.ApiException;
-import org.rockyang.blockj.client.rpc.BlockjRpcService;
-import org.rockyang.blockj.client.rpc.BlockjService;
+import org.rockyang.blockj.client.rpc.BlockRpcService;
+import org.rockyang.blockj.client.rpc.BlockService;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * @author yangjian
  */
-public class BlockjServiceImpl implements BlockjService {
+public class BlockServiceImpl implements BlockService {
 
 	private static final OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
@@ -31,9 +31,9 @@ public class BlockjServiceImpl implements BlockjService {
 
 	private static Retrofit retrofit;
 
-	private static BlockjRpcService rpcService;
+	private static BlockRpcService rpcService;
 
-	public BlockjServiceImpl(String baseUrl, boolean debug)
+	public BlockServiceImpl(String baseUrl, boolean debug)
 	{
 		// open debug log model
 		if (debug) {
@@ -46,15 +46,11 @@ public class BlockjServiceImpl implements BlockjService {
 		builder.client(httpClient.build());
 		builder.addConverterFactory(JacksonConverterFactory.create());
 		retrofit = builder.build();
-		rpcService = retrofit.create(BlockjRpcService.class);
+		rpcService = retrofit.create(BlockRpcService.class);
 	}
 
 	/**
 	 * Invoke the remote API Synchronously
-	 *
-	 * @param call
-	 * @param <T>
-	 * @return
 	 */
 	public static <T> T executeSync(Call<T> call)
 	{
@@ -73,11 +69,6 @@ public class BlockjServiceImpl implements BlockjService {
 
 	/**
 	 * get api error message
-	 *
-	 * @param response
-	 * @return
-	 * @throws IOException
-	 * @throws ApiException
 	 */
 	private static ApiError getApiError(Response<?> response) throws IOException, ApiException
 	{

@@ -12,11 +12,11 @@ public interface AccountService {
 	
 	BigDecimal getBalance(String address);
 
-	boolean addBalance(String address, BigDecimal value);
+	void addBalance(String address, BigDecimal value);
 
-	boolean subBalance(String address, BigDecimal value);
+	void subBalance(String address, BigDecimal value);
 
-	boolean addMessageNonce(String address, long value);
+	void addMessageNonce(String address, long value);
 
 	boolean setAccount(Account account);
 

@@ -93,7 +93,7 @@
 					<!--					<appendAssemblyId>false</appendAssemblyId>-->
 					<archive>
 						<manifest>
-							<mainClass>org.rockyang.blockj.client.BlockjClient</mainClass>
+							<mainClass>org.rockyang.blockj.client.BlockClient</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

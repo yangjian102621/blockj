@@ -7,7 +7,8 @@ import org.rockyang.blockj.client.cmd.Command;
 import org.rockyang.blockj.client.cmd.Send;
 import org.rockyang.blockj.client.cmd.Wallet;
 import org.rockyang.blockj.client.cmd.utils.Printer;
-import org.rockyang.blockj.client.rpc.impl.BlockjServiceMock;
+import org.rockyang.blockj.client.rpc.BlockService;
+import org.rockyang.blockj.client.rpc.impl.BlockServiceImpl;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,21 +19,23 @@ import java.util.Map;
  *
  * @author yangjian
  */
-public class BlockjClient {
+public class BlockClient {
 
-	private static Map<String, Command> commands = new HashMap(16);
-	private static final String ROOT_CMD = "blockj ";
+	private static final Map<String, Command> commands = new HashMap<>(16);
+	private static final String ROOT_CMD = "client ";
 
-	public static void main(String args[])
+	public static void main(String[] argsOri)
 	{
 		// init BlockService
-		CmdArgsParser parser = CmdArgsParser.getInstance(args);
+		CmdArgsParser parser = CmdArgsParser.getInstance(argsOri);
 		String api = parser.getOption("api", "http://127.0.0.1:8001");
 		Boolean debug = parser.getBoolOption("debug", false);
-		BlockjServiceMock blockService = new BlockjServiceMock();
+//		BlockServiceMock blockService = new BlockServiceMock();
+		BlockService blockService = new BlockServiceImpl(api, debug);
 		addCommand(new Chain(blockService));
 		addCommand(new Wallet(blockService));
 		addCommand(new Send(blockService));
+		String[] args = parser.getArgs().toArray(new String[0]);
 
 		if (args.length == 0 || !commands.containsKey(args[0])) {
 			showHelp();
@@ -47,9 +50,10 @@ public class BlockjClient {
 				break;
 			}
 		}
+
 		String[] preArgs = Arrays.copyOfRange(args, 0, index);
-//		Arrays.stream(args).forEach(System.out::println);
-		commands.get(args[0]).init(ROOT_CMD + StringUtils.joinWith(" ", preArgs), Arrays.copyOfRange(args, index, args.length));
+//		Arrays.stream(preArgs).forEach(System.out::println);
+		commands.get(args[0]).init(ROOT_CMD + StringUtils.joinWith(" ", (Object) preArgs), Arrays.copyOfRange(args, index, args.length));
 	}
 
 	private static void showHelp()

@@ -35,9 +35,6 @@ public class CmdArgsParser {
 
 	public void parse(String[] args)
 	{
-		if (args.length == 0) {
-			return;
-		}
 		for (String item : args) {
 			if (StringUtils.isEmpty(item)) {
 				continue;

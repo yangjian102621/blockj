@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author yangjian
  */
-public interface BlockjRpcService {
+public interface BlockRpcService {
 
 	@GET("/wallet/new")
 	Call<JsonVo<Wallet>> newWallet();

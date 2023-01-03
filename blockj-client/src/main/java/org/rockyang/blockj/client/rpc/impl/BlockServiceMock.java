@@ -2,7 +2,7 @@ package org.rockyang.blockj.client.rpc.impl;
 
 import org.rockyang.blockj.base.model.Message;
 import org.rockyang.blockj.base.model.Wallet;
-import org.rockyang.blockj.client.rpc.BlockjService;
+import org.rockyang.blockj.client.rpc.BlockService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author yangjian
  */
-public class BlockjServiceMock implements BlockjService {
+public class BlockServiceMock implements BlockService {
 	@Override
 	public String newWallet()
 	{

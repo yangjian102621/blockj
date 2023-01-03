@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -64,14 +65,10 @@ public class WalletController {
 		return JsonVo.success().setData(wallets);
 	}
 
-	@GetMapping("/balance/{address}")
+	@RequestMapping("/balance/{address}")
 	public JsonVo walletBalance(@PathVariable String address)
 	{
-		Wallet wallet = walletService.getWallet(address);
-		if (wallet == null) {
-			return JsonVo.fail().setMessage(String.format("key %s not found", address));
-		}
-
-		return JsonVo.success().setData(wallet.getBalance());
+		BigDecimal balance = accountService.getBalance(address);
+		return JsonVo.success().setData(balance);
 	}
 }
