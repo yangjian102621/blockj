@@ -1,6 +1,7 @@
 package org.rockyang.blockj.client.cmd;
 
 import org.apache.commons.lang3.StringUtils;
+import org.rockyang.blockj.base.vo.JsonVo;
 import org.rockyang.blockj.client.cmd.utils.CliContext;
 import org.rockyang.blockj.client.rpc.BlockService;
 
@@ -42,7 +43,11 @@ public class Send extends Command
             return;
         }
 
-        String cid = blockService.sendMessage(from, to, value, param);
-        System.out.printf("Send message, CID: %s\n", cid);
+        JsonVo<String> res = blockService.sendMessage(from, to, value, param);
+        if (res.isOK()) {
+            System.out.printf("Send message, CID: %s\n", res.getData());
+        } else {
+            System.out.println(res.getMessage());
+        }
     }
 }

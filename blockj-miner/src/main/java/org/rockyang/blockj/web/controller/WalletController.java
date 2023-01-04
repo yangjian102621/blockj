@@ -40,6 +40,7 @@ public class WalletController
     @RequestMapping("/new/memo")
     public JsonVo newMnemonicWallet()
     {
+
         throw new RuntimeException("Not implemented");
     }
 

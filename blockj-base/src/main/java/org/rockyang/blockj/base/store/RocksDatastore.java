@@ -14,78 +14,82 @@ import java.util.Optional;
  *
  * @author yangjian
  */
-public class RocksDatastore implements Datastore {
+public class RocksDatastore implements Datastore
+{
 
-	private RocksDB datastore;
+    private RocksDB datastore;
 
-	public RocksDatastore(String repo)
-	{
-		// load base dir from
-		String dataPath = String.format("%s/datastore", repo);
-		try {
-			File directory = new File(dataPath);
-			if (!directory.exists() && !directory.mkdirs()) {
-				throw new FileNotFoundException(dataPath);
-			}
-			datastore = RocksDB.open(new Options().setCreateIfMissing(true), dataPath);
-		} catch (RocksDBException | FileNotFoundException e) {
-			//e.printStackTrace();
-		}
-	}
+    public RocksDatastore(String repo)
+    {
+        // load base dir from
+        String dataPath = String.format("%s/datastore", repo);
+        try {
+            File directory = new File(dataPath);
+            if (!directory.exists() && !directory.mkdirs()) {
+                throw new FileNotFoundException(dataPath);
+            }
+            datastore = RocksDB.open(new Options().setCreateIfMissing(true), dataPath);
+        } catch (RocksDBException | FileNotFoundException e) {
+            //e.printStackTrace();
+        }
+    }
 
-	@Override
-	public boolean put(String key, Object value)
-	{
-		try {
-			datastore.put(key.getBytes(), SerializeUtils.serialize(value));
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
+    @Override
+    public boolean put(String key, Object value)
+    {
+        try {
+            datastore.put(key.getBytes(), SerializeUtils.serialize(value));
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
-	@Override
-	public Optional<Object> get(String key)
-	{
-		try {
-			return Optional.of(SerializeUtils.unSerialize(datastore.get(key.getBytes())));
-		} catch (Exception e) {
-			//e.printStackTrace();
-			return Optional.empty();
-		}
-	}
+    @Override
+    public Optional<Object> get(String key)
+    {
+        try {
+            return Optional.of(SerializeUtils.unSerialize(datastore.get(key.getBytes())));
+        } catch (Exception e) {
+            //e.printStackTrace();
+            return Optional.empty();
+        }
+    }
 
-	@Override
-	public boolean delete(String key)
-	{
-		try {
-			datastore.delete(key.getBytes());
-			return true;
-		} catch (Exception e) {
-			//e.printStackTrace();
-			return false;
-		}
-	}
+    @Override
+    public boolean delete(String key)
+    {
+        try {
+            datastore.delete(key.getBytes());
+            return true;
+        } catch (Exception e) {
+            //e.printStackTrace();
+            return false;
+        }
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T> List<T> search(String keyPrefix)
-	{
-		ArrayList<T> list = new ArrayList<>();
-		RocksIterator iterator = datastore.newIterator(new ReadOptions());
-		byte[] key = keyPrefix.getBytes();
-		for (iterator.seek(key); iterator.isValid(); iterator.next()) {
-			list.add((T) SerializeUtils.unSerialize(iterator.value()));
-		}
-		return list;
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> List<T> search(String keyPrefix)
+    {
+        ArrayList<T> list = new ArrayList<>();
+        RocksIterator iterator = datastore.newIterator(new ReadOptions());
+        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+            String key = new String(iterator.key());
+            if (!key.startsWith(keyPrefix)) {
+                continue;
+            }
+            list.add((T) SerializeUtils.unSerialize(iterator.value()));
+        }
+        return list;
+    }
 
-	@Override
-	public void close()
-	{
-		if (datastore != null) {
-			datastore.close();
-		}
-	}
+    @Override
+    public void close()
+    {
+        if (datastore != null) {
+            datastore.close();
+        }
+    }
 }

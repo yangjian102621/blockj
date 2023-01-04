@@ -1,8 +1,10 @@
 package org.rockyang.blockj.client.rpc.impl;
 
+import com.alibaba.fastjson.JSON;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.rockyang.blockj.base.model.Message;
+import org.rockyang.blockj.base.model.Peer;
 import org.rockyang.blockj.base.model.Wallet;
 import org.rockyang.blockj.base.vo.JsonVo;
 import org.rockyang.blockj.client.exception.ApiError;
@@ -22,107 +24,122 @@ import java.util.List;
 /**
  * @author yangjian
  */
-public class BlockServiceImpl implements BlockService {
+public class BlockServiceImpl implements BlockService
+{
 
-	private static final OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+    private static final OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
-	private static final Retrofit.Builder builder = new Retrofit.Builder()
-			.addConverterFactory(JacksonConverterFactory.create());
+    private static final Retrofit.Builder builder = new Retrofit.Builder()
+            .addConverterFactory(JacksonConverterFactory.create());
 
-	private static Retrofit retrofit;
+    private static Retrofit retrofit;
 
-	private static BlockRpcService rpcService;
+    private static BlockRpcService rpcService;
 
-	public BlockServiceImpl(String baseUrl, boolean debug)
-	{
-		// open debug log model
-		if (debug) {
-			HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-			loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-			httpClient.addInterceptor(loggingInterceptor);
-		}
+    public BlockServiceImpl(String baseUrl, boolean debug)
+    {
+        // open debug log model
+        if (debug) {
+            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            httpClient.addInterceptor(loggingInterceptor);
+        }
 
-		builder.baseUrl(baseUrl);
-		builder.client(httpClient.build());
-		builder.addConverterFactory(JacksonConverterFactory.create());
-		retrofit = builder.build();
-		rpcService = retrofit.create(BlockRpcService.class);
-	}
+        builder.baseUrl(baseUrl);
+        builder.client(httpClient.build());
+        builder.addConverterFactory(JacksonConverterFactory.create());
+        retrofit = builder.build();
+        rpcService = retrofit.create(BlockRpcService.class);
+    }
 
-	/**
-	 * Invoke the remote API Synchronously
-	 */
-	public static <T> T executeSync(Call<T> call)
-	{
-		try {
-			Response<T> response = call.execute();
-			if (response.isSuccessful()) {
-				return response.body();
-			} else {
-				ApiError apiError = getApiError(response);
-				throw new ApiException(apiError);
-			}
-		} catch (IOException e) {
-			throw new ApiException(e);
-		}
-	}
+    /**
+     * Invoke the remote API Synchronously
+     */
+    public static <T> T executeSync(Call<T> call)
+    {
+        try {
+            Response<T> response = call.execute();
+            if (response.isSuccessful()) {
+                return response.body();
+            } else {
+                ApiError apiError = getApiError(response);
+                throw new ApiException(apiError);
+            }
+        } catch (IOException e) {
+            throw new ApiException(e);
+        }
+    }
 
-	/**
-	 * get api error message
-	 */
-	private static ApiError getApiError(Response<?> response) throws IOException, ApiException
-	{
-		assert response.errorBody() != null;
-		return (ApiError) retrofit.responseBodyConverter(ApiError.class, new Annotation[0]).convert(response.errorBody());
-	}
+    /**
+     * get api error message
+     */
+    private static ApiError getApiError(Response<?> response) throws IOException, ApiException
+    {
+        assert response.errorBody() != null;
+        return (ApiError) retrofit.responseBodyConverter(ApiError.class, new Annotation[0]).convert(response.errorBody());
+    }
 
-	// create a new wallet
-	public String newWallet()
-	{
-		JsonVo<Wallet> res = executeSync(rpcService.newWallet());
-		if (res.isOK()) {
-			return res.getData().getAddress();
-		}
-		return null;
-	}
+    // create a new wallet
+    public JsonVo<Wallet> newWallet()
+    {
+        return executeSync(rpcService.newWallet());
+    }
 
-	// get wallets list
-	public List<Wallet> walletList()
-	{
-		JsonVo<List<Wallet>> res = executeSync(rpcService.walletList());
-		if (res.isOK()) {
-			return res.getData();
-		}
-		return null;
-	}
+    // get wallets list
+    public JsonVo<List<Wallet>> walletList()
+    {
+        JsonVo res = executeSync(rpcService.walletList());
+        if (res.isOK()) {
+            String s = JSON.toJSONString(res.getData());
+            List<Wallet> wallets = JSON.parseArray(s, Wallet.class);
+            return new JsonVo<>(res.getCode(), wallets);
+        } else {
+            return new JsonVo<>(res.getCode(), res.getMessage());
+        }
+    }
 
-	public BigDecimal getBalance(String address)
-	{
-		JsonVo<BigDecimal> res = executeSync(rpcService.getBalance(address));
-		return res.getData();
-	}
+    public JsonVo<BigDecimal> getBalance(String address)
+    {
+        return executeSync(rpcService.getBalance(address));
+    }
 
-	public String sendMessage(String from, String to, BigDecimal value, String param)
-	{
-		JsonVo<String> res = executeSync(rpcService.sendMessage(to, from, value, param));
-		return res.getData();
-	}
+    public JsonVo<String> sendMessage(String from, String to, BigDecimal value, String param)
+    {
+        return executeSync(rpcService.sendMessage(to, from, value, param));
+    }
 
-	public Message getMessage(String cid)
-	{
-		JsonVo<Message> res = executeSync(rpcService.getMessage(cid));
-		if (res.isOK()) {
-			return res.getData();
-		}
-		return null;
-	}
+    public JsonVo<Message> getMessage(String cid)
+    {
+        return executeSync(rpcService.getMessage(cid));
+    }
 
-	public Long chainHead()
-	{
-		JsonVo<Long> res = executeSync(rpcService.chainHead());
-		if (res.isOK()) {
-			return res.getData();
-		}
-		return null;
-	}
+    public JsonVo<Long> chainHead()
+    {
+        return executeSync(rpcService.chainHead());
+    }
+
+    @Override
+    public JsonVo<List<Peer>> netPeers()
+    {
+        JsonVo res = executeSync(rpcService.netPeers());
+        if (res.isOK()) {
+            String s = JSON.toJSONString(res.getData());
+            List<Peer> peers = JSON.parseArray(s, Peer.class);
+            return new JsonVo<>(res.getCode(), peers);
+        } else {
+            return new JsonVo<>(res.getCode(), res.getMessage());
+        }
+    }
+
+    @Override
+    public JsonVo<String> netListen()
+    {
+        return executeSync(rpcService.netListen());
+    }
+
+    @Override
+    public JsonVo<String> netConnect(String peerAddress)
+    {
+        return executeSync(rpcService.netConnect(peerAddress));
+    }
 }

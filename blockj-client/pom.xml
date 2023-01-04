@@ -1,114 +1,120 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	
-	<parent>
-		<groupId>org.rockyang</groupId>
-		<artifactId>blockj</artifactId>
-		<version>2.0.0</version>
-	</parent>
-	
-	<artifactId>blockj-client</artifactId>
-	<version>2.0.0</version>
-	<packaging>jar</packaging>
-	
-	<name>blockj-client</name>
-	<description>block chain client command implementation</description>
-	
-	<properties>
-		<retrofit2.version>2.9.0</retrofit2.version>
-		<converter-scalars.version>2.5.0</converter-scalars.version>
-		<okhttp.version>3.12.0</okhttp.version>
-		<common-lang.version>3.8.1</common-lang.version>
-		<log4j.version>1.2.17</log4j.version>
-		<junit.version>4.13.1</junit.version>
-	
-	</properties>
-	
-	<dependencies>
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>${okhttp.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>logging-interceptor</artifactId>
-			<version>${okhttp.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.retrofit2</groupId>
-			<artifactId>converter-scalars</artifactId>
-			<version>${converter-scalars.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.retrofit2</groupId>
-			<artifactId>retrofit</artifactId>
-			<version>${retrofit2.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.squareup.retrofit2</groupId>
-			<artifactId>converter-jackson</artifactId>
-			<version>${retrofit2.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>${common-lang.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.rockyang</groupId>
-			<artifactId>blockj-base</artifactId>
-			<version>2.0.0</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>${log4j.version}</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
-	
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-					<!-- override the ori package jar? -->
-					<!--					<finalName>${project.artifactId}</finalName>-->
-					<!--					<appendAssemblyId>false</appendAssemblyId>-->
-					<archive>
-						<manifest>
-							<mainClass>org.rockyang.blockj.client.BlockClient</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.rockyang</groupId>
+        <artifactId>blockj</artifactId>
+        <version>2.0.0</version>
+    </parent>
+
+    <artifactId>blockj-client</artifactId>
+    <version>2.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>blockj-client</name>
+    <description>block chain client command implementation</description>
+
+    <properties>
+        <retrofit2.version>2.9.0</retrofit2.version>
+        <converter-scalars.version>2.5.0</converter-scalars.version>
+        <okhttp.version>3.12.0</okhttp.version>
+        <common-lang.version>3.8.1</common-lang.version>
+        <log4j.version>1.2.17</log4j.version>
+        <junit.version>4.13.1</junit.version>
+
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>logging-interceptor</artifactId>
+            <version>${okhttp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>converter-scalars</artifactId>
+            <version>${converter-scalars.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>retrofit</artifactId>
+            <version>${retrofit2.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>converter-jackson</artifactId>
+            <version>${retrofit2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${common-lang.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.57</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.rockyang</groupId>
+            <artifactId>blockj-base</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <!-- override the ori package jar? -->
+                    <!--					<finalName>${project.artifactId}</finalName>-->
+                    <!--					<appendAssemblyId>false</appendAssemblyId>-->
+                    <archive>
+                        <manifest>
+                            <mainClass>org.rockyang.blockj.client.BlockClient</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 
 </project>

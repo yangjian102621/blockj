@@ -85,6 +85,6 @@ public class MessageController
         }
 
         String cid = messageService.sendMessage(from, to, value, data);
-        return new JsonVo(JsonVo.SUCCESS, cid);
+        return new JsonVo<>(JsonVo.SUCCESS, "", cid);
     }
 }

@@ -36,14 +36,19 @@ public class NetController
     public JsonVo peers()
     {
         List<Peer> peers = peerService.getPeers();
-        return new JsonVo<>(JsonVo.SUCCESS, peers);
+        if (peers == null || peers.size() == 0) {
+            return new JsonVo<>(JsonVo.FAIL, "No peer found.");
+        } else {
+            return new JsonVo<>(JsonVo.SUCCESS, peers);
+        }
+
     }
 
     @GetMapping("/listen")
     public JsonVo listen()
     {
         String listen = String.format("%s:%d", netConfig.getServerAddress(), netConfig.getServerPort());
-        return new JsonVo(JsonVo.SUCCESS, listen);
+        return new JsonVo<>(JsonVo.SUCCESS, "", listen);
     }
 
     @PostMapping("/connect")
@@ -74,6 +79,6 @@ public class NetController
             ApplicationContextProvider.publishEvent(new NewPeerEvent(peer));
         }
 
-        return new JsonVo(JsonVo.SUCCESS, String.format("Connected peer %s successfully", peer));
+        return new JsonVo<>(JsonVo.SUCCESS, "", String.format("Connected peer %s successfully", peer));
     }
 }

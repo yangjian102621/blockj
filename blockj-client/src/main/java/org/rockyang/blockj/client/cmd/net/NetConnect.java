@@ -13,7 +13,8 @@ public class NetConnect extends Command
     public NetConnect(BlockService service)
     {
         this.name = "connect";
-        this.argsUsage = "Connect to a peer";
+        this.usage = "Connect to a peer";
+        this.argsUsage = "[peerAddress]";
         this.blockService = service;
     }
 

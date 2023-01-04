@@ -1,5 +1,6 @@
 package org.rockyang.blockj.client.cmd.wallet;
 
+import org.rockyang.blockj.base.vo.JsonVo;
 import org.rockyang.blockj.client.cmd.Command;
 import org.rockyang.blockj.client.cmd.utils.CliContext;
 import org.rockyang.blockj.client.rpc.BlockService;
@@ -29,8 +30,14 @@ public class WalletBalance extends Command
             System.out.println("Please input address");
             return;
         }
-        BigDecimal balance = blockService.getBalance(args[0]);
-        System.out.printf("%-45s%-15s\n", "Address", "Balance");
-        System.out.printf("%-45s%-15s\n", args[0], balance);
+        
+        JsonVo<BigDecimal> res = blockService.getBalance(args[0]);
+        if (res.isOK()) {
+            System.out.printf("%-45s%-15s\n", "Address", "Balance");
+            System.out.printf("%-45s%-15s\n", args[0], res.getData());
+        } else {
+            System.out.println(res.getMessage());
+        }
+
     }
 }
