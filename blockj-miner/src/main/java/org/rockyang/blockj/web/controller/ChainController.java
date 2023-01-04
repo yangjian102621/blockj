@@ -1,12 +1,10 @@
 package org.rockyang.blockj.web.controller;
 
-import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang3.StringUtils;
 import org.rockyang.blockj.base.model.Block;
 import org.rockyang.blockj.base.vo.JsonVo;
 import org.rockyang.blockj.service.BlockService;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,20 +33,13 @@ public class ChainController
         return new JsonVo<>(JsonVo.SUCCESS, head);
     }
 
-    @GetMapping("/block/get")
-    public JsonVo getBlock(@RequestBody JSONObject params)
+    @GetMapping("/block/{height}")
+    public JsonVo getBlock(@PathVariable Long height)
     {
-        Block block;
-        String hash = params.getString("hash");
-        if (!StringUtils.isEmpty(hash)) {
-            block = blockService.getBlock(hash);
-        } else {
-            long height = params.getLongValue("height");
-            if (height <= 0) {
-                return new JsonVo(JsonVo.FAIL, "Invalid block height");
-            }
-            block = blockService.getBlockByHeight(height);
+        if (height <= 0) {
+            return new JsonVo(JsonVo.FAIL, "Invalid block height");
         }
+        Block block = blockService.getBlockByHeight(height);
 
         if (block == null) {
             return new JsonVo(JsonVo.FAIL, "Block not found");

@@ -1,16 +1,20 @@
 package org.rockyang.blockj.web.controller;
 
+import org.rockyang.blockj.base.crypto.ECKeyPair;
+import org.rockyang.blockj.base.crypto.MnemonicUtils;
+import org.rockyang.blockj.base.crypto.SecureRandomUtils;
 import org.rockyang.blockj.base.model.Account;
 import org.rockyang.blockj.base.model.Wallet;
 import org.rockyang.blockj.base.vo.JsonVo;
+import org.rockyang.blockj.base.vo.MnemonicWallet;
 import org.rockyang.blockj.service.AccountService;
 import org.rockyang.blockj.service.WalletService;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+
+import static org.rockyang.blockj.base.crypto.Hash.sha256;
 
 /**
  * @author yangjian
@@ -37,11 +41,20 @@ public class WalletController
         return new JsonVo<>(JsonVo.SUCCESS, wallet);
     }
 
-    @RequestMapping("/new/memo")
-    public JsonVo newMnemonicWallet()
+    @PostMapping("/new/mnemonic")
+    public JsonVo<MnemonicWallet> newMnemonicWallet(@RequestParam("password") String password) throws Exception
     {
+        byte[] initialEntropy = new byte[16];
+        SecureRandomUtils.secureRandom().nextBytes(initialEntropy);
 
-        throw new RuntimeException("Not implemented");
+        String mnemonic = MnemonicUtils.generateMnemonic(initialEntropy);
+        byte[] seed = MnemonicUtils.generateSeed(mnemonic, password);
+        ECKeyPair privateKey = ECKeyPair.create(sha256(seed));
+
+        Wallet wallet = new Wallet(privateKey);
+        walletService.addWallet(wallet);
+
+        return new JsonVo<>(JsonVo.SUCCESS, new MnemonicWallet(mnemonic, wallet));
     }
 
     @RequestMapping("/list")

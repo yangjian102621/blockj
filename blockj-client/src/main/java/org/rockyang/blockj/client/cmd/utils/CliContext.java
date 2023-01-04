@@ -10,116 +10,121 @@ import java.math.BigDecimal;
  */
 public class CliContext
 {
-	private String[] args;
-	private final CmdArgsParser parser;
+    private String[] args;
+    private final CmdArgsParser parser;
 
-	public CliContext(String[] args)
-	{
-		this.args = args;
-		this.parser = CmdArgsParser.getInstance(args);
-	}
+    public CliContext(String[] args)
+    {
+        this.args = args;
+        this.parser = CmdArgsParser.getInstance(args);
+    }
 
-	public String[] getArgs()
-	{
-		return args;
-	}
+    public String[] getArgs()
+    {
+        return args;
+    }
 
-	public void setArgs(String[] args)
-	{
-		this.args = args;
-	}
+    public void setArgs(String[] args)
+    {
+        this.args = args;
+    }
 
-	public String getArg(int index)
-	{
-		return parser.getArgs().get(index);
-	}
+    public String getArg(int index)
+    {
+        return getArgs()[index];
+    }
 
-	public String getOption(String key)
-	{
-		return parser.getOption(key);
-	}
+    public String getOption(String key)
+    {
+        return parser.getOption(key);
+    }
 
-	public String getOption(String key, String defaultValue)
-	{
-		return parser.getOption(key, defaultValue);
-	}
+    public String getOption(String key, String defaultValue)
+    {
+        return parser.getOption(key, defaultValue);
+    }
 
-	public Integer getInt(String key)
-	{
-		return parser.getIntOption(key);
-	}
+    public Integer getInt(String key)
+    {
+        return parser.getIntOption(key);
+    }
 
-	public Integer getIntArg(int index)
-	{
-		return Integer.parseInt(getArg(index));
-	}
+    public Integer getIntArg(int index)
+    {
+        return Integer.parseInt(getArg(index));
+    }
 
-	public Integer getInt(String key, Integer defaultValue)
-	{
-		return parser.getIntOption(key, defaultValue);
-	}
+    public Long getLongArg(int index)
+    {
+        return Long.parseLong(getArg(index));
+    }
 
-	public Boolean getBool(String key)
-	{
-		return parser.getBoolOption(key);
-	}
+    public Integer getInt(String key, Integer defaultValue)
+    {
+        return parser.getIntOption(key, defaultValue);
+    }
 
-	public Boolean getBoolArg(int index)
-	{
-		return Boolean.getBoolean(getArg(index));
-	}
+    public Boolean getBool(String key)
+    {
+        return parser.getBoolOption(key);
+    }
 
-	public Boolean getBool(String key, boolean defaultValue)
-	{
-		return parser.getBoolOption(key, defaultValue);
-	}
+    public Boolean getBoolArg(int index)
+    {
+        return Boolean.getBoolean(getArg(index));
+    }
 
-	public BigDecimal getBigDecimal(String key)
-	{
-		String option = getOption(key);
-		if (StringUtils.isBlank(option)) {
-			return null;
-		}
+    public Boolean getBool(String key, boolean defaultValue)
+    {
+        return parser.getBoolOption(key, defaultValue);
+    }
 
-		return BigDecimal.valueOf(Long.parseLong(option));
-	}
+    public BigDecimal getBigDecimal(String key)
+    {
+        String option = getOption(key);
+        if (StringUtils.isBlank(option)) {
+            return null;
+        }
 
-	public BigDecimal getBigDecimalArg(int index)
-	{
-		return BigDecimal.valueOf(Long.parseLong(getArg(index)));
-	}
+        return BigDecimal.valueOf(Long.parseLong(option));
+    }
 
-	public BigDecimal getBigDecimal(String key, BigDecimal defaultValue)
-	{
-		String option = getOption(key);
-		if (StringUtils.isBlank(option)) {
-			return defaultValue;
-		}
+    public BigDecimal getBigDecimalArg(int index)
+    {
+        return BigDecimal.valueOf(Long.parseLong(getArg(index)));
+    }
 
-		try {
-			return BigDecimal.valueOf(Long.parseLong(option));
-		} catch (Exception e) {
-			return defaultValue;
-		}
-	}
+    public BigDecimal getBigDecimal(String key, BigDecimal defaultValue)
+    {
+        String option = getOption(key);
+        if (StringUtils.isBlank(option)) {
+            return defaultValue;
+        }
 
-	public Long getLong(String key)
-	{
-		String option = getOption(key);
-		if (StringUtils.isBlank(option)) {
-			return null;
-		}
+        try {
+            return BigDecimal.valueOf(Long.parseLong(option));
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
 
-		return Long.valueOf(option);
-	}
+    public Long getLong(String key)
+    {
+        String option = getOption(key);
+        if (StringUtils.isBlank(option)) {
+            return null;
+        }
 
-	public Long getLong(String key, Long defaultValue)
-	{
-		String option = getOption(key);
-		if (StringUtils.isBlank(option)) {
-			return null;
-		}
+        return Long.valueOf(option);
+    }
 
-		return Long.valueOf(option);
-	}
+    public Long getLong(String key, Long defaultValue)
+    {
+        String option = getOption(key);
+        if (StringUtils.isBlank(option)) {
+            return null;
+        }
+
+        return Long.valueOf(option);
+    }
 }

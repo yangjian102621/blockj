@@ -1,7 +1,10 @@
 package org.rockyang.blockj.client;
 
 import org.rockyang.blockj.base.utils.CmdArgsParser;
-import org.rockyang.blockj.client.cmd.*;
+import org.rockyang.blockj.client.cmd.Chain;
+import org.rockyang.blockj.client.cmd.Command;
+import org.rockyang.blockj.client.cmd.Net;
+import org.rockyang.blockj.client.cmd.Wallet;
 import org.rockyang.blockj.client.cmd.utils.Printer;
 import org.rockyang.blockj.client.rpc.BlockService;
 import org.rockyang.blockj.client.rpc.impl.BlockServiceImpl;
@@ -32,7 +35,6 @@ public class BlockClient
         BlockService blockService = new BlockServiceImpl(api, debug);
         addCommand(new Chain(blockService));
         addCommand(new Wallet(blockService));
-        addCommand(new Send(blockService));
         addCommand(new Net(blockService));
         String[] args = parser.getArgs().toArray(new String[0]);
 

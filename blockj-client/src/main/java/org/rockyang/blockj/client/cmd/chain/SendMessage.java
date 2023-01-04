@@ -1,7 +1,8 @@
-package org.rockyang.blockj.client.cmd;
+package org.rockyang.blockj.client.cmd.chain;
 
 import org.apache.commons.lang3.StringUtils;
 import org.rockyang.blockj.base.vo.JsonVo;
+import org.rockyang.blockj.client.cmd.Command;
 import org.rockyang.blockj.client.cmd.utils.CliContext;
 import org.rockyang.blockj.client.rpc.BlockService;
 
@@ -10,13 +11,13 @@ import java.math.BigDecimal;
 /**
  * @author yangjian
  */
-public class Send extends Command
+public class SendMessage extends Command
 {
 
-    public Send(BlockService service)
+    public SendMessage(BlockService service)
     {
         this.name = "send";
-        this.fullName = "send";
+        this.fullName = "chain send";
         this.usage = "Send funds between accounts";
         this.argsUsage = "[targetAddress] [amount]";
         // 添加选项说明

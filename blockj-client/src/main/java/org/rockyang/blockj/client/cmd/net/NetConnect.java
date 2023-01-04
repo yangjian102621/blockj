@@ -21,6 +21,6 @@ public class NetConnect extends Command
     @Override
     public void action(CliContext context)
     {
-        // TODO: not implemented
+        throw new RuntimeException("Not implemented");
     }
 }

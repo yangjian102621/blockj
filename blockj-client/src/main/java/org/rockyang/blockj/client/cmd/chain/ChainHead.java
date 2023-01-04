@@ -14,6 +14,7 @@ public class ChainHead extends Command
     public ChainHead(BlockService service)
     {
         this.name = "head";
+        this.fullName = "chain head";
         this.argsUsage = "Print chain head";
         this.blockService = service;
     }

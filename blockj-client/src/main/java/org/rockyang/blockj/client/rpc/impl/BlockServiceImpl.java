@@ -3,10 +3,12 @@ package org.rockyang.blockj.client.rpc.impl;
 import com.alibaba.fastjson.JSON;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+import org.rockyang.blockj.base.model.Block;
 import org.rockyang.blockj.base.model.Message;
 import org.rockyang.blockj.base.model.Peer;
 import org.rockyang.blockj.base.model.Wallet;
 import org.rockyang.blockj.base.vo.JsonVo;
+import org.rockyang.blockj.base.vo.MnemonicWallet;
 import org.rockyang.blockj.client.exception.ApiError;
 import org.rockyang.blockj.client.exception.ApiException;
 import org.rockyang.blockj.client.rpc.BlockRpcService;
@@ -85,6 +87,11 @@ public class BlockServiceImpl implements BlockService
         return executeSync(rpcService.newWallet());
     }
 
+    public JsonVo<MnemonicWallet> newMnemonicWallet(String password)
+    {
+        return executeSync(rpcService.newMnemonicWallet(password));
+    }
+
     // get wallets list
     public JsonVo<List<Wallet>> walletList()
     {
@@ -116,6 +123,12 @@ public class BlockServiceImpl implements BlockService
     public JsonVo<Long> chainHead()
     {
         return executeSync(rpcService.chainHead());
+    }
+
+    @Override
+    public JsonVo<Block> getBlock(Long height)
+    {
+        return executeSync(rpcService.getBlock(height));
     }
 
     @Override

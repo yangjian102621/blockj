@@ -1,9 +1,11 @@
 package org.rockyang.blockj.client.rpc.impl;
 
+import org.rockyang.blockj.base.model.Block;
 import org.rockyang.blockj.base.model.Message;
 import org.rockyang.blockj.base.model.Peer;
 import org.rockyang.blockj.base.model.Wallet;
 import org.rockyang.blockj.base.vo.JsonVo;
+import org.rockyang.blockj.base.vo.MnemonicWallet;
 import org.rockyang.blockj.client.rpc.BlockService;
 
 import java.math.BigDecimal;
@@ -21,6 +23,12 @@ public class BlockServiceMock implements BlockService
     public JsonVo<Wallet> newWallet()
     {
         return new JsonVo<>(JsonVo.SUCCESS, new Wallet("t16oicympjfdwwtkzwve6pwgigdw3xbz76k4t66va", BigDecimal.ZERO));
+    }
+
+    @Override
+    public JsonVo<MnemonicWallet> newMnemonicWallet(String password)
+    {
+        return null;
     }
 
     @Override
@@ -71,6 +79,12 @@ public class BlockServiceMock implements BlockService
 
     @Override
     public JsonVo<String> netConnect(String peerAddress)
+    {
+        return null;
+    }
+
+    @Override
+    public JsonVo<Block> getBlock(Long height)
     {
         return null;
     }

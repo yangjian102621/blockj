@@ -1,6 +1,5 @@
 package org.rockyang.blockj.web.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.rockyang.blockj.base.model.Message;
 import org.rockyang.blockj.base.model.Wallet;
@@ -8,10 +7,7 @@ import org.rockyang.blockj.base.vo.JsonVo;
 import org.rockyang.blockj.chain.MessagePool;
 import org.rockyang.blockj.service.MessageService;
 import org.rockyang.blockj.service.WalletService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
@@ -37,10 +33,9 @@ public class MessageController
         this.walletService = walletService;
     }
 
-    @GetMapping("/get")
-    public JsonVo getMessage(@RequestBody JSONObject params)
+    @GetMapping("/get/{cid}")
+    public JsonVo getMessage(@PathVariable String cid)
     {
-        String cid = params.getString("cid");
         if (StringUtils.isBlank(cid)) {
             return new JsonVo(JsonVo.FAIL, "Must pass message cid");
         }
@@ -59,14 +54,14 @@ public class MessageController
         }
     }
 
-    @GetMapping("/send")
-    public JsonVo sendMessage(@RequestBody JSONObject params) throws Exception
+    @PostMapping("/send")
+    public JsonVo sendMessage(
+            @RequestParam("from") String from,
+            @RequestParam("to") String to,
+            @RequestParam("value") BigDecimal value,
+            @RequestParam(value = "param", required = false) String param
+    ) throws Exception
     {
-        String from = params.getString("from");
-        String to = params.getString("to");
-        BigDecimal value = params.getBigDecimal("amount");
-        String data = params.getString("param");
-
         // 如果没有传入 from 地址，则使用默认的钱包地址
         if (StringUtils.isBlank(from)) {
             Wallet defaultWallet = walletService.getDefaultWallet();
@@ -84,7 +79,7 @@ public class MessageController
             return new JsonVo(JsonVo.FAIL, "the value of send amount must > 0");
         }
 
-        String cid = messageService.sendMessage(from, to, value, data);
+        String cid = messageService.sendMessage(from, to, value, param);
         return new JsonVo<>(JsonVo.SUCCESS, "", cid);
     }
 }

@@ -14,77 +14,82 @@ import java.security.NoSuchProviderException;
  *
  * @author yangjian
  */
-public class Wallet implements Serializable {
+public class Wallet implements Serializable
+{
 
-	private String address;
-	private String pubKey;
-	private String priKey;
-	private BigDecimal balance;
-	private long messageNonce;
+    private String address;
+    private String pubKey;
+    private String priKey;
+    private BigDecimal balance;
+    private long messageNonce;
 
-	public Wallet() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
-	{
-		ECKeyPair keyPair = Keys.createEcKeyPair();
-		this.priKey = keyPair.exportPrivateKey();
-		this.pubKey = Keys.publicKeyEncode(keyPair.getPublicKey().getEncoded());
-		this.address = keyPair.getAddress();
-		this.balance = BigDecimal.ZERO;
-		this.messageNonce = 0;
-	}
+    public Wallet() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException
+    {
+        this(Keys.createEcKeyPair());
+    }
 
-	public Wallet(String address, BigDecimal balance)
-	{
-		this.address = address;
-		this.balance = balance;
-	}
+    public Wallet(ECKeyPair keyPair)
+    {
+        this.priKey = keyPair.exportPrivateKey();
+        this.pubKey = Keys.publicKeyEncode(keyPair.getPublicKey().getEncoded());
+        this.address = keyPair.getAddress();
+        this.balance = BigDecimal.ZERO;
+        this.messageNonce = 0;
+    }
 
-	public String getAddress()
-	{
-		return address;
-	}
+    public Wallet(String address, BigDecimal balance)
+    {
+        this.address = address;
+        this.balance = balance;
+    }
 
-	public void setAddress(String address)
-	{
-		this.address = address;
-	}
+    public String getAddress()
+    {
+        return address;
+    }
 
-	public String getPubKey()
-	{
-		return pubKey;
-	}
+    public void setAddress(String address)
+    {
+        this.address = address;
+    }
 
-	public void setPubKey(String pubKey)
-	{
-		this.pubKey = pubKey;
-	}
+    public String getPubKey()
+    {
+        return pubKey;
+    }
 
-	public String getPriKey()
-	{
-		return priKey;
-	}
+    public void setPubKey(String pubKey)
+    {
+        this.pubKey = pubKey;
+    }
 
-	public void setPriKey(String priKey)
-	{
-		this.priKey = priKey;
-	}
+    public String getPriKey()
+    {
+        return priKey;
+    }
 
-	public BigDecimal getBalance()
-	{
-		return balance;
-	}
+    public void setPriKey(String priKey)
+    {
+        this.priKey = priKey;
+    }
 
-	public void setBalance(BigDecimal balance)
-	{
-		this.balance = balance;
-	}
+    public BigDecimal getBalance()
+    {
+        return balance;
+    }
 
-	public long getMessageNonce()
-	{
-		return messageNonce;
-	}
+    public void setBalance(BigDecimal balance)
+    {
+        this.balance = balance;
+    }
 
-	public void setMessageNonce(long messageNonce)
-	{
-		this.messageNonce = messageNonce;
-	}
+    public long getMessageNonce()
+    {
+        return messageNonce;
+    }
+
+    public void setMessageNonce(long messageNonce)
+    {
+        this.messageNonce = messageNonce;
+    }
 }
