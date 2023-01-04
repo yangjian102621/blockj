@@ -16,7 +16,7 @@ public class Wallet extends Command
     {
         this.name = "wallet";
         this.fullName = "wallet";
-        this.desc = "Manage wallet";
+        this.usage = "Manage wallet";
         this.blockService = service;
         this.addCommand(new WalletNew(service));
         this.addCommand(new WalletList(service));

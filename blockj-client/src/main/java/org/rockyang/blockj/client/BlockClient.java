@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * blockj client main class
+ * client application main class
  *
  * @author yangjian
  */
@@ -64,7 +64,7 @@ public class BlockClient
         System.out.println("VERSION:");
         Printer.printTabLine("%s\n\n", VERSION);
         System.out.println("COMMANDS:");
-        commands.forEach((key, command) -> Printer.printTabLine("%-10s  %s\n", command.getName(), command.getDesc()));
+        commands.forEach((key, command) -> Printer.printTabLine("%-10s  %s\n", command.getName(), command.getUsage()));
         System.out.println();
         System.out.println("OPTIONS:");
         Printer.printTabLine("%-10s %s\n", "--api", "blockchain backend api url (default: http://127.0.0.1:8001)");

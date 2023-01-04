@@ -16,8 +16,8 @@ public class WalletBalance extends Command
     {
         this.name = "balance";
         this.fullName = "wallet balance";
-        this.desc = "Get account balance";
-        this.usage = "[address]";
+        this.usage = "Get account balance";
+        this.argsUsage = "[address]";
         this.blockService = service;
     }
 

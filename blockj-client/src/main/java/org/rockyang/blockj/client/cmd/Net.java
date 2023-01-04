@@ -16,7 +16,7 @@ public class Net extends Command
     {
         this.name = "net";
         this.fullName = "net";
-        this.desc = "Manage P2P Network";
+        this.usage = "Manage P2P Network";
         this.blockService = service;
         this.addCommand(new NetPeers(service));
         this.addCommand(new NetListen(service));

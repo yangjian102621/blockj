@@ -7,18 +7,19 @@ import org.rockyang.blockj.client.rpc.BlockService;
 /**
  * @author yangjian
  */
-public class NetListen extends Command {
+public class NetListen extends Command
+{
 
-	public NetListen(BlockService service)
-	{
-		this.name = "listen";
-		this.usage = "List listen addresses";
-		this.blockService = service;
-	}
+    public NetListen(BlockService service)
+    {
+        this.name = "listen";
+        this.argsUsage = "List listen addresses";
+        this.blockService = service;
+    }
 
-	@Override
-	public void action(CliContext context)
-	{
-		// TODO: not implemented
-	}
+    @Override
+    public void action(CliContext context)
+    {
+        // TODO: not implemented
+    }
 }

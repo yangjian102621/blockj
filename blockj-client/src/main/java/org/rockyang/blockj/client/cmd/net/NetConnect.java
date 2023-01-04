@@ -7,18 +7,19 @@ import org.rockyang.blockj.client.rpc.BlockService;
 /**
  * @author yangjian
  */
-public class NetConnect extends Command {
+public class NetConnect extends Command
+{
 
-	public NetConnect(BlockService service)
-	{
-		this.name = "connect";
-		this.usage = "Connect to a peer";
-		this.blockService = service;
-	}
+    public NetConnect(BlockService service)
+    {
+        this.name = "connect";
+        this.argsUsage = "Connect to a peer";
+        this.blockService = service;
+    }
 
-	@Override
-	public void action(CliContext context)
-	{
-		// TODO: not implemented
-	}
+    @Override
+    public void action(CliContext context)
+    {
+        // TODO: not implemented
+    }
 }

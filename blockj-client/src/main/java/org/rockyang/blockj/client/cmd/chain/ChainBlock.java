@@ -7,18 +7,19 @@ import org.rockyang.blockj.client.rpc.BlockService;
 /**
  * @author yangjian
  */
-public class ChainBlock extends Command {
+public class ChainBlock extends Command
+{
 
-	public ChainBlock(BlockService service)
-	{
-		this.name = "getblock";
-		this.usage = "Get a block and print its details";
-		this.blockService = service;
-	}
+    public ChainBlock(BlockService service)
+    {
+        this.name = "getblock";
+        this.argsUsage = "Get a block and print its details";
+        this.blockService = service;
+    }
 
-	@Override
-	public void action(CliContext context)
-	{
-		// TODO: not implemented
-	}
+    @Override
+    public void action(CliContext context)
+    {
+        // TODO: not implemented
+    }
 }

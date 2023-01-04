@@ -15,42 +15,45 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/chain")
-public class ChainController {
-	private final BlockService blockService;
+public class ChainController
+{
+    private final BlockService blockService;
 
-	public ChainController(BlockService blockService)
-	{
-		this.blockService = blockService;
-	}
+    public ChainController(BlockService blockService)
+    {
+        this.blockService = blockService;
+    }
 
-	@GetMapping("/head")
-	public JsonVo head()
-	{
-		long head = blockService.chainHead();
-		if (head < 0) {
-			return JsonVo.fail().setMessage("Invalid chain head found");
-		}
+    @GetMapping("/head")
+    public JsonVo head()
+    {
+        long head = blockService.chainHead();
+        if (head < 0) {
+            return new JsonVo(JsonVo.FAIL, "Invalid chain head found");
+        }
 
-		return JsonVo.success().setData(head);
-	}
+        return new JsonVo<>(JsonVo.SUCCESS, head);
+    }
 
-	@GetMapping("/block/get")
-	public JsonVo getBlock(@RequestBody JSONObject params)
-	{
-		Block block;
-		String hash = params.getString("hash");
-		if (!StringUtils.isEmpty(hash)) {
-			block = blockService.getBlock(hash);
-		} else {
-			long height = params.getLongValue("height");
-			if (height <= 0) {
-				return JsonVo.fail().setMessage("Invalid block height");
-			}
-			block = blockService.getBlockByHeight(height);
-		}
-		if (block == null) {
-			return JsonVo.fail().setMessage("Block not found");
-		}
-		return JsonVo.success().setData(block);
-	}
+    @GetMapping("/block/get")
+    public JsonVo getBlock(@RequestBody JSONObject params)
+    {
+        Block block;
+        String hash = params.getString("hash");
+        if (!StringUtils.isEmpty(hash)) {
+            block = blockService.getBlock(hash);
+        } else {
+            long height = params.getLongValue("height");
+            if (height <= 0) {
+                return new JsonVo(JsonVo.FAIL, "Invalid block height");
+            }
+            block = blockService.getBlockByHeight(height);
+        }
+
+        if (block == null) {
+            return new JsonVo(JsonVo.FAIL, "Block not found");
+        }
+
+        return new JsonVo<>(JsonVo.SUCCESS, block);
+    }
 }

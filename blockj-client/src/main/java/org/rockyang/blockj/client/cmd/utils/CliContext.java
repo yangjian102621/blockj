@@ -8,7 +8,8 @@ import java.math.BigDecimal;
 /**
  * @author yangjian
  */
-public class CliContext {
+public class CliContext
+{
 	private String[] args;
 	private final CmdArgsParser parser;
 
@@ -48,6 +49,11 @@ public class CliContext {
 		return parser.getIntOption(key);
 	}
 
+	public Integer getIntArg(int index)
+	{
+		return Integer.parseInt(getArg(index));
+	}
+
 	public Integer getInt(String key, Integer defaultValue)
 	{
 		return parser.getIntOption(key, defaultValue);
@@ -56,6 +62,11 @@ public class CliContext {
 	public Boolean getBool(String key)
 	{
 		return parser.getBoolOption(key);
+	}
+
+	public Boolean getBoolArg(int index)
+	{
+		return Boolean.getBoolean(getArg(index));
 	}
 
 	public Boolean getBool(String key, boolean defaultValue)
@@ -70,7 +81,12 @@ public class CliContext {
 			return null;
 		}
 
-		return BigDecimal.valueOf(Long.valueOf(option));
+		return BigDecimal.valueOf(Long.parseLong(option));
+	}
+
+	public BigDecimal getBigDecimalArg(int index)
+	{
+		return BigDecimal.valueOf(Long.parseLong(getArg(index)));
 	}
 
 	public BigDecimal getBigDecimal(String key, BigDecimal defaultValue)
@@ -81,7 +97,7 @@ public class CliContext {
 		}
 
 		try {
-			return BigDecimal.valueOf(Long.valueOf(option));
+			return BigDecimal.valueOf(Long.parseLong(option));
 		} catch (Exception e) {
 			return defaultValue;
 		}

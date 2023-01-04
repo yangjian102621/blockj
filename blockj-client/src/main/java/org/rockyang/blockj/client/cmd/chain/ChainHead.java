@@ -7,19 +7,20 @@ import org.rockyang.blockj.client.rpc.BlockService;
 /**
  * @author yangjian
  */
-public class ChainHead extends Command {
+public class ChainHead extends Command
+{
 
-	public ChainHead(BlockService service)
-	{
-		this.name = "head";
-		this.usage = "Print chain head";
-		this.blockService = service;
-	}
+    public ChainHead(BlockService service)
+    {
+        this.name = "head";
+        this.argsUsage = "Print chain head";
+        this.blockService = service;
+    }
 
-	@Override
-	public void action(CliContext context)
-	{
-		Long head = blockService.chainHead();
-		System.out.println(head);
-	}
+    @Override
+    public void action(CliContext context)
+    {
+        Long head = blockService.chainHead();
+        System.out.println(head);
+    }
 }

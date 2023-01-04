@@ -16,8 +16,8 @@ public class WalletList extends Command
     public WalletList(BlockService service)
     {
         this.name = "list";
-        this.desc = "List wallet address";
-        this.usage = "wallet list";
+        this.usage = "List wallet address";
+        this.argsUsage = "wallet list";
         this.blockService = service;
     }
 

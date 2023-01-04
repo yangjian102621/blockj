@@ -14,7 +14,7 @@ public class Chain extends Command
     {
         this.name = "chain";
         this.fullName = "chain";
-        this.desc = "Interact with blockchain";
+        this.usage = "Interact with blockchain";
         this.blockService = service;
         this.addCommand(new ChainHead(service));
     }

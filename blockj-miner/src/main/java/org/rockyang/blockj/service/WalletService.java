@@ -7,24 +7,25 @@ import java.util.List;
 /**
  * @author yangjian
  */
-public interface WalletService {
-	String WALLET_PREFIX = "/wallets/";
-	String MINER_ADDR_KEY = "/wallet/miner";
-	String DEFAULT_ADDR_KEY = "/wallet/default";
+public interface WalletService
+{
+    String WALLET_PREFIX = "/wallets/";
+    String MINER_ADDR_KEY = "/wallet/miner";
+    String DEFAULT_ADDR_KEY = "/wallet/default";
 
-	boolean addWallet(Wallet wallet);
+    boolean addWallet(Wallet wallet);
 
-	List<Wallet> getWallets();
+    List<Wallet> getWallets();
 
-	Wallet getWallet(String address);
+    Wallet getWallet(String address);
 
-	Wallet getMinerWallet();
+    Wallet getMinerWallet();
 
-	boolean setMinerWallet(Wallet wallet);
+    boolean setMinerWallet(Wallet wallet);
 
-	String getDefaultWallet();
+    Wallet getDefaultWallet();
 
-	boolean setDefaultWallet(String address);
+    boolean setDefaultWallet(String address);
 
-	boolean deleteWallet(String address);
+    boolean deleteWallet(String address);
 }

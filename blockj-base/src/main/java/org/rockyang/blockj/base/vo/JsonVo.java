@@ -8,96 +8,87 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * @author yangjian
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class JsonVo<T> {
+public class JsonVo<T>
+{
 
-	// version
-	private int version = 1;
-	// status code
-	private CodeEnum code;
-	// error message
-	private String message;
-	private T data;
+    public static final int SUCCESS = 0;
+    public static final int FAIL = 1;
+    // version
+    private int version = 1;
+    // status code
+    private int code;
+    // error message
+    private String message;
+    private T data;
 
-	public JsonVo()
-	{
-	}
+    public JsonVo()
+    {
+    }
 
-	public JsonVo(CodeEnum code, T data)
-	{
-		this.code = code;
-		this.message = code.getKey();
-		this.data = data;
-	}
+    public JsonVo(int code, T data)
+    {
+        this.code = code;
+        this.data = data;
+    }
 
-	public JsonVo(CodeEnum code, String message, T data)
-	{
-		this.code = code;
-		this.message = message;
-		this.data = data;
-	}
+    public JsonVo(int code, String message, T data)
+    {
+        this.code = code;
+        this.message = message;
+        this.data = data;
+    }
 
-	public JsonVo(CodeEnum code, String message)
-	{
-		this.code = code;
-		this.message = message;
-	}
+    public JsonVo(int code, String message)
+    {
+        this.code = code;
+        this.message = message;
+    }
 
-	public static JsonVo success()
-	{
-		return new JsonVo(CodeEnum.SUCCESS, null);
-	}
+    public int getCode()
+    {
+        return code;
+    }
 
-	public static JsonVo fail()
-	{
-		return new JsonVo(CodeEnum.FAIL, null);
-	}
+    public void setCode(int code)
+    {
+        this.code = code;
+    }
 
-	public CodeEnum getCode()
-	{
-		return code;
-	}
+    public String getMessage()
+    {
+        return message;
+    }
 
-	public JsonVo setCode(CodeEnum code)
-	{
-		this.code = code;
-		return this;
-	}
+    public JsonVo setMessage(String message)
+    {
+        this.message = message;
+        return this;
+    }
 
-	public String getMessage()
-	{
-		return message;
-	}
+    public int getVersion()
+    {
+        return version;
+    }
 
-	public JsonVo setMessage(String message)
-	{
-		this.message = message;
-		return this;
-	}
+    public JsonVo setVersion(int version)
+    {
+        this.version = version;
+        return this;
+    }
 
-	public int getVersion()
-	{
-		return version;
-	}
+    public T getData()
+    {
+        return data;
+    }
 
-	public JsonVo setVersion(int version)
-	{
-		this.version = version;
-		return this;
-	}
+    public JsonVo setData(T data)
+    {
+        this.data = data;
+        return this;
+    }
 
-	public T getData()
-	{
-		return data;
-	}
-
-	public JsonVo setData(T data)
-	{
-		this.data = data;
-		return this;
-	}
-
-	public boolean isOK()
-	{
-		return code.equals(CodeEnum.SUCCESS);
-	}
+    public boolean isOK()
+    {
+        return code == SUCCESS;
+    }
 }

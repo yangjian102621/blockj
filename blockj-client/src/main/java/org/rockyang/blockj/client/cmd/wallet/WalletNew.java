@@ -13,7 +13,7 @@ public class WalletNew extends Command
     public WalletNew(BlockService service)
     {
         this.name = "new";
-        this.desc = "Generate a new key";
+        this.usage = "Generate a new key";
         this.blockService = service;
     }
 

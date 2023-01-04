@@ -7,18 +7,19 @@ import org.rockyang.blockj.client.rpc.BlockService;
 /**
  * @author yangjian
  */
-public class NetPeers extends Command {
+public class NetPeers extends Command
+{
 
-	public NetPeers(BlockService service)
-	{
-		this.name = "peers";
-		this.usage = "Print peers";
-		this.blockService = service;
-	}
+    public NetPeers(BlockService service)
+    {
+        this.name = "peers";
+        this.argsUsage = "Print peers";
+        this.blockService = service;
+    }
 
-	@Override
-	public void action(CliContext context)
-	{
-		// TODO: not implemented
-	}
+    @Override
+    public void action(CliContext context)
+    {
+        // TODO: not implemented
+    }
 }

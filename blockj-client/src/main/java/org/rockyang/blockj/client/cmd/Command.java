@@ -22,9 +22,9 @@ public abstract class Command
     protected String name;
     protected String fullName;
     // command description
-    protected String desc;
-    // command usage
     protected String usage;
+    // command usage
+    protected String argsUsage;
     // command options
     protected Map<String, String> options = new HashMap<>();
     protected Map<String, Command> subCommands = new HashMap<>(8);
@@ -69,17 +69,17 @@ public abstract class Command
     public void showHelp()
     {
         System.out.println("NAME:");
-        Printer.printTabLine("%s%s - %s\n\n", BlockClient.ROOT_CMD, fullName, desc);
+        Printer.printTabLine("%s%s - %s\n\n", BlockClient.ROOT_CMD, fullName, usage);
         System.out.println("USAGE:");
-        if (StringUtils.isBlank(usage)) {
+        if (StringUtils.isBlank(argsUsage)) {
             Printer.printTabLine("%s%s [command options] [arguments...]\n\n", BlockClient.ROOT_CMD, fullName);
         } else {
-            Printer.printTabLine("%s%s %s\n\n", BlockClient.ROOT_CMD, fullName, usage);
+            Printer.printTabLine("%s%s %s\n\n", BlockClient.ROOT_CMD, fullName, argsUsage);
         }
 
         if (subCommands.size() > 0) {
             System.out.println("COMMANDS:");
-            subCommands.forEach((key, cmd) -> Printer.printTabLine("%-10s %s\n", key, cmd.getDesc()));
+            subCommands.forEach((key, cmd) -> Printer.printTabLine("%-10s %s\n", key, cmd.getUsage()));
             System.out.println();
         }
 
@@ -98,14 +98,14 @@ public abstract class Command
         return name;
     }
 
+    public String getArgsUsage()
+    {
+        return argsUsage;
+    }
+
     public String getUsage()
     {
         return usage;
-    }
-
-    public String getDesc()
-    {
-        return desc;
     }
 
     public void addCommand(Command command)
